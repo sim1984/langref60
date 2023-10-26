@@ -5787,12 +5787,28 @@ DSQL, ESQL, PSQL
 .Синтаксис
 [listing,subs="+quotes,attributes"]
 ----
-EXECUTE PROCEDURE _procname_
-   [{ <inparam-list> | ( <inparam-list> ) }]
+<execute procedure> ::=
+    EXECUTE PROCEDURE [<package name> .] <procedure name>
+    [{ (<arguments>) | <arguments> }]
    [RETURNING_VALUES { <outvar-list> | ( <outvar-list> ) }]                
                 
-<inparam-list> ::=
-  <inparam> [, <inparam> ...]
+<arguments> ::=
+    <positional arguments> |
+    [ {<positional arguments>,} ] <named arguments>
+
+<positional arguments> ::=
+    <value or default> [ {, <value or default>}... ]
+
+<named arguments> ::=
+    <named argument> [ {, <named argument>}... ]
+
+<named argument> ::=
+    <argument name> => <value or default>
+
+
+<value or default> ::=
+    <value> |
+    DEFAULT
 
 <outvar-list> ::=
   <outvar> [, <outvar> ...]
@@ -5807,11 +5823,14 @@ EXECUTE PROCEDURE _procname_
 ^| Параметр
 ^| Описание
 
-|procname
+|package name
+|Имя пакета.
+
+|procedure name
 |Имя хранимой процедуры.
 
-|inparam
-|Выражение совместимое по типу с входным параметром хранимой процедуры.
+|argument name
+|Имя входного аргумента.
 
 |varname
 |PSQL переменная, в которую возвращается значение выходного параметра процедуры.
@@ -5819,6 +5838,19 @@ EXECUTE PROCEDURE _procname_
 
 Оператор `EXECUTE PROCEDURE` выполняет хранимую процедуру, получая список из одного или нескольких входных параметров,
 если они определены, и возвращает однострочный набор значений, если он определён.
+
+Список входных аргументов может использовать как позиционные, так и неименованные аргументы.
+
+Именованные аргументы позволяют указывать аргументы процедур по их именам, а не только по их позициям.
+
+Это особенно полезно, когда у подпрограммы много параметров и вы хотите указать их в произвольном порядке или не указывать некоторые из них, имеющие значения по умолчанию.
+
+Согласно позиционному синтаксису, в вызове процедуры должны присутствовать все аргументы, если у них не указано значение по умолчанию. 
+Пропускать аргументы со значением по умолчанию в позиционном синтаксисе, можно только если эти аргументы находятся в конце списка.
+
+Вызов может использовать позиционные, именованные или смешанные аргументы.
+
+Если для аргумента функции существует значение по умолчанию, то вместо указания значения этого аргумента можно использовать ключевое слово `DEFAULT`, в этом случае аргумент будет инициализирован значением по умолчанию.
 
 [[fblangref-dml-execproc-executable]]
 === "Выполняемые" хранимые процедуры
@@ -5840,7 +5872,7 @@ EXECUTE PROCEDURE _procname_
 * Предложение `RETURNING_VALUES` доступно только в PSQL.
 ====
 
-.Использование оператора `EXECUTE PROCEDURE` в PSQL
+.Использование оператора `EXECUTE PROCEDURE` с позиционными аргументами
 [example]
 ====
 [source,sql]
@@ -5859,9 +5891,30 @@ EXECUTE PROCEDURE MakeFullName
    ('Mr./Mrs. ' || First_Name, Middle_Name, upper(Last_Name))
 RETURNING_VALUES FullName;
 ----
+
+В DSQL параметры могут быть только неименованными, то есть с использованием подстановочного символа `?`.
+Использолвание RETURNING_VALUES в DSQL запрещено.
+
+[source,sql]
+----
+EXECUTE PROCEDURE MakeFullName(?, ?, ?)
+----
+
+Вы можете указать ключевое слово `DEFAULT`, если для параметра задано начение по умолчанию.
+
+[source,sql]
+----
+EXECUTE PROCEDURE MakeFullName(?, DEFAULT, ?)
+----
+
+[source,sql]
+----
+EXECUTE PROCEDURE MakeFullName(:First_Name, DEFAULT, :Last_Name)
+RETURNING_VALUES :FullName;
+----
 ====
 
-.Вызов оператора `EXECUTE PROCEDURE` в [app]``isql``
+.Вызов оператора `EXECUTE PROCEDURE` в `isql`
 [example]
 ====
 [source,sql]
@@ -5870,6 +5923,91 @@ EXECUTE PROCEDURE MakeFullName
   'J', 'Edgar', 'Hoover';
 ----
 ====
+
+.Использование оператора `EXECUTE PROCEDURE` с именованными аргументами
+[example]
+====
+[source,sql]
+----
+execute procedure insert_customer (
+  last_name => 'SCHUMACHER',
+  first_name => 'MICHAEL')
+----
+
+Вызов в PSQL с параметрами:
+
+[source,sql]
+----
+execute procedure insert_customer (
+  last_name => :LastName,
+  first_name => :FirstName)
+----
+
+Вызов в DSQL с параметрами:
+
+[source,sql]
+----
+execute procedure insert_customer (
+  last_name => ?,
+  first_name => ?)
+----
+
+Вы можете указать ключевое слово `DEFAULT`, если для параметра задано начение по умолчанию.
+
+[source,sql]
+----
+execute procedure insert_customer (
+  last_name => ?,
+  first_name => DEFAULT,
+  middle_name => ?)
+----
+====
+
+.Использование оператора `EXECUTE PROCEDURE` со смешанными аргументами
+[example]
+====
+[source,sql]
+----
+execute procedure insert_customer (
+  ?,
+  first_name => DEFAULT,
+  middle_name => ?)
+----
+====
+
+[[fblangref-dml-callproc]]
+== `CALL`
+
+.Назначение
+Выполнение хранимой процедуры.
+(((CALL)))
+
+.Доступно в
+DSQL, ESQL, PSQL
+
+.Синтаксис
+[listing,subs="+quotes,macros"]
+----
+<call statement> ::=
+    CALL [<package name> .] <procedure name> (<arguments>)
+
+<arguments> ::=
+    <positional arguments> |
+    [ {<positional arguments>,} ] <named arguments>
+
+<positional arguments> ::=
+    <value or default> [ {, <value or default>}... ]
+
+<named arguments> ::=
+    <named argument> [ {, <named argument>}... ]
+
+<named argument> ::=
+    <argument name> => <value or default>
+
+<value or default> ::=
+    <value> |
+    DEFAULT
+----
 
 [[fblangref-dml-execblock]]
 == `EXECUTE BLOCK`
