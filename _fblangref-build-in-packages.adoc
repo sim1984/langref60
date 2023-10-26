@@ -677,6 +677,105 @@ select pstat.*
            pstat.record_source_id;
 ----
 
+[[fblangref-build-in-packages-sql-pkg]]
+== Пакет `RDB$SQL`
+
+(((RDB$SQL)))
+Пакет `RDB$SQL` содержит процедуры и функции для получения различной информации о переданном SQL запросе.
+
+[[fblangref-build-in-packages-sql-explain]]
+=== Процедура `RDB$SQL.EXPLAIN`
+
+Процедура `RDB$SQL.EXPLAIN` возвращает расширенный (explain) план переданного SQL запроса в разрезе источников данных.
+
+.Входные параметры процедуры `RDB$SQL.EXPLAIN`
+[cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
+|===
+^| Параметр
+^| Тип
+^| Описание
+
+|SQL
+|`BLOB SUB_TYPE TEXT`
+|Текст SQL запроса.
+|===
+
+.Выходные параметры процедуры `RDB$SQL.EXPLAIN`
+[cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
+|===
+^| Параметр
+^| Тип
+^| Описание
+
+|PLAN_LINE
+|`INTEGER`
+|Номер строки плана.
+
+|RECORD_SOURCE_ID
+|`BIGINT`
+|Идентификатор источника данных.
+
+|PARENT_RECORD_SOURCE_ID
+|`BIGINT`
+|Идентификатор родительского источника данных.
+
+|LEVEL
+|`INTEGER`
+|Уровень отступа для источника данных. 
+Необходим при конструировании подробного плана в виде единой строки.
+
+|OBJECT_TYPE
+|`SMALLINT`
+|Тип объекта метаданных:
+
+`0` -- таблица; +
+`5` -- хранимая процедура.
+
+|PACKAGE_NAME
+|`CHAR(63)`
+|Наименование пакета. Отображается если источником данных выступает хранимая процедура пакета.
+
+|OBJECT_NAME
+|`CHAR(63)`
+|Наименование объекта метаданных.
+
+|ALIAS
+|`CHAR(63)`
+|Псевдоним объекта метаданных.
+
+|CARDINALITY
+|`DOUBLE PRECISION`
+|Кардинальность (мощность) источника данных.
+
+|RECORD_LENGTH
+|`INTEGER`
+|Длина записи в байтах.
+
+|KEY_LENGTH
+|`INTEGER`
+|Длина ключа в байтах.
+
+|ACCESS_PATH
+|`BLOB SUB_TYPE TEXT`
+|Описание метода доступа, используемое источником данных.
+|===
+
+
+.Использование процедуры `RDB$SQL.EXPLAIN`
+====
+[source,sql]
+----
+SELECT *
+FROM RDB$SQL.EXPLAIN(Q'{
+  SELECT *
+  FROM HORSE
+    JOIN COLOR ON COLOR.CODE_COLOR = HORSE.CODE_COLOR
+    JOIN BREED ON BREED.CODE_BREED = HORSE.CODE_BREED
+  WHERE HORSE.CODE_DEPARTURE = ?
+}')
+----
+====
+
 [[fblangref-build-in-packages-time-zone-util-pkg]]
 == Пакет `RDB$TIME_ZONE_UTIL`
 
@@ -684,7 +783,7 @@ select pstat.*
 Пакет `RDB$TIME_ZONE_UTIL` содержит процедуры и функции для работы с часовыми поясами.
 
 [[fblangref-build-in-packages-time-zone-util-version]]
-=== Функция `RDB$TIME_ZONE_UTIL.DATABASE_VERSION()`
+=== Функция `RDB$TIME_ZONE_UTIL.DATABASE_VERSION`
 
 Функция `RDB$TIME_ZONE_UTIL.DATABASE_VERSION` возвращает версию базы данных часовых поясов (из библиотеки icu).
 
@@ -710,10 +809,9 @@ DATABASE_VERSION
 ====
 
 [[fblangref-build-in-packages-timezone-zone-util-transitions]]
-=== Процедура `RDB$TIME_ZONE_UTIL.TRANSITIONS()`
+=== Процедура `RDB$TIME_ZONE_UTIL.TRANSITIONS`
 
 Процедура `RDB$TIME_ZONE_UTIL.TRANSITIONS` возвращает набор правил для часового пояса между начальной и конечной временной меткой.
-
 
 .Входные параметры процедуры `RDB$TIME_ZONE_UTIL.TRANSITIONS`
 [cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
