@@ -5616,7 +5616,7 @@ MERGE
 ====
 
 [[fblangref-dml-merge-examples]]
-=== `Примеры`
+=== Примеры
 
 .Простые операторы `MERGE`
 [example]
@@ -5850,7 +5850,7 @@ DSQL, ESQL, PSQL
 
 Вызов может использовать позиционные, именованные или смешанные аргументы.
 
-Если для аргумента функции существует значение по умолчанию, то вместо указания значения этого аргумента можно использовать ключевое слово `DEFAULT`, в этом случае аргумент будет инициализирован значением по умолчанию.
+Если для аргумента процедуры существует значение по умолчанию, то вместо указания значения этого аргумента можно использовать ключевое слово `DEFAULT`, в этом случае аргумент будет инициализирован значением по умолчанию.
 
 [[fblangref-dml-execproc-executable]]
 === "Выполняемые" хранимые процедуры
@@ -5975,6 +5975,8 @@ execute procedure insert_customer (
 ----
 ====
 
+Смотри также: <<fblangref-dml-callproc>>.
+
 [[fblangref-dml-callproc]]
 == `CALL`
 
@@ -6008,6 +6010,117 @@ DSQL, ESQL, PSQL
     <value> |
     DEFAULT
 ----
+
+[[fblangref-dml-tbl-callproc]]
+.Параметры оператора `CALL`
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|package name
+|Имя пакета.
+
+|procedure name
+|Имя хранимой процедуры.
+
+|argument name
+|Имя входного аргумента.
+|===
+
+Оператор `CALL` вызывает хранимую процедуру. Оператор `CALL` аналогичен оператору `EXECUTE PROCEDURE`, 
+но позволяет вызывающей стороне получить определенные выходные параметры или не получить ни одного.
+
+При использовании позиционной или смешанной передачи параметров выходные параметры следуют за входными.
+
+При передаче NULL в выходные параметры они игнорируются, а в случае DSQL даже не возвращаются.
+
+В DSQL входные и выходные параметры указываются с помощью `?`, а в PSQL – с помощью целевых переменных или параметров.
+
+Если для входного аргумента процедуры существует значение по умолчанию, то вместо указания значения этого аргумента можно использовать ключевое слово `DEFAULT`, в этом случае аргумент будет инициализирован значением по умолчанию.
+
+.Использование оператора `CALL` 
+[example]
+====
+[source,sql]
+----
+create or alter procedure insert_customer (
+    last_name varchar(30),
+    first_name varchar(30)
+) returns (
+    id integer,
+    full_name varchar(62)
+)
+as
+begin
+    insert into customers (last_name, first_name)
+        values (:last_name, :first_name)
+        returning id, last_name || ', ' || first_name
+        into :id, :full_name;
+end
+----
+
+[source,sql]
+----
+-- не все выходные операторы требуются
+call insert_customer(
+    'LECLERC',
+    'CHARLES',
+    ?)
+----
+
+[source,sql]
+----
+-- Первый выходной параметр игноируется (используется NULL) и возвращается второй.
+call insert_customer(
+    'LECLERC',
+    'CHARLES',
+    null,
+    ?)
+----
+
+[source,sql]
+----
+-- Игнорируется выходной параметр ID.
+call insert_customer(
+    'LECLERC',
+    'CHARLES',
+    full_name => ?)
+----
+
+[source,sql]
+----
+-- Передача входных и возврат выходных параметров с использованием именованных аргументов.
+call insert_customer(
+    last_name => 'LECLERC',
+    first_name => 'CHARLES',
+    last_name => ?,
+    id => ?)
+----
+
+[source,sql]
+----
+-- использование оператора call в PSQL.
+
+create or alter procedure do_something_and_insert_customer returns (
+    out_id integer,
+    out_full_name varchar(62)
+)
+as
+    declare last_name varchar(30);
+    declare first_name varchar(30);
+begin
+    call insert_customer(
+        last_name,
+        first_name,
+        out_id,
+        full_name => out_full_name);
+end
+----
+
+====
+
+Смотри также: <<fblangref-dml-execproc>>.
 
 [[fblangref-dml-execblock]]
 == `EXECUTE BLOCK`
