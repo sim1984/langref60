@@ -89,10 +89,10 @@ Language Reference for Firebird 6.0 Initial
 
  
 -   PDF —
-    [firebird-60-language-reference.pdf](https://github.com/sim1984/langref60/releases/download/1.0/firebird-60-language-reference.pdf)
+    [firebird-60-language-reference-ru.pdf](https://github.com/sim1984/langref60/releases/download/1.0/firebird-60-language-reference-ru.pdf)
 
 -   HTML —
-    [firebird-60-language-reference-html.zip](https://github.com/sim1984/langref60/releases/download/1.0/firebird-60-language-reference-html.zip)
+    [firebird-60-language-reference-ru-html.zip](https://github.com/sim1984/langref60/releases/download/1.0/firebird-60-language-reference-ru-html.zip)
 
 
     
