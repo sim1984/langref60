@@ -2508,6 +2508,112 @@ END
 .См. также:
 <<fblangref-datatypes-chartypes-special,Литералы даты и времени>>, <<fblangref-scalarfuncs-cast>>.
 
+[[fblangref-datatypes-cast-format]]
+==== Преобразование из/в строку с заданным форматом
+
+При преобразовании типов `DATE`, `TIME` или `TIMESTAMP` в строку, или наоборот из строки, можно задать формат. 
+
+.Синтаксис CAST(.. FORMAT ..)
+[listing,subs=+quotes]
+----
+CAST(<value> AS <datatype> FORMAT <format>)
+
+<datatype> ::=
+    [VAR]CHAR(_n_)
+  | DATE
+  | TIME [WITH[OUT] TIME ZONE]
+  | TIMESTAMP [WITH[OUT] TIME ZONE]
+----
+
+Здесь `<format>` представляет собой строку с описанием формата. Формат может содержать подстановочные шаблоны, разделители и другие символы.
+
+[cols="1,3", options="header"]
+|===
+| Подстановочный шаблон
+| Описание 
+
+| YEAR 
+| Year (1 - 9999)
+
+| YYYY 
+| Last 4 digits of Year (0001 - 9999)
+
+| YYY 
+| Last 3 digits of Year (000 - 999)
+
+| YY 
+| Last 2 digits of Year (00 - 99)
+
+| Y 
+| Last 1 digits of Year (0 - 9)
+
+| Q 
+| Quarter of the Year (1 - 4)
+
+| MM 
+| Month (01 - 12)
+
+| MON 
+| Short Month name (Apr)
+
+| MONTH 
+| Full Month name (APRIL)
+
+| RM 
+| Roman representation of the Month (I - XII)
+
+| WW 
+| Week of the Year (01 - 53)
+
+| W 
+| Week of the Month (1 - 5)
+
+| D 
+| Day of the Week (1 - 7)
+
+| DAY 
+| Full name of the Day (MONDAY)
+
+| DD 
+| Day of the Month (01 - 31)
+
+| DDD 
+| Day of the Year (001 - 366)
+
+| DY 
+| Short name of the Day (Mon)
+
+| J 
+| Julian Day (number of days since January 1, 4712 BC)
+
+| HH / HH12 
+| Hour of the Day (01 - 12) with period (AM, PM) 
+
+| HH24 
+| Hour of the Day (00 - 23)
+
+| MI 
+| Minutes (00 - 59)
+
+| SS 
+| Seconds (00 - 59)
+
+| SSSSS 
+| Seconds after midnight (0 - 86399)
+
+| FF1 - FF9 
+| Fractional seconds with the specified accuracy
+
+| TZH 
+| Time zone in Hours  (-14 - 14)
+
+| TZM 
+| Time zone in Minutes (00 - 59)
+
+| TZR 
+| Time zone Name 
+|===
+
 [[fblangref-datatypes-convert-implicit]]
 === Неявное преобразование типов данных
 
