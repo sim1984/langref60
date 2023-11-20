@@ -4328,7 +4328,7 @@ DSQL, PSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CAST(_value_ | NULL AS <type>)
+CAST(_value_ | NULL AS <type> [FORMAT <format>])
                             
 <type> ::= 
     <datatype>
@@ -4482,6 +4482,11 @@ FROM rdb$database;
 
 .См. также:
 <<fblangref-datatypes-convert-explicit>>.
+
+==== Преобразование с использованием формата
+
+При преобразовании из типов даты и времени в строку или наоборот можно указать формат с помощью ключевого слова `FORMAT`.
+Подробно о преобразовании с форматированием см. в "<<fblangref-datatypes-cast-tostring-format>>" и "<<fblangref-datatypes-cast-fromstring-format>>".
 
 ==== Примеры приведения типов
 
@@ -5333,6 +5338,9 @@ MAKE_DBKEY (<relation>, _recnum_ [, _dpnum_ [, _ppnum_]]})
 |ppnum
 |Номер страницы указателей на данные PP.
 |===
+
+.Тип возвращаемого результата
+`BINARY(8)`
 
 Функция `MAKE_DBKEY` создает значение `DBKEY`, используя имя или идентификатор таблицы, номер записи и, необязательно, логический номер страницы данных и страницы указателя.
 

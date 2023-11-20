@@ -2508,10 +2508,10 @@ END
 .См. также:
 <<fblangref-datatypes-chartypes-special,Литералы даты и времени>>, <<fblangref-scalarfuncs-cast>>.
 
-[[fblangref-datatypes-cast-format]]
-==== Преобразование из/в строку с заданным форматом
+[[fblangref-datatypes-cast-tostring-format]]
+==== Преобразование даты и времени в строку с заданным форматом
 
-При преобразовании типов `DATE`, `TIME` или `TIMESTAMP` в строку, или наоборот из строки, можно задать формат. 
+При преобразовании типов `DATE`, `TIME` или `TIMESTAMP` в строку можно задать формат. 
 
 .Синтаксис CAST(.. FORMAT ..)
 [listing,subs=+quotes]
@@ -2520,12 +2520,13 @@ CAST(<value> AS <datatype> FORMAT <format>)
 
 <datatype> ::=
     [VAR]CHAR(_n_)
-  | DATE
-  | TIME [WITH[OUT] TIME ZONE]
-  | TIMESTAMP [WITH[OUT] TIME ZONE]
+
+<separator> := . | / | , | ; | : | - | <space>  
 ----
 
-Здесь `<format>` представляет собой строку с описанием формата. Формат может содержать подстановочные шаблоны, разделители и другие символы.
+Здесь `<format>` представляет собой строковый литерал с описанием формата. 
+Формат может содержать подстановочные шаблоны, разделители и другие символы.
+Использование выражений и параметров в качестве формата недопускается.
 
 [cols="1,3", options="header"]
 |===
@@ -2533,86 +2534,259 @@ CAST(<value> AS <datatype> FORMAT <format>)
 | Описание 
 
 | YEAR 
-| Year (1 - 9999)
+| Год (1 - 9999)
 
 | YYYY 
-| Last 4 digits of Year (0001 - 9999)
+| Поледние 4 цифры года (0001 - 9999)
 
 | YYY 
-| Last 3 digits of Year (000 - 999)
+| Последние 3 цифры года (000 - 999)
 
 | YY 
-| Last 2 digits of Year (00 - 99)
+| Последние 2 цифры года (00 - 99)
 
 | Y 
-| Last 1 digits of Year (0 - 9)
+| Последняя цифра года (0 - 9)
 
 | Q 
-| Quarter of the Year (1 - 4)
+| Квартал года (1 - 4)
 
 | MM 
-| Month (01 - 12)
+| Месяц (01 - 12)
 
 | MON 
-| Short Month name (Apr)
+| Соркащённое наименование месяца (Apr)
 
 | MONTH 
-| Full Month name (APRIL)
+| Полное наименование месяца (APRIL)
 
 | RM 
-| Roman representation of the Month (I - XII)
+| Номер месяца римскими цифрами (I - XII)
 
 | WW 
-| Week of the Year (01 - 53)
+| Номер недели года (01 - 53)
 
 | W 
-| Week of the Month (1 - 5)
+| Номер недели месяца (1 - 5)
 
 | D 
-| Day of the Week (1 - 7)
+| Номер дня недели (1 - 7)
 
 | DAY 
-| Full name of the Day (MONDAY)
+| Полное наименование дня недели (MONDAY)
 
 | DD 
-| Day of the Month (01 - 31)
+| День месяца (01 - 31)
 
 | DDD 
-| Day of the Year (001 - 366)
+| День года (001 - 366)
 
 | DY 
-| Short name of the Day (Mon)
+| Соращённое наименование для недели (Mon)
 
 | J 
-| Julian Day (number of days since January 1, 4712 BC)
+| Юлианский день (Количество дней прошедших с 1 Января 4712 до н.э.)
 
 | HH / HH12 
-| Hour of the Day (01 - 12) with period (AM, PM) 
+| Час дня (01 - 12) с периодом (AM, PM) 
 
 | HH24 
-| Hour of the Day (00 - 23)
+| Час дня (00 - 23)
 
 | MI 
-| Minutes (00 - 59)
+| Минуты (00 - 59)
 
 | SS 
-| Seconds (00 - 59)
+| Секунды (00 - 59)
 
 | SSSSS 
-| Seconds after midnight (0 - 86399)
+| Количество секунд после получночи (0 - 86399)
 
 | FF1 - FF9 
-| Fractional seconds with the specified accuracy
+| Доли секунды с заданной точностью
 
 | TZH 
-| Time zone in Hours  (-14 - 14)
+| Часовой пояс в часах  (-14 - 14)
 
 | TZM 
-| Time zone in Minutes (00 - 59)
+| Часовой пояс в минутах (00 - 59)
 
 | TZR 
-| Time zone Name 
+| Наименование часового пояса 
 |===
+
+[source,sql]
+----
+SELECT
+  CAST(LOCALTIMESTAMP AS VARCHAR(64) FORMAT 'DD.MM.YYYY HH24:MI:SS')
+FROM RDB$DATABASE;
+----
+
+----
+=========================
+20.11.2023 11:40:58
+----
+
+В строковом литерале формата разделитель можно опускать:
+
+[source,sql]
+----
+SELECT
+  CAST(CURRENT_TIMESTAMP AS VARCHAR(50) FORMAT 'YEARMMDD HH24MISS')
+FROM RDB$DATABASE;
+----
+
+----
+=========================
+20231120 114250
+----
+
+[NOTE]
+====
+Будьте осторожны с такими шаблонами, как `DDDD`, они будут интерпретироваться как `DDD` + `DD`.
+====
+
+В строку формата можно вставить необработанный текст, заключив его в двойные кавычки. Например:
+
+[source,sql]
+----
+SELECT CAST(CURRENT_TIMESTAMP AS VARCHAR(45) FORMAT 'DD.MM.YEAR HH24:MI:SS "is" J "Julian day"') 
+FROM RDB$DATABASE;
+----
+
+----
+=========================
+20.11.2023 11:43:30 is 2460269 Julian day
+----
+
+Если необходимо добавить двойную кавычку в текст формата, то её необходим экранировать предварив символом обратной косой черты `"\"`.
+Если необходим добавить в текст формата обратную косую черту, то её необходимо удвоить. Пример:
+
+[source,sql]
+----
+SELECT
+  CAST(CURRENT_TIMESTAMP AS VARCHAR(50) FORMAT _utf8'"Сегодня: \""DD.MM.YEAR"\""')
+FROM RDB$DATABASE;
+----
+
+----
+=========================
+Сегодня: "20.11.2023"
+----
+
+Строковый литерал формата не чувствителен к регистру. Это обозначает, что формат `YYYY-MM` == `yyyy-mm`.
+
+[[fblangref-datatypes-cast-fromstring-format]]
+==== Преобразование строки с заданным форматом в дату и время
+
+При преобразовании строки в типы `DATE`, `TIME` или `TIMESTAMP` для исходной строки можно задать формат. 
+
+.Синтаксис CAST(.. FORMAT ..)
+[listing,subs=+quotes]
+----
+CAST(<value> AS <datatype> FORMAT <format>)
+
+<datatype> ::=
+    DATE
+  | TIME [WITH[OUT] TIME ZONE]
+  | TIMESTAMP [WITH[OUT] TIME ZONE]
+
+<separator> := . | / | , | ; | : | - | <space>  
+----
+
+Здесь `<format>` представляет собой строковый литерал с описанием формата. 
+Формат может содержать подстановочные шаблоны, разделители и другие символы.
+Использование выражений и параметров в качестве формата недопускается.
+
+[cols="1,3", options="header"]
+|===
+| Подстановочный шаблон
+| Описание 
+
+| YEAR 
+| Год (1 - 9999)
+
+| YYYY 
+| Поледние 4 цифры года (0001 - 9999)
+
+| YYY 
+| Последние 3 цифры года (000 - 999)
+
+| YY 
+| Последние 2 цифры года (00 - 99)
+
+| Y 
+| Последняя цифра года (0 - 9)
+
+| MM 
+| Месяц (01 - 12)
+
+| MON 
+| Соркащённое наименование месяца (Apr)
+
+| MONTH 
+| Полное наименование месяца (APRIL)
+
+| RM 
+| Номер месяца римскими цифрами (I - XII)
+
+| DD 
+| День месяца (01 - 31)
+
+| DDD 
+| День года (001 - 366)
+
+| DY 
+| Соращённое наименование для недели (Mon)
+
+| J 
+| Юлианский день (Количество дней прошедших с 1 Января 4712 до н.э.)
+
+| HH / HH12 
+| Час дня (01 - 12) с периодом (AM, PM) 
+
+| HH24 
+| Час дня (00 - 23)
+
+| MI 
+| Минуты (00 - 59)
+
+| SS 
+| Секунды (00 - 59)
+
+| SSSSS 
+| Количество секунд после получночи (0 - 86399)
+
+| FF1 - FF4 
+| Доли секунды с заданной точностью
+
+| TZH 
+| Часовой пояс в часах  (-14 - 14)
+
+| TZM 
+| Часовой пояс в минутах (00 - 59)
+
+| TZR 
+| Наименование часового пояса 
+|===
+
+Пример использования:
+
+[source,sql]
+----
+SELECT
+  CAST('2011.09.05 21:39:46.8643' AS TIMESTAMP FORMAT 'YEAR.MM.DD HH24:MI:SS.FF4')
+FROM RDB$DATABASE;
+----
+
+В строковом литерале формата разделитель можно опускать:
+
+[source,sql]
+----
+SELECT
+  CAST('20110905 2139468643' AS TIMESTAMP FORMAT 'YYYYMMDD HH24MISSFF4')
+FROM RDB$DATABASE;
+----
 
 [[fblangref-datatypes-convert-implicit]]
 === Неявное преобразование типов данных
