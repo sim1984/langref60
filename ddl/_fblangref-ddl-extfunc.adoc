@@ -314,7 +314,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP EXTERNAL FUNCTION _funcname_
+DROP EXTERNAL FUNCTION [IF EXISTS] _funcname_
 ----
 
 
@@ -330,6 +330,9 @@ DROP EXTERNAL FUNCTION _funcname_
 
 Оператор `DROP EXTERNAL FUNCTION` удаляет объявление функции определённой пользователем из базы данных.
 Если есть зависимости от внешней функции, то удаления не произойдёт и будет выдана соответствующая ошибка.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP EXTERNAL FUNCTION` попытается удалить внешнюю функцию и не будет получать ошибку, 
+если она не существует.
 
 [[fblangref-ddl-extfunc-drop-who]]
 === Кто может удалить внешнюю функцию?
@@ -350,6 +353,15 @@ DROP EXTERNAL FUNCTION _funcname_
 [source,sql]
 ----
 DROP EXTERNAL FUNCTION addDay;
+----
+====
+
+.Удаление внешней функции, если она существует
+[example]
+====
+[source,sql]
+----
+DROP EXTERNAL FUNCTION IF EXISTS addDay;
 ----
 ====
 

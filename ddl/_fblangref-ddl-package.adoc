@@ -426,7 +426,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP PACKAGE _package_name_
+DROP PACKAGE [IF EXISTS] _package_name_
 ----
 
 .Параметры оператора `DROP PACKAGE`
@@ -442,6 +442,9 @@ DROP PACKAGE _package_name_
 Оператор `DROP PACKAGE` удаляет существующий заголовок пакета.
 Перед удалением заголовка пакета (`DROP PACKAGE`), необходимо выполнить удаление тела пакета (`DROP PACKAGE BODY`), иначе будет выдана ошибка.
 Если от заголовка пакета существуют зависимости, то при попытке удаления такого заголовка будет выдана соответствующая ошибка.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP PACKAGE` попытается удалить заголовок пакета и не будет получать ошибку, 
+если его не существует.
 
 [[fblangref-ddl-package-drop-who]]
 === Кто может удалить заголовок пакета?
@@ -462,6 +465,15 @@ DROP PACKAGE _package_name_
 [source,sql]
 ----
 DROP PACKAGE APP_VAR;
+----
+====
+
+.Удаление заголовка пакета, если он существует
+[example]
+====
+[source,sql]
+----
+DROP PACKAGE IF EXISTS APP_VAR;
 ----
 ====
 

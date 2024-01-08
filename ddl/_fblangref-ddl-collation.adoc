@@ -247,7 +247,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP COLLATION _collname_
+DROP COLLATION [IF EXISTS] _collname_
 ----
 
 [[fblangref-ddl-tbl-collatdrp]]
@@ -263,6 +263,9 @@ DROP COLLATION _collname_
 
 Оператор `DROP COLLATION` удаляет указанную сортировку.
 Сортировка должна присутствовать в базе данных, иначе будет выдана соответствующая ошибка. 
+
+Если используется предложение `IF EXISTS`, то оператор `DROP COLLATION` попытается удалить сортировку и не будет получать ошибку, 
+если её не существует.
 
 [TIP]
 ====
@@ -289,6 +292,15 @@ DROP COLLATION _collname_
 [source,sql]
 ----
 DROP COLLATION ES_ES_NOPAD_CI;
+----
+====
+
+.Удаление сортировки, если она существует 
+[example]
+====
+[source,sql]
+----
+DROP COLLATION IF EXISTS ES_ES_NOPAD_CI;
 ----
 ====
 

@@ -451,7 +451,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP VIEW _viewname_
+DROP VIEW [IF EXISTS] _viewname_
 ----
 
 [[fblangref-ddl-view-dropview-tbl]]
@@ -466,7 +466,10 @@ DROP VIEW _viewname_
 |===
 
 Оператор `DROP VIEW` удаляет существующее представление.
-Если представление имеет зависимости, то удаление не будет произведено. 
+Если представление имеет зависимости, то удаление не будет произведено.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP VIEW` попытается удалить представление и не будет получать ошибку, 
+если его не существует.
 
 [[fblangref-ddl-view-drop-who]]
 === Кто может удалить представление?
@@ -487,6 +490,15 @@ DROP VIEW _viewname_
 [source,sql]
 ----
 DROP VIEW PRICE_WITH_MARKUP;
+----
+====
+
+.Удаление представления, если оно существует
+[example]
+====
+[source,sql]
+----
+DROP VIEW IF EXISTS PRICE_WITH_MARKUP;
 ----
 ====
 

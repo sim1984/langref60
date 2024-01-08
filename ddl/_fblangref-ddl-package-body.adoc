@@ -265,7 +265,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP PACKAGE BODY _package_name_
+DROP PACKAGE BODY [IF EXISTS] _package_name_
 ----
 
 .Параметры оператора `DROP PACKAGE BODY`
@@ -279,6 +279,9 @@ DROP PACKAGE BODY _package_name_
 |===
 
 Оператор `DROP PACKAGE BODY` удаляет тело пакета.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP PACKAGE BODY` попытается удалить тело пакета и не будет получать ошибку, 
+если его не существует.
 
 [[fblangref-ddl-package-body-drop-who]]
 === Кто может удалить тело пакета?
@@ -299,6 +302,15 @@ DROP PACKAGE BODY _package_name_
 [source,sql]
 ----
 DROP PACKAGE BODY APP_VAR;
+----
+====
+
+.Удаление тела пакета, если оно существует
+[example]
+====
+[source,sql]
+----
+DROP PACKAGE BODY IF EXISTS APP_VAR;
 ----
 ====
 

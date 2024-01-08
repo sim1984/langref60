@@ -598,7 +598,7 @@ DSQL
 
 [listing,subs="+quotes"]
 ----
-DROP FUNCTION _funcname_
+DROP FUNCTION [IF EXISTS] _funcname_
 ----
 
 
@@ -614,6 +614,9 @@ DROP FUNCTION _funcname_
 
 Оператор `DROP FUNCTION` удаляет существующую хранимую функцию.
 Если от хранимой функции существуют зависимости, то при попытке удаления такой функции будет выдана соответствующая ошибка. 
+
+Если используется предложение `IF EXISTS`, то оператор `DROP FUNCTION` попытается удалить хранимую функцию и не будет получать ошибку, 
+если её не существует.
 
 [[fblangref-ddl-function-drop-who]]
 === Кто может удалить функцию?
@@ -634,6 +637,15 @@ DROP FUNCTION _funcname_
 [source,sql]
 ----
 DROP FUNCTION ADD_INT;
+----
+====
+
+.Удаление хранимой функции, если она существует
+[example]
+====
+[source,sql]
+----
+DROP FUNCTION IF EXISTS ADD_INT;
 ----
 ====
 

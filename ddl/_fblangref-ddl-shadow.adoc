@@ -145,7 +145,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP SHADOW _sh_num_
+DROP SHADOW [IF EXISTS] _sh_num_
   [{PRESERVE | DELETE} FILE]
 ----
 
@@ -167,6 +167,9 @@ DROP SHADOW _sh_num_
 Это может быть полезно, если вы делаете резервную копию с теневого файла.
 По умолчанию используется опция `DELETE FILE`.
 
+Если используется предложение `IF EXISTS`, то оператор `DROP SHADOW` попытается удалить теневую копию и не будет получать ошибку, 
+если её не существует.
+
 [[fblangref-ddl-shadow-drop-who]]
 === Кто может удалить теневую копию?
 
@@ -186,6 +189,15 @@ DROP SHADOW _sh_num_
 [source,sql]
 ----
 DROP SHADOW 1;
+----
+====
+
+.Удаление теневой копии с номером 1, если она существует
+[example]
+====
+[source,sql]
+----
+DROP SHADOW IF EXISTS 1;
 ----
 ====
 

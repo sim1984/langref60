@@ -345,7 +345,7 @@ DSQL
 
 [listing,subs=+quotes]
 ----
-DROP [GLOBAL] MAPPING _name_
+DROP [GLOBAL] MAPPING [IF EXISTS] _name_
 ----
 
 .Параметры оператора DROP MAPPING
@@ -360,6 +360,9 @@ DROP [GLOBAL] MAPPING _name_
 
 Оператор `DROP MAPPING` удаляет существующее отображение.
 Если указана опция `GLOBAL`, то будет удалено глобальное отображение.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP MAPPING` попытается удалить отображение и не будет получать ошибку, 
+если его не существует.
 
 [IMPORTANT]
 ====
@@ -386,6 +389,15 @@ DROP [GLOBAL] MAPPING _name_
 [source,sql]
 ----
 DROP MAPPING FROM_RT;
+----
+====
+
+.Удаление отображения, если оно существует.
+[example]
+====
+[source,sql]
+----
+DROP MAPPING IF EXISTS FROM_RT;
 ----
 ====
 

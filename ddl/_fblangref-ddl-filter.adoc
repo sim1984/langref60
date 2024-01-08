@@ -157,7 +157,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP FILTER _filtername_
+DROP FILTER [IF EXISTS] _filtername_
 ----
 
 
@@ -173,6 +173,9 @@ DROP FILTER _filtername_
 
 Оператор `DROP FILTER` удаляет объявление BLOB фильтра из базы данных.
 Удаление BLOB фильтра из базы данных делает его не доступным из базы данных, при этом динамическая библиотека, в которой расположена функция преобразования, остаётся не тронутой.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP FILTER` попытается удалить BLOB фильтр и не будет получать ошибку, 
+если его не существует.
 
 [[fblangref-ddl-filter-drop-who]]
 === Кто может удалить BLOB фильтр?
@@ -193,6 +196,15 @@ DROP FILTER _filtername_
 [source,sql]
 ----
 DROP FILTER DESC_FILTER;
+----
+====
+
+.Удаление BLOB фильтра, если он существует
+[example]
+====
+[source,sql]
+----
+DROP FILTER IF EXISTS DESC_FILTER;
 ----
 ====
 

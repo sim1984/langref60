@@ -1038,14 +1038,14 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,attributes,macros"]
 ----
-ALTER TABLE tablename 
+ALTER TABLE _tablename_ 
   <operation> [, <operation>];
 
 <operation> ::=
     ADD <col_def> 
   | ADD <tconstraint> 
-  | DROP _colname_
-  | DROP CONSTRAINT _constr_name_
+  | DROP [IF EXISTS] _colname_
+  | DROP CONSTRAINT [IF EXISTS] _constr_name_
   | DROP SQL SECURITY
   | ALTER [COLUMN] colname <col_mod>
   | ALTER SQL SECURITY {DEFINER | INVOKER}
@@ -1371,7 +1371,30 @@ REFERENCES COUNTRY (COUNTRY);
 * в хранимых процедурах и триггерах;
 * в представлениях.
 
+Если используется предложение `IF EXISTS`, то оператор `ALTER TABLE _tablename_ DROP` попытается удалить столбец таблицы и не будет получать ошибку, 
+если его не существует.
+
 При каждом удалении столбца номер формата увеличивается на единицу. 
+
+.Удаление столбца таблицы
+[example]
+====
+[source,sql]
+----
+ALTER TABLE COUNTRY
+DROP CURRENCY;
+----
+====
+
+.Удаление столбца таблицы, если он существует
+[example]
+====
+[source,sql]
+----
+ALTER TABLE COUNTRY
+DROP IF EXISTS CURRENCY;
+----
+====
 
 [[fblangref-ddl-tablealter-drop-constraint]]
 === Предложение `DROP CONSTRAINT`
@@ -1381,7 +1404,30 @@ REFERENCES COUNTRY (COUNTRY);
 Ограничение первичного ключа или уникального ключа не могут быть удалены, если они используются в ограничении внешнего ключа другой таблицы.
 В этом случае необходимо удалить ограничение `FOREIGN KEY` до удаления `PRIMARY KEY` или `UNIQUE` ключа, на которые оно ссылается.
 
+Если используется предложение `IF EXISTS`, оператор `ALTER TABLE ... DROP CONSTRAINT` попытается удалить ограничение таблицы и не будет получать ошибку, 
+если его не существует.
+
 Удаление ограничения столбца или ограничения таблицы не влечёт за собой увеличение номера формата. 
+
+.Удаление ограничения таблицы
+[example]
+====
+[source,sql]
+----
+ALTER TABLE COUNTRY
+DROP CONSTRAINT CHK_SALARY;
+----
+====
+
+.Удаление ограничения таблицы, если оно существует
+[example]
+====
+[source,sql]
+----
+ALTER TABLE COUNTRY
+DROP CONSTRAINT IF EXISTS CHK_SALARY;
+----
+====
 
 [[fblangref-ddl-table-alter-drop-sql-security]]
 === Предложение `DROP SQL SECURITY`
@@ -1703,7 +1749,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP TABLE _tablename_
+DROP TABLE [IF EXISTS] _tablename_
 ----
 
 .Параметры оператора `DROP TABLE`
@@ -1720,12 +1766,24 @@ DROP TABLE _tablename_
 Если таблица имеет зависимости, то удаление не будет произведено.
 При удалении таблицы будут также удалены все триггеры на её события и индексы, построенные для её полей.
 
+Если используется предложение `IF EXISTS`, то оператор `DROP TABLE` попытается удалить таблицу и не будет получать ошибку, 
+если её не существует.
+
 .Удаление таблицы
 [example]
 ====
 [source,sql]
 ----
 DROP TABLE COUNTRY;
+----
+====
+
+.Удаление таблицы, если она существует
+[example]
+====
+[source,sql]
+----
+DROP TABLE IF EXISTS COUNTRY;
 ----
 ====
 

@@ -437,7 +437,7 @@ DSQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP USER _username_
+DROP USER [IF EXISTS] _username_
   [USING PLUGIN _pluginname_]
 ----
 
@@ -456,6 +456,9 @@ DROP USER _username_
 |===
 
 Оператор `DROP USER` удаляет учётную запись пользователя Firebird.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP USER` попытается удалить пользователя и не будет получать ошибку, 
+если его не существует.
 
 (((DROP USER, USING PLUGIN)))
 Необязательное предложение `USING PLUGIN` позволяет явно указывать какой плагин управления пользователями будет использован.
@@ -483,6 +486,15 @@ DROP USER _username_
 [source,sql]
 ----
 DROP USER bobby;
+----
+====
+
+.Удаление пользователя, если он существует
+[example]
+====
+[source,sql]
+----
+DROP USER IF EXISTS bobby;
 ----
 ====
 

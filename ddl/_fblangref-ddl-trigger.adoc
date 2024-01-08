@@ -1034,7 +1034,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP TRIGGER _trigname_
+DROP TRIGGER [IF EXISTS] _trigname_
 ----
 
 .Параметры оператора `DROP TRIGGER`
@@ -1048,6 +1048,9 @@ DROP TRIGGER _trigname_
 |===
 
 Оператор `DROP TRIGGER` удаляет существующий триггер.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP TRIGGER` попытается удалить триггер и не будет получать ошибку, 
+если его не существует.
 
 [[_fblangref_ddl_trigger_drop_who]]
 === Кто может удалить триггеры?
@@ -1074,6 +1077,15 @@ DML триггеры могут удалить:
 [source,sql]
 ----
 DROP TRIGGER set_cust_no;
+----
+====
+
+.Удаление триггера, если он существует
+[example]
+====
+[source,sql]
+----
+DROP TRIGGER IF EXISTS set_cust_no;
 ----
 ====
 

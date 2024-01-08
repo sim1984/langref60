@@ -318,7 +318,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP {SEQUENCE | GENERATOR} _seq_name_
+DROP {SEQUENCE | GENERATOR} [IF EXISTS] _seq_name_
 ----
 
 [[fblangref-ddl-tbl-dropseq]]
@@ -335,6 +335,9 @@ DROP {SEQUENCE | GENERATOR} _seq_name_
 Оператор `DROP SEQUENCE` удаляет существующую последовательность (генератор). Слова `SEQUENCE` и `GENERATOR` являются синонимами.
 Вы можете использовать любое из них, но рекомендуется использовать `SEQUENCE`.
 При наличии зависимостей для существующей последовательности (генератора) удаления не будет выполнено. 
+
+Если используется предложение `IF EXISTS`, то оператор `DROP SEQUENCE` попытается удалить последовательность и не будет получать ошибку, 
+если её не существует.
 
 [[fblangref-ddl-sequence-drop_who]]
 === Кто может удалить генератор?
@@ -355,6 +358,15 @@ DROP {SEQUENCE | GENERATOR} _seq_name_
 [source,sql]
 ----
 DROP SEQUENCE EMP_NO_GEN;
+----
+====
+
+.Удаление последовательности, если она существует 
+[example]
+====
+[source,sql]
+----
+DROP SEQUENCE IF EXISTS EMP_NO_GEN;
 ----
 ====
 

@@ -444,7 +444,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP INDEX _indexname_
+DROP INDEX [IF EXISTS] _indexname_
 ----
 
 .Параметры оператора `DROP INDEX`
@@ -459,6 +459,9 @@ DROP INDEX _indexname_
 
 Оператор `DROP INDEX` удаляет существующий индекс из базы данных.
 При наличии зависимостей для существующего индекса (если он используется в ограничении) удаление не будет выполнено.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP INDEX` попытается удалить индекс и не будет получать ошибку, 
+если его не существует.
 
 [[fblangref-ddl-index-drop-who]]
 === Кто может удалить индекс?
@@ -479,6 +482,15 @@ DROP INDEX _indexname_
 [source,sql]
 ----
 DROP INDEX IDX_UPDATER;
+----
+====
+
+.Удаление индекса, если он существует
+[example]
+====
+[source,sql]
+----
+DROP INDEX IF EXISTS IDX_UPDATER;
 ----
 ====
 

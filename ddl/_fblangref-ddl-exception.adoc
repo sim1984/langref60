@@ -218,7 +218,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP EXCEPTION _exception_name_
+DROP EXCEPTION [IF EXISTS] _exception_name_
 ----
 
 [[fblangref-ddl-tbl-dropexcep]]
@@ -234,6 +234,9 @@ DROP EXCEPTION _exception_name_
 
 Оператор `DROP EXCEPTION` удаляет пользовательское исключение.
 При наличии зависимостей для существующего исключения удаления не будет выполнено. 
+
+Если используется предложение `IF EXISTS`, то оператор `DROP EXCEPTION` попытается удалить исключение и не будет получать ошибку, 
+если его не существует.
 
 [[fblangref-ddl-exception-drop-who]]
 === Кто может удалить исключение?
@@ -254,6 +257,15 @@ DROP EXCEPTION _exception_name_
 [source,sql]
 ----
 DROP EXCEPTION E_LARGE_VALUE;
+----
+====
+
+.Удаление пользовательского исключения, если оно существует
+[example]
+====
+[source,sql]
+----
+DROP EXCEPTION IF EXISTS E_LARGE_VALUE;
 ----
 ====
 

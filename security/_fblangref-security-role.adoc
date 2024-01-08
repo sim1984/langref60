@@ -269,7 +269,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP ROLE _rolename_
+DROP ROLE [IF EXISTS] _rolename_
 ----
 
 .Параметры оператора `DROP ROLE`
@@ -284,6 +284,9 @@ DROP ROLE _rolename_
 
 Оператор `DROP ROLE` удаляет существующую роль.
 При удалении роли все привилегии, предоставленные этой роли, отменяются.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP ROLE` попытается удалить роль и не будет получать ошибку, 
+если её не существует.
 
 [[fblangref-security-role-droppriv]]
 === Кто может удалить роль
@@ -304,6 +307,15 @@ DROP ROLE _rolename_
 [source,sql]
 ----
 DROP ROLE SELLERS;
+----
+====
+
+.Удаление роли, если она существует
+[example]
+====
+[source,sql]
+----
+DROP ROLE [IF EXISTS] SELLERS;
 ----
 ====
 
