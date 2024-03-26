@@ -1616,6 +1616,64 @@ FROM RDB$DATABASE
 .См. также:
 <<fblangref-scalarfuncs-char-length>>, <<fblangref-scalarfuncs-octet-length>>.
 
+[[fblangref-scalarfuncs-btrim]]
+=== `BTRIM()`
+
+.Доступно в
+DSQL, PSQL
+(((Функция, `BTRIM()`)))
+
+.Синтаксис
+[listing,subs=+quotes]
+----
+BTRIM (<value expression> [, <trim characters>])
+----
+
+.Параметры функции `BTRIM`
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|value expression
+|Выражение строкового типа.
+
+|trim characters
+|Удаляемые символы. Если не указано, то по умолчанию пробел (`' '`).
+
+|===
+
+.Тип возвращаемого результата:
+`VARCHAR` или `BLOB` в зависимости от типов входных аргументов.
+
+Функция `BTRIM` принимает последовательность символов в качестве второго аргумента и удаляет все начальные и конечные вхождения любых из этих символов, независимо от их порядка.
+
+.Использование функции `BTRIM`
+[example]
+====
+[source,sql]
+----
+BTRIM('!^!Hello world!^!', '!^') -- возвращает 'Hello world'
+----
+====
+
+.Удаление всех пробельных символов с помощью `BTRIM`
+[example]
+====
+[source,sql]
+----
+SELECT
+  BTRIM(' Hello 
+  ', x'090A0D20') AS STR
+FROM RDB$DATABASE
+----
+
+Здесь `x'090A0D20'` -- это `'\t\n\r '`. 
+====
+
+.См. также:
+<<fblangref-scalarfuncs-ltrim>>, <<fblangref-scalarfuncs-rtrim>>, <<fblangref-scalarfuncs-trim>>.
+
 [[fblangref-scalarfuncs-char-length]]
 === `CHAR_LENGTH()`, `CHARACTER_LENGTH()`
 
@@ -2021,6 +2079,50 @@ LPAD ('Hello', 2, '')             -- возвращает 'He'
 
 .См. также:
 <<fblangref-scalarfuncs-rpad>>.
+
+[[fblangref-scalarfuncs-ltrim]]
+=== `LTRIM()`
+
+.Доступно в
+DSQL, PSQL
+(((Функция, `LTRIM()`)))
+
+.Синтаксис
+[listing,subs=+quotes]
+----
+LTRIM (<value expression> [, <trim characters>])
+----
+
+.Параметры функции `LTRIM`
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|value expression
+|Выражение строкового типа.
+
+|trim characters
+|Удаляемые символы. Если не указано, то по умолчанию пробел (`' '`).
+
+|===
+
+.Тип возвращаемого результата:
+`VARCHAR` или `BLOB` в зависимости от типов входных аргументов.
+
+Функция `LTRIM` принимает последовательность символов в качестве второго аргумента и удаляет все начальные вхождения любых из этих символов, независимо от их порядка.
+
+.Использование функции `LTRIM`
+[example]
+====
+[source,sql]
+----
+LTRIM('baobab is a tree', 'aboe') -- возвращает ' is a tree'
+----
+====
+
+.См. также:
+<<fblangref-scalarfuncs-rtrim>>, <<fblangref-scalarfuncs-btrim>>, <<fblangref-scalarfuncs-trim>>.
 
 [[fblangref-scalarfuncs-octet-length]]
 === `OCTET_LENGTH()`
@@ -2497,6 +2599,50 @@ RPAD ('Hello', 2, '')             -- возвращает 'He'
 .См. также:
 <<fblangref-scalarfuncs-lpad>>.
 
+[[fblangref-scalarfuncs-rtrim]]
+=== `RTRIM()`
+
+.Доступно в
+DSQL, PSQL
+(((Функция, `RTRIM()`)))
+
+.Синтаксис
+[listing,subs=+quotes]
+----
+RTRIM (<value expression> [, <trim characters>])
+----
+
+.Параметры функции `RTRIM`
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|value expression
+|Выражение строкового типа.
+
+|trim characters
+|Удаляемые символы. Если не указано, то по умолчанию пробел (`' '`).
+
+|===
+
+.Тип возвращаемого результата:
+`VARCHAR` или `BLOB` в зависимости от типов входных аргументов.
+
+Функция `RTRIM` принимает последовательность символов в качестве второго аргумента и удаляет все конечные вхождения любых из этих символов, независимо от их порядка.
+
+.Использование функции `RTRIM`
+[example]
+====
+[source,sql]
+----
+RTRIM('Hello world!^!', '!^') -- возвращает 'Hello world'
+----
+====
+
+.См. также:
+<<fblangref-scalarfuncs-ltrim>>, <<fblangref-scalarfuncs-btrim>>, <<fblangref-scalarfuncs-trim>>.
+
 [[fblangref-scalarfuncs-substring]]
 === `SUBSTRING()`
 
@@ -2654,11 +2800,9 @@ DSQL, PSQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-TRIM ([<adjust>] _str_)
+TRIM ([ [<trim specification>] [<trim characters>] FROM ] <value expression>)
 
-<adjust> ::=  {[<where>] [_what_]} FROM
-
-<where> ::=  BOTH | LEADING | TRAILING
+<trim specification> ::=  BOTH | LEADING | TRAILING
 ----
 
 .Параметры функции `TRIM`
@@ -2667,14 +2811,14 @@ TRIM ([<adjust>] _str_)
 ^| Параметр
 ^| Описание
 
-|str
+|value expression
 |Выражение строкового типа.
 
-|where
+|trim specification
 |Из какого места необходимо удалить подстроку -- `BOTH` {vbar} `LEADING` {vbar} `TRAILING`.
 По умолчанию `BOTH`.
 
-|what
+|trim characters
 |Подстрока, которую надо удалить (неоднократно, если таких вхождений несколько) из входной строки _str_ в её начале и/или конце.
 По умолчанию является пробелом (`' '`).
 |===
@@ -2688,8 +2832,8 @@ TRIM ([<adjust>] _str_)
 .Особенности использования
 [NOTE]
 ====
-* Если входной параметр _str_ имеет тип `BLOB`, то и результат будет иметь тип BLOB. В противном случае результат будет иметь тип `VARCHAR(__n__)`, где _n_ является длиной параметра _str_;
-* Подстрока для удаления, если она, конечно, задана, не должна иметь длину больше, чем 32767 байта. Однако при повторениях подстроки в начале и/или конце входного параметра _str_ общее число удаляемых байтов может быть гораздо больше.
+* Если входной параметр `<value expression>` имеет тип `BLOB`, то и результат будет иметь тип BLOB. В противном случае результат будет иметь тип `VARCHAR(__n__)`, где _n_ является длиной параметра `<value expression>`;
+* Подстрока для удаления, если она, конечно, задана, не должна иметь длину больше, чем 32767 байта. Однако при повторениях подстроки в начале и/или конце входного параметра `<value expression>` общее число удаляемых байтов может быть гораздо больше.
 ====
 
 [WARNING]
@@ -2724,7 +2868,7 @@ FROM RDB$DATABASE -- Результат: ' I love you El'
 ====
 
 .См. также:
-<<fblangref-scalarfuncs-overlay>>, <<fblangref-scalarfuncs-replace>>.
+<<fblangref-scalarfuncs-ltrim>>, <<fblangref-scalarfuncs-rtrim>>, <<fblangref-scalarfuncs-btrim>>.
 
 [[fblangref-scalarfuncs-unicodechar]]
 === `UNICODE_CHAR()`

@@ -1,7 +1,7 @@
 [[fblangref]]
 = Руководство по языку SQL СУБД Firebird 6.0 Initial
 Дмитрий Филиппов; Александр Карпейкин; Алексей Ковязин; Дмитрий Кузьменко; Денис Симонов; Paul Vinkenoog; Дмитрий Еманов; Mark Rotteveel
-0.2.1, от 16.02.2024
+0.2.2, от 26.03.2024
 :doctype: book
 :sectnums:
 :sectanchors:
