@@ -21,11 +21,15 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE PROCEDURE _procname_ [(<inparam> [, <inparam> ...])]
-[ RETURNS (<outparam> [, <outparam> ...]) ]
+CREATE PROCEDURE [IF NOT EXISTS] _procname_ [( <in_params> )]
+[ RETURNS ( <out_params> ) ]
 <routine body> 
   
+<in_params> ::= <inparam> [, <inparam> ...]
+
 <inparam> ::= <param_decl> [{= | DEFAULT} <value>]  
+
+<out_params> ::= <outparam> [, <outparam> ...]
 
 <outparam>  ::=  <param_decl>  
                     
@@ -134,6 +138,14 @@ CREATE PROCEDURE _procname_ [(<inparam> [, <inparam> ...])]
 Желательно также, чтобы имя хранимой процедуры было уникальным и среди имён процедур расположенных в PSQL пакетах (package), хотя это и допустимо.
 Дело в том, что в настоящее время вы не сможете вызвать функцию/процедуру из глобального пространства имён внутри пакета, если в пакете объявлена одноименная функция/процедура.
 В этом случае всегда будет вызвана процедура/функция пакета. 
+====
+
+Если используется предложение `IF NOT EXISTS`, то оператор `CREATE PROCEDURE` попытается создать новую хранимую процедуру без выдачи ошибки, если она уже существует.
+DDL триггеры не будут запускаться, если процедура уже существует. 
+
+[NOTE]
+====
+Хранимые процедуры используют одно и то же "`пространство имён`", что и таблицы и представления. Таким образом, если таблица с именем `SOME_NAME` существует и будет попытка выполнить `CREATE PROCEDURE IF NOT EXISTS SOME_NAME`, то процедура не будет создана без выдачи ошибки.
 ====
 
 `CREATE PROCEDURE` является составным оператором, состоящий из заголовка и тела.
@@ -350,8 +362,8 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER PROCEDURE _procname_ [(<inparam> [, <inparam> ...])]
-[ RETURNS (<outparam> [, <outparam> ...]) ]
+ALTER PROCEDURE _procname_ [( <in_params> )]
+[ RETURNS ( <out_params> ) ]
 <routine-body>
 
 Подробнее см. <<fblangref-ddl-proc-create-syntax,CREATE PROCEDURE>>.
@@ -425,8 +437,8 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER PROCEDURE _procname_ [(<inparam> [, <inparam> ...])]
-[ RETURNS (<outparam> [, <outparam> ...]) ]
+CREATE OR ALTER PROCEDURE _procname_ [( <in_params> )]
+[ RETURNS ( <out_params> ) ]
 <routine-body>
 
 Подробнее см. <<fblangref-ddl-proc-create-syntax,CREATE PROCEDURE>>.
@@ -498,8 +510,8 @@ DROP PROCEDURE [IF EXISTS] _procname_
 Оператор `DROP PROCEDURE` удаляет существующую хранимую процедуру.
 Если от хранимой процедуры существуют зависимости, то при попытке удаления такой процедуру будет выдана соответствующая ошибка.
 
-Если используется предложение `IF EXISTS`, то оператор `DROP PROCEDURE` попытается удалить хранимую процедуру и не будет получать ошибку, 
-если её не существует.
+Если используется предложение `IF EXISTS`, то оператор `DROP PROCEDURE` попытается удалить процедуру без выдачи ошибки, если её не существует.
+DDL триггеры не будут запускаться, если процедура не существует.
 
 [[fblangref-ddl-procedure-drop-who]]
 === Кто может удалить хранимую процедуру?
@@ -548,8 +560,8 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE PROCEDURE _procname_ [(<inparam> [, <inparam> ...])]
-[ RETURNS (<outparam> [, <outparam> ...]) ]
+RECREATE PROCEDURE _procname_ [( <in_params> )]
+[ RETURNS ( <out_params> ) ]
 <routine-body>
 
 Подробнее см. <<fblangref-ddl-proc-create-syntax,CREATE PROCEDURE>>.

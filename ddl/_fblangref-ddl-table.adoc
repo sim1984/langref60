@@ -22,7 +22,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE [GLOBAL TEMPORARY] TABLE _tablename_
+CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] _tablename_
   [EXTERNAL [FILE] '_filespec_']
   (<col_def> [, <col_def> | <tconstraint> ...])  
   [ON COMMIT {DELETE | PRESERVE} ROWS]
@@ -35,7 +35,7 @@ CREATE [GLOBAL TEMPORARY] TABLE _tablename_
   | <identity_col_def>
                     
 <regular_col_def> ::= 
-  colname { <datatype> | _domain_name_ }
+  _colname_ { <datatype> | _domain_name_ }
   [DEFAULT {<literal> | NULL | <context_var>}] 
   [NOT NULL]
   [<col_constraint>]
@@ -217,6 +217,14 @@ CREATE [GLOBAL TEMPORARY] TABLE _tablename_
 
 Оператор `CREATE TABLE` создаёт новую таблицу.
 Имя таблицы должно быть уникальным среди имён всех таблиц, представлений (VIEWs) и хранимых процедур базы данных. 
+
+Если используется предложение `IF NOT EXISTS`, то оператор `CREATE TABLE` попытается создать новую таблицу без выдачи ошибки, если она уже существует.
+DDL триггеры не будут запускаться, если таблица уже существует.
+
+[NOTE]
+====
+Таблицы используют одно и то же "`пространство имён`", что и представления и хранимые процедуры. Таким образом, если хранимая процедура с именем `SOME_NAME` существует и будет попытка выполнить `CREATE TABLE IF NOT EXISTS SOME_NAME`, то таблица не будет создана без выдачи ошибки.
+====
 
 Таблица может содержать, по меньшей мере, один столбец и произвольное количество ограничений таблицы.
 
@@ -1042,7 +1050,7 @@ ALTER TABLE _tablename_
   <operation> [, <operation>];
 
 <operation> ::=
-    ADD <col_def> 
+    ADD [IF NOT EXISTS] <col_def> 
   | ADD <tconstraint> 
   | DROP [IF EXISTS] _colname_
   | DROP CONSTRAINT [IF EXISTS] _constr_name_
@@ -1119,7 +1127,7 @@ ALTER TABLE _tablename_
   }          
 
 <tconstraint> ::= 
-  [CONSTRAINT _constr_name_]
+  [CONSTRAINT [IF NOT EXISTS] _constr_name_]
   {   UNIQUE (<col_list>) [<using_index>] 
     | PRIMARY KEY (<col_list>) [<using_index>] 
     | FOREIGN KEY (<col_list>) 
@@ -1766,8 +1774,8 @@ DROP TABLE [IF EXISTS] _tablename_
 Если таблица имеет зависимости, то удаление не будет произведено.
 При удалении таблицы будут также удалены все триггеры на её события и индексы, построенные для её полей.
 
-Если используется предложение `IF EXISTS`, то оператор `DROP TABLE` попытается удалить таблицу и не будет получать ошибку, 
-если её не существует.
+Если используется предложение `IF EXISTS`, то оператор `DROP TABLE` попытается удалить таблицу без выдачи ошибки, если её не существует.
+DDL триггеры не будут запускаться, если таблицы не существует.
 
 .Удаление таблицы
 [example]

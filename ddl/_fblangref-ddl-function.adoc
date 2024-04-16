@@ -22,11 +22,13 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE FUNCTION _funcname_ [(<inparam> [, <inparam> ...])]
+CREATE FUNCTION [IF NOT EXISTS] _funcname_ [( <in_params> )]
   RETURNS <type> [NOT NULL] [COLLATE _collation_]
   [DETERMINISTIC]
   <routine-body>
   
+<in_params> ::= <inparam> [, <inparam> ... ]
+
 <inparam> ::= <param_decl> [{= | DEFAULT} <value>]  
                     
 <value> ::=  {<literal> | NULL | <context_var>}
@@ -137,6 +139,9 @@ CREATE FUNCTION _funcname_ [(<inparam> [, <inparam> ...])]
 В этом случае всегда будет вызвана процедура/функция пакета. 
 ====
 
+Если используется предложение `IF NOT EXISTS`, то оператор `CREATE FUNCTION` попытается создать новую функцию без выдачи ошибки, если она уже существует.
+DDL триггеры не будут запускаться, если функция уже существует.
+
 `CREATE FUNCTION` является составным оператором, состоящий из заголовка и тела.
 Заголовок определяет имя хранимой функции, объявляет входные параметры и тип возвращаемого значения. 
 
@@ -146,11 +151,11 @@ CREATE FUNCTION _funcname_ [(<inparam> [, <inparam> ...])]
 [[fblangref-ddl-function-term]]
 === Терминатор оператора
 
-Некоторые редакторы SQL-операторов -- в частности утилита [app]``isql``, которая идёт в комплекте с Firebird, и возможно некоторые сторонние редакторы -- используют внутреннее соглашение, которое требует, чтобы все операторы были завершены с точкой с запятой.
+Некоторые редакторы SQL-операторов -- в частности утилита `isql`, которая идёт в комплекте с Firebird, и возможно некоторые сторонние редакторы -- используют внутреннее соглашение, которое требует, чтобы все операторы были завершены с точкой с запятой.
 
 Это создает конфликт с синтаксисом PSQL при кодировании в этих средах.
 Если вы не знакомы с этой проблемой и её решением, пожалуйста, изучите детали в главе PSQL в разделе, озаглавленном
-<<fblangref-psql-setterm,Изменение терминатора в [app]``isql``>>.
+<<fblangref-psql-setterm,Изменение терминатора в isql>>.
 
 [[fblangref-ddl-function-create-params]]
 === Входные параметры
@@ -472,8 +477,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER FUNCTION _funcname_
-[(<inparam> [, <inparam> ...])]   
+ALTER FUNCTION _funcname_ [( <in_params> )]
 RETURNS <type> [COLLATE _collation_]
 [DETERMINISTIC]
 <routine-body>
@@ -545,8 +549,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER FUNCTION _funcname_
-[(<inparam> [, <inparam> ...])]   
+CREATE OR ALTER FUNCTION _funcname_ [( <in_params> )]
 RETURNS <type> [COLLATE _collation_]
 [DETERMINISTIC]
 <routine-body>
@@ -615,8 +618,8 @@ DROP FUNCTION [IF EXISTS] _funcname_
 Оператор `DROP FUNCTION` удаляет существующую хранимую функцию.
 Если от хранимой функции существуют зависимости, то при попытке удаления такой функции будет выдана соответствующая ошибка. 
 
-Если используется предложение `IF EXISTS`, то оператор `DROP FUNCTION` попытается удалить хранимую функцию и не будет получать ошибку, 
-если её не существует.
+Если используется предложение `IF EXISTS`, то оператор `DROP FUNCTION` попытается удалить функцию без выдачи ошибки, если её не существует.
+DDL триггеры не будут запускаться, если функция не существует.
 
 [[fblangref-ddl-function-drop-who]]
 === Кто может удалить функцию?
@@ -665,8 +668,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE FUNCTION _funcname_
-[(<inparam> [, <inparam> ...])]   
+RECREATE FUNCTION _funcname_ [( <in_params> )]
 RETURNS <type> [COLLATE _collation_]
 [DETERMINISTIC]
 <routine-body>
