@@ -4904,7 +4904,7 @@ SELECT CHAR_TO_UUID('A0bF4E45-3029-2a44-D493-4998c9b439A3') FROM rdb$database
 -- returns A0BF4E4530292A44D4934998C9B439A3 (16-byte string)
 
 SELECT CHAR_TO_UUID('A0bF4E45-3029-2A44-X493-4998c9b439A3') FROM rdb$database
--- error: -Human readable UUID argument for CHAR_TO_UUID must
+-- error: Human readable UUID argument for CHAR_TO_UUID must
 -- have hex digit at position 20 instead of "X (ASCII 88)"
 ----
 ====
@@ -4922,14 +4922,18 @@ DSQL, PSQL
 .Синтаксис
 [listing]
 ----
-GEN_UUID()
+GEN_UUID([<version>])
+
+<version> ::= 4 | 7
 ----
 
 .Тип возвращаемого результата
 `BINARY(16)`
 
-Функция возвращает универсальный уникальный идентификатор ID в виде 16-байтной строки символов, отвечающий требованиям стандарта RFC-4122.
-Функция возвращает строку UUID 4-ой версии, где несколько битов зарезервированы, а остальные являются случайными.
+Функция возвращает универсальный уникальный идентификатор UUID в виде 16-байтной строки символов, отвечающий требованиям стандарта RFC-4122.
+Функция возвращает строку UUID 4-ой или 7-ой версии (по умолчанию 4-ой), где несколько битов зарезервированы, а остальные являются случайными.
+
+Строковый формат совместимого UUID v4/v7 -- `XXXXXXXX-XXXX-YXXX-ZXXX-XXXXXXXXXXXX`, где Y -- версия (4 или 7), а Z -- 8, 9, A или B.
 
 [[fblangref-scalarfuncs-gen-uuid-exmpl]]
 ==== Примеры `GEN_UUID`
@@ -4948,6 +4952,23 @@ GUID
 ========
 
 017347BFE212B2479C00FA4323B36320
+----
+====
+
+.Использование функции `GEN_UUID` v7
+[example]
+====
+[source,sql]
+----
+SELECT GEN_UUID(7) AS GUID FROM RDB$DATABASE
+----
+
+[listing]
+----
+GUID
+========
+
+019048F5B5FA7FD884ACBC17319B0EB6
 ----
 ====
 
@@ -4998,7 +5019,10 @@ SELECT UUID_TO_CHAR(x'876C45F4569B320DBCB4735AC3509E5F') FROM RDB$DATABASE;
 -- returns '876C45F4-569B-320D-BCB4-735AC3509E5F'
 
 SELECT UUID_TO_CHAR(GEN_UUID()) FROM RDB$DATABASE;
--- returns e.g. '680D946B-45FF-DB4E-B103-BB5711529B86'
+-- returns e.g. 'E362B6D9-75DE-4D6A-8812-8D6619064F8B'
+
+SELECT UUID_TO_CHAR(GEN_UUID(7)) FROM RDB$DATABASE
+-- returns e.g. '019048F8-8357-7443-8826-7CBA0C9528E6'
 
 SELECT UUID_TO_CHAR('Firebird swings!') FROM RDB$DATABASE;
 -- returns '46697265-6269-7264-2073-77696E677321'
