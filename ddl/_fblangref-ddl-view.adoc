@@ -162,6 +162,18 @@ WHERE MAX_SALARY < 15000;
 ----
 ====
 
+.Создание представления, если его не существует
+[example]
+====
+[source,sql]
+----
+CREATE VIEW IF NOT EXISTS ENTRY_LEVEL_JOBS AS
+SELECT JOB_CODE, JOB_TITLE
+FROM JOB
+WHERE MAX_SALARY < 15000;
+----
+====
+
 .Создание представления с проверкой условия фильтрации
 [example]
 ====

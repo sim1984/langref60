@@ -634,6 +634,17 @@ CREATE TABLE COUNTRY (
 ----
 ====
 
+.Создание таблицы, если её не существует
+[example]
+====
+[source,sql]
+----
+CREATE TABLE IF NOT EXISTS COUNTRY (
+  COUNTRY COUNTRYNAME NOT NULL PRIMARY KEY,
+  CURRENCY VARCHAR(10) NOT NULL);
+----
+====
+
 .Создание таблицы с заданием именованного первичного и уникального ключей
 [example]
 ====
@@ -836,7 +847,7 @@ SQL SECURITY DEFINER;
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE GLOBAL TEMPORARY TABLE name
+CREATE GLOBAL TEMPORARY TABLE [IF NOT EXISTS] name
   (<column_def> [, {<column_def> | <table_constraint>} ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS] 
   [SQL SECURITY {DEFINER | INVOKER}]
@@ -1316,6 +1327,16 @@ DDL триггеры не будут запускаться только есл�
 ----
 ALTER TABLE COUNTRY
 ADD CAPITAL VARCHAR(25);
+----
+====
+
+.Добавление столбца в таблицу, если его не существует
+[example]
+====
+[source,sql]
+----
+ALTER TABLE COUNTRY
+ADD IF NOT EXISTS CAPITAL VARCHAR(25);
 ----
 ====
 

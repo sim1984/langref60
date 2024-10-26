@@ -328,6 +328,21 @@ END
 ----
 ====
 
+.Создание DML триггера, если его не существует
+[example]
+====
+[source,sql]
+----
+CREATE TRIGGER IF NOT EXISTS SET_CUST_NO FOR CUSTOMER
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+  IF (NEW.CUST_NO IS NULL) THEN
+    NEW.CUST_NO = GEN_ID(CUST_NO_GEN, 1);
+END
+----
+====
+
 .Создание DML триггера выполняющегося с правами определяющего пользователя
 [example]
 ====

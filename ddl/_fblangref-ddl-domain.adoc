@@ -213,6 +213,17 @@ CHECK (VALUE > 1000);
 ----
 ====
 
+.Создание домена, если его не существует.
+[example]
+====
+[source,sql]
+----
+CREATE DOMAIN IF NOT EXISTS CUSTNO AS
+INTEGER DEFAULT 10000
+CHECK (VALUE > 1000);
+----
+====
+
 .Создание домена, который может принимать значения 'Да' и 'Нет'.
 [example]
 ====

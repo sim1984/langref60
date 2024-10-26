@@ -323,6 +323,32 @@ END
 ----
 ====
 
+.Создание хранимой процедуры, если её не существует
+[example]
+====
+[source,sql]
+----
+CREATE PROCEDURE IF NOT EXISTS ADD_BREED (
+  NAME D_BREEDNAME,
+  NAME_EN TYPE OF D_BREEDNAME, 
+  SHORTNAME TYPE OF COLUMN BREED.SHORTNAME,
+  REMARK VARCHAR(120),
+  CODE_ANIMAL INT NOT NULL DEFAULT 1
+)
+RETURNS (
+  CODE_BREED INT
+)
+AS
+BEGIN
+  INSERT INTO BREED (
+    CODE_ANIMAL, NAME, NAME_EN, SHORTNAME, REMARK)
+  VALUES (
+    :CODE_ANIMAL, :NAME, :NAME_EN, :SHORTNAME, :REMARK)
+  RETURNING CODE_BREED INTO CODE_BREED;
+END
+----
+====
+
 .Создание внешней хранимой процедуры
 ====
 [example]

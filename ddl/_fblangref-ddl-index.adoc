@@ -19,7 +19,8 @@ DSQL, ESQL.
 [listing,subs=+quotes]
 ----
 CREATE [UNIQUE] [ASC[ENDING] | DESC[ENDING]] 
-INDEX [IF NOT EXISTS] _indexname_ ON _tablename_
+INDEX [IF NOT EXISTS] _indexname_ [{ACTIVE | INACTIVE}] 
+ON _tablename_
 {(<column_list>) | COMPUTED [BY] (<value_expression>)}
 [WHERE <search_condition>]
 
@@ -58,6 +59,8 @@ INDEX [IF NOT EXISTS] _indexname_ ON _tablename_
 
 Если используется предложение `IF NOT EXISTS`, то оператор `CREATE INDEX` попытается создать новый индекс без выдачи ошибки, если он уже существует.
 DDL триггеры не будут запускаться, если индекс уже существует.
+
+По умолчанию индекс создаётся в активном состоянии, если в операторе `CREATE INDEX` будет указано ключевое слово `INACTIVE`, то индекс метаданные индекса будут созданы, но сам индекс не постоен (не активен). Неактивный индекс можно построить (активировать) позже используя оператор `ALTER INDEX`.
 
 .Индексы в ключах
 [NOTE]
@@ -235,12 +238,31 @@ CREATE INDEX IDX_UPDATER ON SALARY_HISTORY (UPDATER_ID);
 ----
 ====
 
+.Создание индекса, если он не существует
+[example]
+====
+[source,sql]
+----
+CREATE INDEX IF NOT EXISTS IDX_UPDATER ON SALARY_HISTORY (UPDATER_ID);
+----
+====
+
+.Создание индекса в неактивном состоянии
+[example]
+====
+[source,sql]
+----
+CREATE INDEX IDX_CHANGE INACTIVE 
+ON SALARY_HISTORY (CHANGE_DATE);
+----
+====
+
 .Создание индекса с сортировкой ключей по убыванию
 [example]
 ====
 [source,sql]
 ----
-CREATE DESCENDING INDEX IDX_CHANGE 
+CREATE DESCENDING INDEX IDX_CHANGE_DESC 
 ON SALARY_HISTORY (CHANGE_DATE);
 ----
 ====

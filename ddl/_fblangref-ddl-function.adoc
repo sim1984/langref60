@@ -336,6 +336,20 @@ MY_VAR = ADD_INT(A);
 ----
 ====
 
+.Создание хранимой функции, если её не существует
+[example]
+====
+[source,sql]
+----
+CREATE FUNCTION IF NOT EXISTS ADD_INT(A INT, B INT DEFAULT 0) 
+RETURNS INT
+AS
+BEGIN
+  RETURN A+B;
+END
+----
+====
+
 .Создание детерминистической хранимой функции
 [example]
 ====
