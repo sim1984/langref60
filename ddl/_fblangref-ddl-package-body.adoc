@@ -255,6 +255,190 @@ END
 .См. также:
 <<fblangref-ddl-package-body-drop,`DROP PACKAGE BODY`>>, <<fblangref-ddl-package-create,`CREATE PACKAGE`>>.
 
+[[fblangref-ddl-package-body-alter]]
+== `ALTER PACKAGE BODY`
+
+.Назначение
+Изменение существующего тела пакета.
+(((ALTER PACKAGE BODY)))
+
+.Доступно в
+DSQL
+
+.Синтаксис
+[listing,subs="+quotes,macros"]
+----
+ALTER PACKAGE BODY _package_name_
+AS
+BEGIN
+  [<package_item> ...]
+  [<package_body_item> ...]
+END
+
+<package_item> ::=
+    <function_decl>;
+  | <procedure_decl>;
+
+<function_decl> ::=
+  FUNCTION _func_name_ [(<in_params>)]
+  RETURNS <type> [COLLATE _collation_]
+  [<function_options>]
+
+<procedure_decl> ::=
+  PROCEDURE _proc_name_ [(<in_params>)]
+  [RETURNS (<out_params>)]
+  [<procedure_options>]
+
+<package_body_item> ::=
+    <function_impl>
+  | <procedure_impl>
+
+<function_impl> ::=
+  FUNCTION _func_name_ [(<in_impl_params>)]
+  RETURNS <type> [COLLATE _collation_]
+  [DETERMINISTIC]
+  <routine-body>
+
+<procedure_impl> ::=
+  PROCEDURE _proc_name_ [(<in_impl_params>)]
+  [RETURNS (<out_params>)]
+  <routine-body>
+
+Подробнее см. <<fblangref-ddl-pkg-body-create-syntax,CREATE PACKAGE BODY>>.
+----
+
+Оператор `ALTER PACKAGE BODY` изменяет существующее тело пакета.
+
+[[fblangref-ddl-package-body-alter-examples]]
+=== Примеры
+
+.Изменение тела пакета
+[example]
+====
+[source,sql]
+----
+ALTER PACKAGE BODY APP_VAR
+AS
+BEGIN
+  -- Возвращает дату начала периода
+  FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC
+  AS
+  BEGIN
+    RETURN RDB$GET_CONTEXT('USER_SESSION', 'DATEBEGIN');
+  END
+  -- Возвращает дату окончания периода
+  FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC
+  AS
+  BEGIN
+    RETURN RDB$GET_CONTEXT('USER_SESSION', 'DATEEND');
+  END
+  -- Устанавливает диапазон дат рабочего периода
+  PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE)
+  AS
+  BEGIN
+    RDB$SET_CONTEXT('USER_SESSION', 'DATEBEGIN', ADATEBEGIN);
+    RDB$SET_CONTEXT('USER_SESSION', 'DATEEND', ADATEEND);
+  END
+END
+----
+====
+
+.См. также:
+<<fblangref-ddl-package-body-create,`CREATE PACKAGE BODY`>>.
+
+[[fblangref-ddl-package-body-createoralter]]
+== `CREATE OR ALTER PACKAGE BODY`
+
+.Назначение
+Создание нового или изменение существующего тела пакета.
+(((CREATE OR ALTER ALTER PACKAGE BODY)))
+
+.Доступно в
+DSQL
+
+.Синтаксис
+[listing,subs="+quotes,macros"]
+----
+CREATE OR ALTER PACKAGE BODY _package_name_
+AS
+BEGIN
+  [<package_item> ...]
+  [<package_body_item> ...]
+END
+
+<package_item> ::=
+    <function_decl>;
+  | <procedure_decl>;
+
+<function_decl> ::=
+  FUNCTION _func_name_ [(<in_params>)]
+  RETURNS <type> [COLLATE _collation_]
+  [<function_options>]
+
+<procedure_decl> ::=
+  PROCEDURE _proc_name_ [(<in_params>)]
+  [RETURNS (<out_params>)]
+  [<procedure_options>]
+
+<package_body_item> ::=
+    <function_impl>
+  | <procedure_impl>
+
+<function_impl> ::=
+  FUNCTION _func_name_ [(<in_impl_params>)]
+  RETURNS <type> [COLLATE _collation_]
+  [DETERMINISTIC]
+  <routine-body>
+
+<procedure_impl> ::=
+  PROCEDURE _proc_name_ [(<in_impl_params>)]
+  [RETURNS (<out_params>)]
+  <routine-body>
+
+Подробнее см. <<fblangref-ddl-pkg-body-create-syntax,CREATE PACKAGE BODY>>.
+----
+
+Оператор `CREATE OR ALTER PACKAGE BODY` создаёт новое или изменяет существующее тело пакета. Если тело пакета с заданным именем существовало на момент выполнения опреатора, то оно будет изменено, в противном случае создано.
+
+[[fblangref-ddl-package-body-createoralter-examples]]
+=== Примеры
+
+.Создание нового или изменение существующего тела пакета
+[example]
+====
+[source,sql]
+----
+CREATE OR ALTER PACKAGE BODY APP_VAR
+AS
+BEGIN
+  -- Возвращает дату начала периода
+  FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC
+  AS
+  BEGIN
+    RETURN RDB$GET_CONTEXT('USER_SESSION', 'DATEBEGIN');
+  END
+  -- Возвращает дату окончания периода
+  FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC
+  AS
+  BEGIN
+    RETURN RDB$GET_CONTEXT('USER_SESSION', 'DATEEND');
+  END
+  -- Устанавливает диапазон дат рабочего периода
+  PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE)
+  AS
+  BEGIN
+    RDB$SET_CONTEXT('USER_SESSION', 'DATEBEGIN', ADATEBEGIN);
+    RDB$SET_CONTEXT('USER_SESSION', 'DATEEND', ADATEEND);
+  END
+END
+----
+====
+
+.См. также:
+<<fblangref-ddl-package-body-create,`CREATE PACKAGE BODY`>>,
+<<fblangref-ddl-package-body-alter,`ALTER PACKAGE BODY`>>,
+<<fblangref-ddl-package-body-recreate,`RECREATE PACKAGE BODY`>>.
+
 [[fblangref-ddl-package-body-drop]]
 == `DROP PACKAGE BODY`
 
