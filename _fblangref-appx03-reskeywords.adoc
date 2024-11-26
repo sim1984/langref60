@@ -34,7 +34,9 @@
 |`BLOB`
 |`BOOLEAN`
 |`BOTH`
+|`BTRIM`
 |`BY`
+|`CALL`
 |`CASE`
 |`CAST`
 |`CHAR`
@@ -121,6 +123,7 @@
 |`LOCALTIMESTAMP`
 |`LONG`
 |`LOWER`
+|`LTRIM`
 |`MAX`
 |`MERGE`
 |`MIN`
@@ -184,6 +187,7 @@
 |`ROW`
 |`ROWS`
 |`ROW_COUNT`
+|`RTRIM`
 |`SAVEPOINT`
 |`SCROLL`
 |`SECOND`
@@ -247,26 +251,6 @@
 
 [%autowidth,cols="3*",frame=none,grid=none,stripes=none]
 |===
-|`!<`
-|`^<`
-|`^=`
-|`^>`
-|`,`
-|`:=`
-|`!=`
-|`!>`
-|`(`
-|`)`
-|`<`
-|`++<=++`
-|`<>`
-|`=`
-|`>`
-|`>=`
-|`{vbar}{vbar}`
-|`~<`
-|`~=`
-|`~>`
 |`ABS`
 |`ABSOLUTE`
 |`ACCENT`
@@ -282,6 +266,7 @@
 |`ALWAYS`
 |`AND`
 |`ANY`
+|`ANY_VALUE`
 |`AS`
 |`ASC`
 |`ASCENDING`
@@ -313,12 +298,15 @@
 |`BIN_XOR`
 |`BIT_LENGTH`
 |`BLOB`
+|`BLOBID`
 |`BLOCK`
 |`BODY`
 |`BOOLEAN`
 |`BOTH`
 |`BREAK`
+|`BTRIM`
 |`BY`
+|`CALL`
 |`CALLER`
 |`CASCADE`
 |`CASE`
@@ -435,6 +423,7 @@
 |`FOLLOWING`
 |`FOR`
 |`FOREIGN`
+|`FORMAT`
 |`FREE_IT`
 |`FROM`
 |`FULL`
@@ -508,6 +497,7 @@
 |`LOWER`
 |`LPAD`
 |`LPARAM`
+|`LTRIM`
 |`MAKE_DBKEY`
 |`MANUAL`
 |`MAPPING`
@@ -561,6 +551,7 @@
 |`OVERFLOW`
 |`OVERLAY`
 |`OVERRIDING`
+|`OWNER`
 |`PACKAGE`
 |`PAD`
 |`PAGE`
@@ -647,6 +638,7 @@
 |`RSA_PUBLIC`
 |`RSA_SIGN_HASH`
 |`RSA_VERIFY_HASH`
+|`RTRIM`
 |`SALT_LENGTH`
 |`SAVEPOINT`
 |`SCALAR_ARRAY`
@@ -699,6 +691,7 @@
 |`TAN`
 |`TANH`
 |`TARGET`
+|`TEMP`
 |`TEMPORARY`
 |`THEN`
 |`TIES`
