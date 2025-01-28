@@ -239,7 +239,6 @@
 |`WITH`
 |`WITHOUT`
 |`YEAR`
-|{nbsp}
 |===
 
 
