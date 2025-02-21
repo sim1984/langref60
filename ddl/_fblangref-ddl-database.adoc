@@ -18,7 +18,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,attributes"]
 ----
-CREATE {DATABASE | SCHEMA} <filespec>
+CREATE DATABASE <filespec>
   [<db_initial_option> [<db_initial_option> ...]]
   [<db_config_option> [<db_config_option> ...]]
 
@@ -119,8 +119,6 @@ CREATE {DATABASE | SCHEMA} <filespec>
 |===
 
 Оператор `CREATE DATABASE` создаёт новую базу данных.
-Вы можете использовать `CREATE DATABASE` или `CREATE SCHEMA`.
-Это синонимы. 
 
 /// TODO: Переписать после введения табличных пространств.
 
@@ -343,7 +341,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-ALTER {DATABASE | SCHEMA}
+ALTER DATABASE 
     {ADD DIFFERENCE FILE '_diff_file_' | DROP DIFFERENCE FILE}
   | {{BEGIN | END} BACKUP}
   | {SET DEFAULT CHARACTER SET _charset_}
