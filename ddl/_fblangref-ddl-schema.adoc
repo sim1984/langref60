@@ -1,0 +1,143 @@
+[[fblangref-ddl-schema]]
+= SCHEMA
+
+TODO: Написать
+
+[[fblangref-ddl-schema-create]]
+== `CREATE SCHEMA`
+
+.Назначение
+Создание новой схемы.
+(((CREATE SCHEMA)))
+
+.Доступно в
+DSQL, ESQL
+
+[[fblangref-ddl-schema-create-syntax]]
+.Синтаксис
+[listing,subs="+quotes,attributes"]
+----
+CREATE [IF NOT EXISTS] SCHEMA <schema name>
+    [DEFAULT CHARACTER SET <character set name>]
+    [DEFAULT SQL SECURITY {DEFINER | INVOKER}]
+
+----
+
+.Параметры оператора `CREATE SCHEMA`
+[[fblangref-ddl-tbl-createdatabase]]
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^|Параметр
+^|Описание
+
+|schema name
+|Имя схемы базы данных. Может содержать до 63 символов.
+
+|character set name
+|Задаёт набор символов по умолчанию для строковых типов данных для объектов внутри схемы.
+|===
+
+Оператор `CREATE SCHEMA` создаёт новую схему базы данных.
+
+Если используется предложение `IF NOT SCHEMA`, то оператор `CREATE DOMAIN` попытается создать новую схему без выдачи ошибки, если она уже существует.
+
+(((CREATE SCHEMA, DEFAULT CHARACTER SET)))
+Необязательное предложение `DEFAULT CHARACTER SET` задаёт набор символов по умолчанию для строковых типов данных (`CHAR`, `VARCHAR` и `BLOB`) для объектов принадлежащих этой схеме. Если набор символов по умолчанию не указан для схемы, то используется набор символов по умолчанию базы данных.
+
+(((CREATE SCHEMA, DEFAULT SQL SECURITY)))
+Необязательное предложение `DEFAULT SQL SECURITY` позволяет задать значение по умолчанию привилегий выполнения для вновь создаваемых объектов схемы. Объекты схемы могут выполняться с привилегиями вызывающего (`INVOKER`) или определяющего пользователя (`DEFINER`). Если предложение `DEFAULT SQL SECURITY` не указано, то схема унаследует привилегии выполнения заданные для базы данных.
+
+В отличие от автоматически созданной схемы `PUBLIC`, вновь созданные схемы предоставляют разрешение `USAGE` только своим владельцам, а не `PUBLIC`.
+
+Имена схем `INFORMATION_SCHEMA` и `DEFINITION_SCHEMA` зарезервированы и не могут использоваться для новых схем.
+
+[[fblangref-ddl-schema-create-who]]
+=== Кто может создать схему?
+
+Выполнить оператор `CREATE SCHEMA` могут: 
+
+* <<fblangref-security-administrators,Администраторы>>
+* Пользователи с привилегией `CREATE SCHEMA`.
+
+Пользователь, создавший схему, становится её владельцем.
+
+[[fblangref-ddl-schema-alter]]
+== `ALTER SCHEMA`
+
+.Назначение
+Изменение существующей схемы.
+(((ALTER SCHEMA)))
+
+.Доступно в
+DSQL, ESQL
+
+[[fblangref-ddl-schema-alter-syntax]]
+.Синтаксис
+[listing,subs="+quotes,attributes"]
+----
+ALTER SCHEMA <schema name>
+    <alter schema option> [<alter schema option>  ...]
+
+<alter schema option> ::=
+    SET DEFAULT CHARACTER SET <character set name> |
+    SET DEFAULT SQL SECURITY {DEFINER | INVOKER} |
+    DROP DEFAULT CHARACTER SET |
+    DROP DEFAULT SQL SECURITY
+
+----
+
+Оператор `ALTER SCHEMA` позволяет изменить аттрибуты по умолчанию для вновь создаваемых объектов схемы.
+
+[[fblangref-ddl-schema-create-or-alter]]
+== `CREATE OR ALTER SCHEMA`
+
+.Назначение
+Создание новой схемы или изменение существующей.
+(((CREATE OR ALTER SCHEMA)))
+
+.Доступно в
+DSQL, ESQL
+
+.Синтаксис
+[listing,subs="+quotes,attributes"]
+----
+CREATE OR ALTER SCHEMA <schema name>
+    [DEFAULT CHARACTER SET <character set name>]
+    [DEFAULT SQL SECURITY {DEFINER | INVOKER}]
+
+----
+
+[[fblangref-ddl-schema-recreate]]
+== `RECREATE SCHEMA`
+
+.Назначение
+Создание новой схемы или удаление старой и создание новой схемы.
+(((RECREATE SCHEMA)))
+
+.Доступно в
+DSQL, ESQL
+
+.Синтаксис
+[listing,subs="+quotes,attributes"]
+----
+RECREATE SCHEMA <schema name>
+    [DEFAULT CHARACTER SET <character set name>]
+    [DEFAULT SQL SECURITY {DEFINER | INVOKER}]
+
+----
+
+[[fblangref-ddl-schema-drop]]
+== `DROP SCHEMA`
+
+.Назначение
+Создание схемы базы данных.
+(((DROP SCHEMA)))
+
+.Доступно в
+DSQL, ESQL
+
+.Синтаксис
+[listing,subs="+quotes,attributes"]
+----
+DROP [IF EXISTS] SCHEMA <schema name>
+----
