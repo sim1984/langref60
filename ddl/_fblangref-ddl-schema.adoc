@@ -1,7 +1,55 @@
 [[fblangref-ddl-schema]]
 = SCHEMA
 
-TODO: Написать
+Схемы позволяют логически группировать объекты базы данных (такие как таблицы, представления и индексы), обеспечивая четкую структуру базы данных.  В основном они используются для двух целей:
+
+* Схемы для организации объектов базы данных
++
+Схемы помогают в модульной организации объектов базы данных, что упрощает управление и поддержку базы данных. Разделив базу данных на разные схемы, разработчики и администраторы могут сосредоточиться на определенных областях, 
+улучшая масштабируемость команды и снижая сложность.
++
+Например, схема `SYSTEM` разделяет объекты, созданные двумя различными группами (основная команда СУБД Firebird и пользователи Firebird). Пользователи Firebird могут организовывать объекты в настраиваемых схемах, таких как `FINANCE` и `MARKETPLACE`.
+
+* Схемы для изоляции данных
++
+В многопользовательских приложениях схемы могут обеспечивать изоляцию данных для разных клиентов или арендаторов. Назначая уникальную схему каждому арендатору, таблицы и другие объекты могут иметь одинаковые имена в разных схемах, что снижает риски утечки данных и иногда повышает производительность. Приложения могут устанавливать путь поиска схемы для текущего выбранного клиента.
++
+Такой подход упрощает управление базой данных и масштабирование, поскольку данные каждого арендатора изолированы, что упрощает обслуживание, обновления и резервное копирование. Примерами имен схем могут быть `CUSTOMER_1` и `CUSTOMER_2`.
+
+Объекты базы данных делятся на две категории: не имеющие схемы и имеющие привязку к схеме.
+
+Следующие типы объектов базы данных не имеют схем:
+
+* Пользователи
+* Роли
+* BLOB фильтры
+* Схемы
+* Табличные пространства
+
+Следующие типы объектов базы данных имеют привязку к схеме:
+
+* Таблицы
+* Индексы
+* Представления
+* Триггеры
+* Процедуры
+* Функции
+* Пакеты
+* Домены
+* Последовательности (генераторы)
+* Исключения
+* Наборы символов
+* Сортировки
+
+При создании новой базы данных автоматически будут созданы две схемы: `PUBLIC` и `SYSTEM`.
+
+Все системные объекты, привязанные к схеме (например, `RDB$*` и `MON$*`), создаются в выделенной схеме под названием `SYSTEM`. Схема `SYSTEM` имеет разрешение `USAGE` по умолчанию, предоставленное PUBLIC, и включена в путь поиска по умолчанию. Это обеспечивает обратную совместимость с предыдущими версиями Firebird.
+
+Хотя схема `SYSTEM` допускает такие операции, как создание индексов и манипуляции этими индексами, в остальном она заблокирована для изменений DDL. Изменение объектов в схеме `SYSTEM` с помощью операций DDL настоятельно не рекомендуется.
+
+Схема с именем `PUBLIC` автоматически создается в новых базах данных с разрешением `USAGE` по умолчанию, предоставленным `PUBLIC`. Однако только владелец базы данных или схемы имеет разрешения по умолчанию для манипулирования объектами в этой схеме.
+
+В отличие от схемы `SYSTEM`, схема `PUBLIC` не является системным объектом и может быть удалена владельцем базы данных или пользователем с разрешением `DROP ANY SCHEMA`. Если восстанавливается резервная копия Firebird 6 или более поздней версии с помощью `gbak`, а схема `PUBLIC` отсутствовала в исходной базе данных, восстановленная база данных также исключит её.
 
 [[fblangref-ddl-schema-create]]
 == `CREATE SCHEMA`
@@ -17,14 +65,14 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,attributes"]
 ----
-CREATE [IF NOT EXISTS] SCHEMA <schema name>
+CREATE SCHEMA [IF NOT EXISTS] <schema name>
     [DEFAULT CHARACTER SET <character set name>]
     [DEFAULT SQL SECURITY {DEFINER | INVOKER}]
 
 ----
 
 .Параметры оператора `CREATE SCHEMA`
-[[fblangref-ddl-tbl-createdatabase]]
+[[fblangref-ddl-tbl-create-schema]]
 [cols="<1,<3", options="header",stripes="none"]
 |===
 ^|Параметр
@@ -39,7 +87,7 @@ CREATE [IF NOT EXISTS] SCHEMA <schema name>
 
 Оператор `CREATE SCHEMA` создаёт новую схему базы данных.
 
-Если используется предложение `IF NOT SCHEMA`, то оператор `CREATE DOMAIN` попытается создать новую схему без выдачи ошибки, если она уже существует.
+Если используется предложение `IF NOT SCHEMA`, то оператор `CREATE SCHEMA` попытается создать новую схему без выдачи ошибки, если она уже существует.
 
 (((CREATE SCHEMA, DEFAULT CHARACTER SET)))
 Необязательное предложение `DEFAULT CHARACTER SET` задаёт набор символов по умолчанию для строковых типов данных (`CHAR`, `VARCHAR` и `BLOB`) для объектов принадлежащих этой схеме. Если набор символов по умолчанию не указан для схемы, то используется набор символов по умолчанию базы данных.
@@ -51,6 +99,40 @@ CREATE [IF NOT EXISTS] SCHEMA <schema name>
 
 Имена схем `INFORMATION_SCHEMA` и `DEFINITION_SCHEMA` зарезервированы и не могут использоваться для новых схем.
 
+=== Примеры
+
+.Создание новой схемы с аттрибутами унаследованными от базы данных
+[example]
+====
+[source,sql]
+----
+CREATE SCHEMA FINANCE;
+----
+====
+
+.Создание новой схемы с аттрибутами отличными от тех, что указаны при создании БД
+[example]
+====
+[source,sql]
+----
+CREATE SCHEMA FINANCE
+DEFAULT CHARACTER SET UTF8;
+
+CREATE SCHEMA MARKETPLACE
+DEFAULT CHARACTER SET UTF8
+DEFAULT SQL SECURITY DEFINER;
+----
+====
+
+.Создание новой схемы, если её не существует
+[example]
+====
+[source,sql]
+----
+CREATE SCHEMA IF NOT EXISTS FINANCE;
+----
+====
+
 [[fblangref-ddl-schema-create-who]]
 === Кто может создать схему?
 
@@ -60,6 +142,12 @@ CREATE [IF NOT EXISTS] SCHEMA <schema name>
 * Пользователи с привилегией `CREATE SCHEMA`.
 
 Пользователь, создавший схему, становится её владельцем.
+
+.См. также:
+<<fblangref-ddl-schema-alter>>,
+<<fblangref-ddl-schema-drop>>,
+<<fblangref-ddl-schema-create-or-alter>>,
+<<fblangref-ddl-schema-recreate>>.
 
 [[fblangref-ddl-schema-alter]]
 == `ALTER SCHEMA`
@@ -88,6 +176,35 @@ ALTER SCHEMA <schema name>
 
 Оператор `ALTER SCHEMA` позволяет изменить аттрибуты по умолчанию для вновь создаваемых объектов схемы.
 
+=== Примеры
+
+.Изменение аттрибутов схемы
+[example]
+====
+[source,sql]
+----
+ALTER SCHEMA FINANCE
+SET DEFAULT CHARACTER SET UTF8;
+
+ALTER SCHEMA MARKETPLACE
+SET DEFAULT CHARACTER SET UTF8
+DROP DEFAULT SQL SECURITY;
+----
+====
+
+=== Кто может выполнить ALTER SCHEMA?
+
+Выполнить оператор `ALTER SCHEMA` могут: 
+
+* <<fblangref-security-administrators,Администраторы>>
+* Владелец схемы; 
+* Пользователи с привилегией `ALTER ANY SCHEMA`.
+
+.См. также:
+<<fblangref-ddl-schema-create>>,
+<<fblangref-ddl-schema-drop>>,
+<<fblangref-ddl-schema-create-or-alter>>.
+
 [[fblangref-ddl-schema-create-or-alter]]
 == `CREATE OR ALTER SCHEMA`
 
@@ -106,6 +223,84 @@ CREATE OR ALTER SCHEMA <schema name>
     [DEFAULT SQL SECURITY {DEFINER | INVOKER}]
 
 ----
+
+Оператор `CREATE OR ALTER SCHEMA` создаёт схему с указанными аттрибутами, если её не существует, или изменяет аттрибуты схемы на указанные, если схема существует.
+
+=== Примеры
+
+.Создание новой схемы или изменение аттрибутов существующей
+[example]
+====
+[source,sql]
+----
+CREATE OR ALTER SCHEMA FINANCE
+SET DEFAULT CHARACTER SET UTF8;
+
+CREATE OR ALTER SCHEMA MARKETPLACE
+DEFAULT CHARACTER SET UTF8
+DEFAULT SQL SECURITY INVOKER;
+----
+====
+
+.См. также:
+<<fblangref-ddl-schema-create>>,
+<<fblangref-ddl-schema-alter>>,
+<<fblangref-ddl-schema-recreate>>.
+
+[[fblangref-ddl-schema-drop]]
+== `DROP SCHEMA`
+
+.Назначение
+Удаление схемы базы данных.
+(((DROP SCHEMA)))
+
+.Доступно в
+DSQL, ESQL
+
+.Синтаксис
+[listing,subs="+quotes,attributes"]
+----
+DROP SCHEMA [IF EXISTS] <schema name>
+----
+
+Оператор `DROP SCHEMA` удаляет существующую схему. Если схема имеет зависимости, то удаление не будет произведено и будет выдана ошибка.
+
+В настоящее время разрешается удалять только пустые схемы, то есть схемы в которых нет ни одного объекта базы данных.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP SCHEMA` попытается удалить схему без выдачи ошибки, если её не существует.
+
+=== Примеры
+
+.Удаление схемы
+[example]
+====
+[source,sql]
+----
+DROP SCHEMA FINANCE;
+----
+====
+
+.Удаление схемы, если она существует
+[example]
+====
+[source,sql]
+----
+DROP SCHEMA IF EXISTS MARKETPLACE;
+----
+====
+
+=== Кто может удалить схему?
+
+Выполнить оператор `DROP SCHEMA` могут: 
+
+* <<fblangref-security-administrators,Администраторы>>
+* Владелец схемы; 
+* Пользователи с привилегией `DROP ANY SCHEMA`.
+
+.См. также:
+<<fblangref-ddl-schema-create>>,
+<<fblangref-ddl-schema-alter>>,
+<<fblangref-ddl-schema-recreate>>.
 
 [[fblangref-ddl-schema-recreate]]
 == `RECREATE SCHEMA`
@@ -126,18 +321,20 @@ RECREATE SCHEMA <schema name>
 
 ----
 
-[[fblangref-ddl-schema-drop]]
-== `DROP SCHEMA`
+Оператор `CREATE OR ALTER SCHEMA` создаёт схему с указанными аттрибутами, если её не существует, или пересоздаёт схему, если она существует.
 
-.Назначение
-Создание схемы базы данных.
-(((DROP SCHEMA)))
+=== Примеры
 
-.Доступно в
-DSQL, ESQL
-
-.Синтаксис
-[listing,subs="+quotes,attributes"]
+.Пересоздание схемы
+[example]
+====
+[source,sql]
 ----
-DROP [IF EXISTS] SCHEMA <schema name>
+RECREATE SCHEMA FINANCE;
 ----
+====
+
+.См. также:
+<<fblangref-ddl-schema-create>>,
+<<fblangref-ddl-schema-drop>>,
+<<fblangref-ddl-schema-create-or-alter>>.
