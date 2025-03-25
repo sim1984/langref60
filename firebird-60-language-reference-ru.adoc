@@ -1,7 +1,7 @@
 [[fblangref]]
 = Руководство по языку SQL СУБД Firebird 6.0
 Денис Симонов; Дмитрий Филиппов; Александр Карпейкин; Алексей Ковязин; Дмитрий Кузьменко; Paul Vinkenoog; Дмитрий Еманов; Mark Rotteveel
-0.2.9, от 28.01.2025
+0.2.10, от 25.03.2025
 :doctype: book
 :sectnums:
 :sectanchors:
@@ -46,6 +46,8 @@ include::_fblangref-functions-scalar.adoc[leveloffset=1]
 include::_fblangref-functions-aggregate.adoc[leveloffset=1]
 
 include::_fblangref-functions-window.adoc[leveloffset=1]
+
+include::_fblangref-functions-table.adoc[leveloffset=1]
 
 include::_fblangref-build-in-packages.adoc[leveloffset=1]
 

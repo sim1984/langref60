@@ -1,0 +1,156 @@
+[[fblangref-tablevalue-functions]]
+= Табличные функции
+
+Табличные функции -- это функции, выдающие набор строк, которые состоят из одного или нескольких столбцов скалярных типов. Они применяются в запросах как таблицы, представления или подзапросы в предложении `FROM`. Столбцы, возвращённые табличными функциями, можно включить в выражения `SELECT`, `JOIN` или `WHERE` так же, как столбцы таблиц, представлений или подзапросов.
+
+В общем виде вызов табличной функции выглядит следующим образом:
+
+.Синтаксис
+[listing,subs="+quotes, macros"]
+----
+<table value function> ::= 
+  _function_name_ (<args>) [AS] <correlation name> [(<derived column list>)]
+
+<derived column list> ::=  
+  <derived column name> [, <derived column name> ... ] 
+----
+
+[[fblangref-tablefuncs-tbl]]
+.Параметры табличных функций
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|function_name
+|Имя табличной функции.
+
+|correlation name
+|Псевдоним набора записей, возвращаемого табличной функцией. Это обязательный параметр (согласно стандарту SQL).
+
+|derived column name
+|Псевдоним столбца для набора записей, возвращаемого табличной функцией. 
+
+|===
+
+[NOTE]
+====
+Табличные функции очень похожи на хранимые процедуры выбора, но в отличии от процедур в настоящее время пользователь не может создавать свои табличные функции. Таким образом табличную функцию можно рассматривать как встроенную хранимую процедуру выбора.
+====
+
+[[fblangref-tablefunc-unlist]]
+== UNLIST
+
+Функция `UNLIST` анализирует входную строку, используя указанный разделитель (по умолчанию подразумевается запятая ",") и возвращает подстроки как дискретные записи, содержащие одно поле. Кроме того, можно указать желаемый тип возвращаемого поля. Если указанное преобразование типа данных невозможно, во время выполнения возникает ошибка.
+
+.Синтаксис
+[listing,subs="+quotes, macros"]
+----
+UNLIST (<input> [, <separator>] [<data type conversion>]) [AS] <correlation name> [(<derived column name>)]
+ 
+<input> ::= <value>
+ 
+<separator> ::= <value>
+ 
+<data type conversion> ::= RETURNING <data type>
+----
+
+.Параметры функции `UNLIST`
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|input
+|Любое выражение, которое возвращает строку символов или BLOB (или может быть преобразовано в строку). Этот параметр является обязательным.
+
+|separator
+|Необязательное выражение, которое возвращает строку, которая используется как разделитель (т. е. отделяет одно значение от другого внутри входной строки). Если указана пустая строка, то на выходе будет только одна запись, содержащая входную строку. Если этот параметр пропущен, в качестве разделителя используется запятая. Максимальная длинна разделителя ограничена 32 Кбайт.
+
+|data type
+|Целевой тип данных для преобразования выходных значений. В качестве альтернативы в качестве возвращаемого типа можно указать домен. Если этот параметр пропущен, подразумевается `VARCHAR(32)`. Старайтесь всегда указывать тип выходного результата, заменяя тип по умолчанию.
+
+|correlation name
+|Псевдоним набора записей, возвращаемого функцией `UNLIST`. Это обязательный параметр (согласно стандарту SQL).
+
+|derived column name
+|Необязательный псевдоним столбца, возвращаемого функцией `UNLIST`. Если этот параметр пропущен, то возвращаемый столбец имеет имя `UNLIST`.
+|===
+
+.Примеры использования UNLIST в SQL запросах
+====
+[source,sql]
+----
+SELECT * FROM UNLIST('1,2,3,4,5') AS U;
+
+SELECT * FROM UNLIST('100:200:300:400:500', ':' RETURNING INT) AS U;
+
+SELECT U.* FROM UNLIST('text1, text2, text3') AS U;
+
+SELECT C0 FROM UNLIST('text1, text2, text3') AS U(C0);
+
+SELECT U.C0 FROM UNLIST(‘text1, text2, text3’) AS U(C0);
+
+SELECT *
+FROM COLOR
+WHERE COLOR.CODE_COLOR IN (
+  SELECT I FROM UNLIST('1,2,3,4,5' RETURNING INT) AS U(I)
+)
+----
+====
+
+.Примеры использования UNLIST в PSQL
+====
+[source,sql]
+----
+SET TERM ^ ;
+
+RECREATE PROCEDURE TEST_PROC RETURNS (PROC_RETURN_INT INT)
+AS
+DECLARE VARIABLE text VARCHAR(11);
+BEGIN
+    text = '123:123:123';
+    FOR 
+        SELECT * FROM UNLIST( :text, ':' RETURNING INT) AS A 
+        INTO :PROC_RETURN_INT 
+    DO
+        SUSPEND;
+END^
+ 	
+SET TERM ; ^
+
+SELECT * FROM TEST_PROC;
+----
+====
+
+.Примеры преобразования к типу домену или типу столбца
+====
+[source,sql]
+----
+CREATE DOMAIN D1 AS INT;
+SELECT TEST_DOMAIN FROM UNLIST('1,2,3,4' RETURNING D1) AS A(TEST_DOMAIN);
+ 
+CREATE TABLE TABLE_TEST (COL1 INT);
+SELECT TEST_TYPE_OF 
+FROM UNLIST('1,2,3,4' RETURNING TYPE OF COLUMN TABLE_TEST.COL1) AS A(TEST_TYPE_OF);
+----
+====
+
+[IMPORTANT]
+====
+Непосредственное указание `UNLIST` в качестве столбца в предложении `SELECT` запрещено.
+
+[source,sql]
+----
+SELECT UNLIST FROM UNLIST('1,2,3') AS A;
+----
+
+Данный запрос вызовет ошибку "столбец UNLIST не существует".
+
+[source,sql]
+----
+SELECT * FROM UNLIST('1,2,3') AS A;
+----
+
+Однако этот запрос отработает без ошибок и в наборе данных имя возвращаемого столбца будет `UNLIST`ю
+====
