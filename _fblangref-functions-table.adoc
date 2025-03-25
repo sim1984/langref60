@@ -89,7 +89,7 @@ SELECT U.* FROM UNLIST('text1, text2, text3') AS U;
 
 SELECT C0 FROM UNLIST('text1, text2, text3') AS U(C0);
 
-SELECT U.C0 FROM UNLIST(‘text1, text2, text3’) AS U(C0);
+SELECT U.C0 FROM UNLIST('text1, text2, text3') AS U(C0);
 
 SELECT 
     COLOR.*
