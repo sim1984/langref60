@@ -4,9 +4,9 @@
 Firebird -- это реляционная СУБД.
 Данные в таких базах хранятся в таблицах.
 Таблица -- это плоская двухмерная структура, содержащая произвольное количество строк (row). Строки таблицы часто называют записями (record). Все строки таблицы имеют одинаковую структуру и состоят из столбцов (column). Столбцы таблицы часто называют полями (fields). Таблица должна иметь хотя бы один столбец.
-С каждым столбцом связан определённый тип данных SQL. 
+С каждым столбцом связан определённый тип данных SQL.
 
-В данном разделе рассматриваются вопросы создания, модификации и удаления таблиц базы данных. 
+В данном разделе рассматриваются вопросы создания, модификации и удаления таблиц базы данных.
 
 [[fblangref-ddl-table-create]]
 == `CREATE TABLE`
@@ -24,113 +24,113 @@ DSQL, ESQL
 ----
 CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] _tablename_
   [EXTERNAL [FILE] '_filespec_']
-  (<col_def> [, <col_def> | <tconstraint> ...])  
+  (<col_def> [, <col_def> | <tconstraint> ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]
-  [SQL SECURITY {DEFINER | INVOKER}] 
-  [{ENABLE | DISABLE} PUBLICATION]  
+  [SQL SECURITY {DEFINER | INVOKER}]
+  [{ENABLE | DISABLE} PUBLICATION]
 
 <col_def> ::=
     <regular_col_def>
   | <computed_col_def>
   | <identity_col_def>
-                    
-<regular_col_def> ::= 
+
+<regular_col_def> ::=
   _colname_ { <datatype> | _domain_name_ }
-  [DEFAULT {<literal> | NULL | <context_var>}] 
+  [DEFAULT {<literal> | NULL | <context_var>}]
   [NOT NULL]
   [<col_constraint>]
   [COLLATE _collation_name_]
-  
-                    
-<computed_col_def> ::= 
+
+
+<computed_col_def> ::=
   _colname_ [{ <datatype> | _domain_name_ }]
-  {COMPUTED [BY] | GENERATED ALWAYS AS} (<expression>) 
-                    
-<identity_col_def> ::= 
+  {COMPUTED [BY] | GENERATED ALWAYS AS} (<expression>)
+
+<identity_col_def> ::=
   _colname_ [<datatype>]
-  GENERATED {ALWAYS | BY DEFAULT} AS IDENTITY [(<identity column options>)] 
-  [<col_constraint>]  
-                    
-<identity column options> ::=     
+  GENERATED {ALWAYS | BY DEFAULT} AS IDENTITY [(<identity column options>)]
+  [<col_constraint>]
+
+<identity column options> ::=
   <identity column option> [<identity column option>]
 
 <identity column option> ::=
     START WITH startvalue
   | INCREMENT [BY] incrementvalue
-                    
-                    
-<datatype> ::= 
-    <scalar_datatype> | <blob_datatype> | <array_datatype>                    
-                    
+
+
+<datatype> ::=
+    <scalar_datatype> | <blob_datatype> | <array_datatype>
+
 <scalar_datatype> ::=  См. <<fblangref-datatypes-syntax-scalar,Синтаксис скалярных типов данных>>
 
 <blob_datatype> ::= См. <<fblangref-datatypes-syntax-blob,Синтаксис типа данных BLOB>>
 
 <array_datatype> ::= См. <<fblangref-datatypes-syntax-array,Синтаксис массивов>>
-                    
+
 <col_constraint> ::= [CONSTRAINT _constr_name_]
-{   UNIQUE [<using_index>] 
-  | PRIMARY KEY [<using_index>] 
+{   UNIQUE [<using_index>]
+  | PRIMARY KEY [<using_index>]
   | REFERENCES _other_table_ [(_other_col_)]
       [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
-      [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}] 
+      [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [<using_index>]
-  | CHECK (<check_condition>) 
-}          
+  | CHECK (<check_condition>)
+}
 
 <tconstraint> ::= [CONSTRAINT _constr_name_]
-{   UNIQUE (<col_list>) [<using_index>] 
-  | PRIMARY KEY (<col_list>) [<using_index>] 
-  | FOREIGN KEY (<col_list>) 
+{   UNIQUE (<col_list>) [<using_index>]
+  | PRIMARY KEY (<col_list>) [<using_index>]
+  | FOREIGN KEY (<col_list>)
     REFERENCES _other_table_ [(<col_list>)]
-      [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}] 
-      [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}] 
+      [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
+      [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [<using_index>]
-  | CHECK (<check_condition>) 
-}    
+  | CHECK (<check_condition>)
+}
 
 <col_list> ::= _colname_ [, _colname_ ...]
 
 <using_index> ::= USING [ASC[ENDING] | DESC[ENDING]] INDEX _indexname_
 
-<check_condition> ::=  
-    <val> <operator> <val> 
-  | <val> [NOT] BETWEEN <val> AND <val> 
-  | <val> [NOT] IN (<val> [, <val> ...] | <select_list>) 
-  | <val> IS [NOT] NULL 
-  | <val> IS [NOT] DISTINCT <val> 
+<check_condition> ::=
+    <val> <operator> <val>
+  | <val> [NOT] BETWEEN <val> AND <val>
+  | <val> [NOT] IN (<val> [, <val> ...] | <select_list>)
+  | <val> IS [NOT] NULL
+  | <val> IS [NOT] DISTINCT <val>
   | <val> IS [NOT] {TRUE | FALSE | UNKNOWN}
-  | <val> [NOT] CONTAINING <val> 
-  | <val> [NOT] STARTING [WITH] <val> 
-  | <val> [NOT] LIKE <val> [ESCAPE <val>] 
-  | <val> [NOT] SIMILAR TO <val> [ESCAPE <val>] 
-  | <val> <operator> {ALL | SOME | ANY} (<select_list>) 
-  | [NOT] EXISTS (<select_expr>) 
-  | [NOT] SINGULAR (<select_expr>)   
-  | (<check_condition>)   
-  | NOT <check_condition>   
-  | <check_condition> OR <check_condition>   
-  | <check_condition> AND <check_condition> 
-    
- 
-<operator> ::= 
+  | <val> [NOT] CONTAINING <val>
+  | <val> [NOT] STARTING [WITH] <val>
+  | <val> [NOT] LIKE <val> [ESCAPE <val>]
+  | <val> [NOT] SIMILAR TO <val> [ESCAPE <val>]
+  | <val> <operator> {ALL | SOME | ANY} (<select_list>)
+  | [NOT] EXISTS (<select_expr>)
+  | [NOT] SINGULAR (<select_expr>)
+  | (<check_condition>)
+  | NOT <check_condition>
+  | <check_condition> OR <check_condition>
+  | <check_condition> AND <check_condition>
+
+
+<operator> ::=
     <> | != | ^= | ~= | = | < | > | <= | >=
-  | !< | ^< | ~< | !> | ^> | ~>    
-                    
-<val> ::=  
+  | !< | ^< | ~< | !> | ^> | ~>
+
+<val> ::=
     _colname_ ['['<array_idx> [, <array_idx> ...]']']
-  | <literal>   
-  | <context_var>   
-  | <expression>   
-  | NULL   
+  | <literal>
+  | <context_var>
+  | <expression>
+  | NULL
   | NEXT VALUE FOR _genname_
   | GEN_ID(_genname_, <val>)
-  | CAST(<val> AS <cast_type>)   
-  | (<select_one>)   
+  | CAST(<val> AS <cast_type>)
+  | (<select_one>)
   | _func_(<val> [, <val> ...])
-     
+
 <cast_type> ::=
-   <datatype> 
+   <datatype>
   | [TYPE OF] _domain_name_
   | TYPE OF COLUMN _rel_._colname_
 ----
@@ -194,7 +194,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] _tablename_
 
 |collation_name
 |Порядок сортировки.
-Необходимо указывать если вы хотите чтобы порядок сортировки для столбца отличался от порядка сортировки для набора символов по умолчанию этого столбца. 
+Необходимо указывать если вы хотите чтобы порядок сортировки для столбца отличался от порядка сортировки для набора символов по умолчанию этого столбца.
 
 |select_one
 |Оператор `SELECT` выбирающий один столбец и возвращающий только одну строку.
@@ -216,7 +216,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] _tablename_
 |===
 
 Оператор `CREATE TABLE` создаёт новую таблицу.
-Имя таблицы должно быть уникальным среди имён всех таблиц, представлений (VIEWs) и хранимых процедур базы данных. 
+Имя таблицы должно быть уникальным среди имён всех таблиц, представлений (VIEWs) и хранимых процедур базы данных.
 
 Если используется предложение `IF NOT EXISTS`, то оператор `CREATE TABLE` попытается создать новую таблицу без выдачи ошибки, если она уже существует.
 DDL триггеры не будут запускаться, если таблица уже существует.
@@ -231,7 +231,7 @@ DDL триггеры не будут запускаться, если табли
 Имя столбца должно быть уникальным для создаваемой таблицы.
 Для столбца обязательно должен быть указан либо тип данных, либо имя домена, характеристики которого будут скопированы для столбца, либо должно быть указано, что столбец является вычисляемым.
 
-В качестве типа столбца можно использовать любой тип данных SQL. 
+В качестве типа столбца можно использовать любой тип данных SQL.
 
 [[fblangref-ddl-table-create-column-character]]
 === Символьные столбцы
@@ -293,11 +293,11 @@ DDL триггеры не будут запускаться, если табли
 ====
 [source,sql]
 ----
-                    
+
 CREATE TABLE greetings (
-  id INT GENERATED BY DEFAULT AS IDENTITY, 
+  id INT GENERATED BY DEFAULT AS IDENTITY,
   name CHAR(50));
-	
+
 -- specify value "1":
 INSERT INTO greetings VALUES (1, 'hi');
 
@@ -323,11 +323,11 @@ INSERT INTO greetings(ch) VALUES ('bonjour');
 ====
 [source,sql]
 ----
-                    
+
 create table greetings (
-  id INT GENERATED ALWAYS AS IDENTITY, 
+  id INT GENERATED ALWAYS AS IDENTITY,
   name CHAR(50));
-	
+
 INSERT INTO greetings VALUES (DEFAULT, 'hello');
 
 INSERT INTO greetings(ch) VALUES ('bonjour');
@@ -411,9 +411,9 @@ INSERT INTO greetings(ch) VALUES ('bonjour');
 [[fblangref-ddl-table-create-constraints-named-index]]
 ==== Имена для ограничений и их индексов
 
-Если имя ограничения не задано, то оно автоматически будет сгенерировано системой. 
+Если имя ограничения не задано, то оно автоматически будет сгенерировано системой.
 
-Ограничения уровня столбца и их индексы автоматически именуются следующим образом: 
+Ограничения уровня столбца и их индексы автоматически именуются следующим образом:
 
 * Имена ограничений имеют следующий вид `INTEG_<n>`, где _n_ представлено одним или несколькими числами;
 * Имена индексов имеют вид `RDB$PRIMARY<n>` (для индекса первичного ключа), `RDB$FOREIGN<n>` (для индекса внешнего ключа) или `RDB$<n>` (для индекса уникального ключа), где _n_ представлено одним или несколькими числами;
@@ -438,7 +438,7 @@ INSERT INTO greetings(ch) VALUES ('bonjour');
 
 (((CREATE TABLE, PRIMARY KEY)))
 Ограничение первичного ключа `PRIMARY KEY` строится на поле с заданным ограничением `NOT NULL` и требует уникальности значений столбца.
-Таблица может иметь только один первичный ключ. 
+Таблица может иметь только один первичный ключ.
 
 * Первичный ключ по единственному столбцу может быть определён как на уровне столбца, так и на уровне таблицы.
 * Первичный ключ по нескольким столбцам может быть определён только на уровне таблицы.
@@ -542,7 +542,7 @@ CONSTRAINT FK_ARTSOURCE FOREIGN KEY(DEALER_ID, COUNTRY)
 ====
 [source,sql]
 ----
-                                        
+
 CONSTRAINT FK_ORDERS_CUST
 FOREIGN KEY (CUSTOMER) REFERENCES CUSTOMERS (ID)
 ON UPDATE CASCADE ON DELETE SET NULL
@@ -613,7 +613,7 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 [[fblangref-ddl-table-create-who]]
 === Кто может создать таблицу?
 
-Выполнить оператор `CREATE TABLE` могут: 
+Выполнить оператор `CREATE TABLE` могут:
 
 * <<fblangref-security-administrators,Администраторы>>
 * Пользователи с привилегией `CREATE TABLE`.
@@ -690,7 +690,7 @@ CREATE TABLE JOB (
     FOREIGN KEY (JOB_COUNTRY) REFERENCES COUNTRY (COUNTRY)
       ON UPDATE CASCADE
       ON DELETE SET NULL,
-    CONSTRAINT CHK_SALARY CHECK (MIN_SALARY < MAX_SALARY) 
+    CONSTRAINT CHK_SALARY CHECK (MIN_SALARY < MAX_SALARY)
 );
 ----
 ====
@@ -702,14 +702,14 @@ CREATE TABLE JOB (
 ----
 CREATE TABLE PROJECT (
     PROJ_ID    PROJNO NOT NULL,
-    PROJ_NAME  VARCHAR(20) NOT NULL UNIQUE 
+    PROJ_NAME  VARCHAR(20) NOT NULL UNIQUE
       USING DESC INDEX IDX_PROJNAME,
     PROJ_DESC    BLOB SUB_TYPE 1,
     TEAM_LEADER  EMPNO,
     PRODUCT      PRODTYPE,
-    CONSTRAINT PK_PROJECT PRIMARY KEY (PROJ_ID) 
+    CONSTRAINT PK_PROJECT PRIMARY KEY (PROJ_ID)
       USING INDEX IDX_PROJ_ID,
-    FOREIGN KEY (TEAM_LEADER) REFERENCES EMPLOYEE (EMP_NO) 
+    FOREIGN KEY (TEAM_LEADER) REFERENCES EMPLOYEE (EMP_NO)
       USING INDEX IDX_LEADER
 );
 ----
@@ -805,9 +805,9 @@ CREATE TABLE SALARY_HISTORY (
     UPDATER_ID      VARCHAR(20) NOT NULL,
     OLD_SALARY      SALARY NOT NULL,
     PERCENT_CHANGE  DOUBLE PRECISION DEFAULT 0 NOT NULL,
-    SALARY_CHANGE   GENERATED ALWAYS AS 
+    SALARY_CHANGE   GENERATED ALWAYS AS
       (OLD_SALARY * PERCENT_CHANGE / 100),
-    NEW_SALARY      COMPUTED BY 
+    NEW_SALARY      COMPUTED BY
       (OLD_SALARY + OLD_SALARY * PERCENT_CHANGE / 100)
 );
 ----
@@ -817,16 +817,16 @@ CREATE TABLE SALARY_HISTORY (
 
 [source,sql]
 ----
-CREATE TABLE SALARY_HISTORY 
+CREATE TABLE SALARY_HISTORY
 (
     EMP_NO          EMPNO NOT NULL,
     CHANGE_DATE     TIMESTAMP DEFAULT 'NOW' NOT NULL,
     UPDATER_ID      VARCHAR(20) NOT NULL,
     OLD_SALARY      SALARY NOT NULL,
     PERCENT_CHANGE  DOUBLE PRECISION DEFAULT 0 NOT NULL,
-    SALARY_CHANGE   GENERATED ALWAYS AS 
+    SALARY_CHANGE   GENERATED ALWAYS AS
       (OLD_SALARY * PERCENT_CHANGE / 100),
-    NEW_SALARY      COMPUTED BY 
+    NEW_SALARY      COMPUTED BY
       (OLD_SALARY + OLD_SALARY * PERCENT_CHANGE / 100)
 )
 SQL SECURITY DEFINER;
@@ -849,7 +849,7 @@ SQL SECURITY DEFINER;
 ----
 CREATE GLOBAL TEMPORARY TABLE [IF NOT EXISTS] name
   (<column_def> [, {<column_def> | <table_constraint>} ...])
-  [ON COMMIT {DELETE | PRESERVE} ROWS] 
+  [ON COMMIT {DELETE | PRESERVE} ROWS]
   [SQL SECURITY {DEFINER | INVOKER}]
 ----
 
@@ -937,24 +937,24 @@ CREATE GLOBAL TEMPORARY TABLE MYTXGTT (
 
 (((CREATE TABLE, EXTERNAL FILE)))
 Необязательное предложение `EXTERNAL [FILE]` указывает, что таблица хранится вне базы данных во внешнем текстовом файле.
-Столбцы таблицы, хранящейся во внешнем файле, могут быть любого типа за исключением BLOB и массивов с любым типом данных. 
+Столбцы таблицы, хранящейся во внешнем файле, могут быть любого типа за исключением BLOB и массивов с любым типом данных.
 
 Над таблицей, хранящейся во внешнем файле, допустимы только операции добавления новых строк (`INSERT`) и выборки (`SELECT`) данных.
 Операции же изменения существующих данных (`UPDATE`) или удаления строк такой таблицы (`DELETE`) не могут быть выполнены.
 
 Внешняя таблица не может содержать ограничений первичного, внешнего и уникального ключа.
-Для полей такой таблицы невозможно создать индексы. 
+Для полей такой таблицы невозможно создать индексы.
 
 Файл с внешней таблицей должен располагаться на устройстве хранения, физически расположенном на сервере, на котором расположена СУБД.
 Если параметр [parameter]``ExternalFileAccess`` в файле конфигурации [path]_firebird.conf_ содержит `Restrict`, то файл внешней таблицы должен находится в одном из каталогов, указанных в качестве аргумента `Restrict`.
-Если при обращении к таблице Firebird не находит файла, то он создаёт его при первом обращении. 
+Если при обращении к таблице Firebird не находит файла, то он создаёт его при первом обращении.
 
 [IMPORTANT]
 ====
-Возможность использования для таблиц внешних файлов зависит от установки значения параметра [parameter]``ExternalFileAccess`` в файле конфигурации [path]_firebird.conf_: 
+Возможность использования для таблиц внешних файлов зависит от установки значения параметра [parameter]``ExternalFileAccess`` в файле конфигурации [path]_firebird.conf_:
 
 * Если он установлен в значение `None`, то запрещён любой доступ к внешнему файлу.
-* Значение `Restrict` рекомендуется для ограничения доступа к внешним файлам только каталогами, созданными специально для этой цели администратором сервера. Например: 
+* Значение `Restrict` рекомендуется для ограничения доступа к внешним файлам только каталогами, созданными специально для этой цели администратором сервера. Например:
 +
 ** `ExternalFileAccess = Restrict _externalfiles_` ограничит доступ директорией [path]_externalfiles_ корневого каталога Firebird.
 ** `ExternalFileAccess = Restrict d:\databases\outfiles; e:\infiles` ограничит доступ только двумя директориями Windows. Обратите внимание, что любые пути являющиеся отображением сетевых путей не будут работать. Также не будут работать пути заключённые в одинарные или двойные кавычки.
@@ -999,10 +999,10 @@ CREATE GLOBAL TEMPORARY TABLE MYTXGTT (
 ----
 CREATE TABLE ext_log
 EXTERNAL FILE 'd:\externals\log_me.txt' (
-   stamp   CHAR(24), 
+   stamp   CHAR(24),
    message CHAR(100),
    crlf    CHAR(2) -- Для Windows
-);   
+);
 
 COMMIT;
 ----
@@ -1057,25 +1057,25 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,attributes,macros"]
 ----
-ALTER TABLE _tablename_ 
+ALTER TABLE _tablename_
   <operation> [, <operation>];
 
 <operation> ::=
-    ADD [IF NOT EXISTS] <col_def> 
-  | ADD <tconsrtaint> 
+    ADD [IF NOT EXISTS] <col_def>
+  | ADD <tconsrtaint>
   | DROP [IF EXISTS] _colname_
   | DROP CONSTRAINT [IF EXISTS] _constr_name_
   | DROP SQL SECURITY
   | ALTER [COLUMN] colname <col_mod>
   | ALTER SQL SECURITY {DEFINER | INVOKER}
   | {ENABLE | DISABLE} PUBLICATION
-                        
-<col_def> ::= 
-    <regular_col_def> 
-  | <computed_col_def> 
-  | <identity_col_def>                        
 
-<regular_col_def> ::= 
+<col_def> ::=
+    <regular_col_def>
+  | <computed_col_def>
+  | <identity_col_def>
+
+<regular_col_def> ::=
   colname { <datatype> | _domainname_ }
   [DEFAULT {literal | NULL | <context_var>}]
   [NOT NULL]
@@ -1083,115 +1083,115 @@ ALTER TABLE _tablename_
   [COLLATE _collation_name_]
 
 
-<computed_col_def>  ::=   
+<computed_col_def>  ::=
   _colname_ [<datatype>]
   {COMPUTED [BY] | GENERATED ALWAYS AS} (<expression>)
-                        
-<identity_col_def> ::= 
-  _colname_ [<datatype>] {ALWAYS | GENERATED BY} DEFAULT AS IDENTITY
-  [(START WITH startvalue)] [<col_constraint>]                          
 
-<col_mod> ::= 
+<identity_col_def> ::=
+  _colname_ [<datatype>] {ALWAYS | GENERATED BY} DEFAULT AS IDENTITY
+  [(START WITH startvalue)] [<col_constraint>]
+
+<col_mod> ::=
      TO _newname_
   |  POSITION _newpos_
-  | <regular_col_mod> 
-  | <computed_col_mod> 
-  | <identity_col_mod> 
+  | <regular_col_mod>
+  | <computed_col_mod>
+  | <identity_col_mod>
 
-<regular_col_mod> ::=                      
+<regular_col_mod> ::=
   |  TYPE { <datatype>  | _domain_name_ }
   |  SET DEFAULT {_literal_ | NULL | <context_var>}
-  |  DROP DEFAULT 
+  |  DROP DEFAULT
   |  SET NOT NULL
-  |  DROP NOT NULL  
+  |  DROP NOT NULL
 
 <computed_col_mod> ::=
-  [TYPE <datatype>] {GENERATED ALWAYS AS | COMPUTED [BY]} (<expression>)  
+  [TYPE <datatype>] {GENERATED ALWAYS AS | COMPUTED [BY]} (<expression>)
 
-<identity_col_mod> ::=  
+<identity_col_mod> ::=
      <alter identity column option> ...
   |  SET GENERATED { ALWAYS | BY DEFAULT } [<alter identity column option> ...]
   |  DROP INDENITY
-          
+
 <alter identity column option> ::=
      RESTART [ WITH _startvalue_ ]
   |  SET INCREMENT [BY] _incrementvalue_
 
-<datatype> ::= 
-    <scalar_datatype> | <blob_datatype> | <array_datatype>                    
-                    
+<datatype> ::=
+    <scalar_datatype> | <blob_datatype> | <array_datatype>
+
 <scalar_datatype> ::=  См. <<fblangref-datatypes-syntax-scalar,Синтаксис скалярных типов данных>>
 
 <blob_datatype> ::= См. <<fblangref-datatypes-syntax-blob,Синтаксис типа данных BLOB>>
 
 <array_datatype> ::= См. <<fblangref-datatypes-syntax-array,Синтаксис массивов>>
-                    
-<col_constraint> ::= 
-  [CONSTRAINT _constr_name_]
-  {   UNIQUE [<using_index>] 
-    | PRIMARY KEY [<using_index>] 
-    | REFERENCES other_table [(other_col)]  
-        [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
-        [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}] 
-        [<using_index>]
-    | CHECK (<check_condition>) 
-  }          
 
-<tconstraint> ::= 
-  [CONSTRAINT [IF NOT EXISTS] _constr_name_]
-  {   UNIQUE (<col_list>) [<using_index>] 
-    | PRIMARY KEY (<col_list>) [<using_index>] 
-    | FOREIGN KEY (<col_list>) 
-      REFERENCES other_table [(<col_list>)]  
-        [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}] 
-        [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}] 
+<col_constraint> ::=
+  [CONSTRAINT _constr_name_]
+  {   UNIQUE [<using_index>]
+    | PRIMARY KEY [<using_index>]
+    | REFERENCES other_table [(other_col)]
+        [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
+        [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [<using_index>]
-    | CHECK (<check_condition>) 
-  }    
+    | CHECK (<check_condition>)
+  }
+
+<tconstraint> ::=
+  [CONSTRAINT [IF NOT EXISTS] _constr_name_]
+  {   UNIQUE (<col_list>) [<using_index>]
+    | PRIMARY KEY (<col_list>) [<using_index>]
+    | FOREIGN KEY (<col_list>)
+      REFERENCES other_table [(<col_list>)]
+        [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
+        [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
+        [<using_index>]
+    | CHECK (<check_condition>)
+  }
 
 <col_list> ::= _colname_ [, _colname_ ...]
 
-<using_index> ::= USING [ASC[ENDING] | DESC[ENDING]] INDEX indexname   
+<using_index> ::= USING [ASC[ENDING] | DESC[ENDING]] INDEX indexname
 
-<check_condition> ::=  
-    <val> <operator> <val> 
-  | <val> [NOT] BETWEEN <val> AND <val> 
-  | <val> [NOT] IN (<val> [, <val> ...] | <select_list>) 
-  | <val> IS [NOT] NULL 
-  | <val> IS [NOT] DISTINCT <val> 
+<check_condition> ::=
+    <val> <operator> <val>
+  | <val> [NOT] BETWEEN <val> AND <val>
+  | <val> [NOT] IN (<val> [, <val> ...] | <select_list>)
+  | <val> IS [NOT] NULL
+  | <val> IS [NOT] DISTINCT <val>
   | <val> IS [NOT] {TRUE | FALSE | UNKNOWN}
-  | <val> [NOT] CONTAINING <val> 
-  | <val> [NOT] STARTING [WITH] <val> 
-  | <val> [NOT] LIKE <val> [ESCAPE <val>] 
-  | <val> [NOT] SIMILAR TO <val> [ESCAPE <val>] 
-  | <val> <operator> {ALL | SOME | ANY} (<select_list>) 
-  | [NOT] EXISTS (<select_expr>) 
-  | [NOT] SINGULAR (<select_expr>)   
-  | (<check_condition>)   
-  | NOT <check_condition>   
-  | <check_condition> OR <check_condition>   
-  | <check_condition> AND <check_condition> 
-    
- 
-<operator> ::= 
+  | <val> [NOT] CONTAINING <val>
+  | <val> [NOT] STARTING [WITH] <val>
+  | <val> [NOT] LIKE <val> [ESCAPE <val>]
+  | <val> [NOT] SIMILAR TO <val> [ESCAPE <val>]
+  | <val> <operator> {ALL | SOME | ANY} (<select_list>)
+  | [NOT] EXISTS (<select_expr>)
+  | [NOT] SINGULAR (<select_expr>)
+  | (<check_condition>)
+  | NOT <check_condition>
+  | <check_condition> OR <check_condition>
+  | <check_condition> AND <check_condition>
+
+
+<operator> ::=
     <> | != | ^= | ~= | = | < | > | <= | >=
-  | !< | ^< | ~< | !> | ^> | ~>       
-                    
-<val> ::=  
+  | !< | ^< | ~< | !> | ^> | ~>
+
+<val> ::=
     _colname_ [[<array_idx> [, <array_idx> ...]]]
   | _literal_
-  | <context_var>   
-  | <expression>   
-  | NULL   
+  | <context_var>
+  | <expression>
+  | NULL
   | NEXT VALUE FOR _genname_
   | GEN_ID(_genname_, <val>)
-  | CAST(<val> AS <datatype>)   
-  | (<select_one>)   
-  | func(<val> [, <val> ...])   
-                       
+  | CAST(<val> AS <datatype>)
+  | (<select_one>)
+  | func(<val> [, <val> ...])
+
 
 <cast_type> ::=
-   <datatype> 
+   <datatype>
   | [TYPE OF] _domain_name_
   | TYPE OF COLUMN _rel_._colname_
 ----
@@ -1211,11 +1211,11 @@ ALTER TABLE _tablename_
 
 |colname
 |Имя столбца таблицы, может содержать до 63 символов.
-Должно быть уникальным внутри таблицы. 
+Должно быть уникальным внутри таблицы.
 
 |newname
 |Новое имя столбца таблицы, может содержать до 63 символов.
-Должно быть уникальным внутри таблицы. 
+Должно быть уникальным внутри таблицы.
 
 |gencolname
 |Имя вычисляемого столбца таблицы.
@@ -1225,7 +1225,7 @@ ALTER TABLE _tablename_
 
 |newpos
 |Новая позиция столбца в таблице.
-Целое число в диапазоне от 1 до количества столбцов таблицы. 
+Целое число в диапазоне от 1 до количества столбцов таблицы.
 
 |datatype
 |Тип данных SQL.
@@ -1270,7 +1270,7 @@ ALTER TABLE _tablename_
 
 |collation_name
 |Имя порядка сортировки.
-Необходимо указывать если вы хотите чтобы порядок сортировки для столбца отличался от порядка сортировки для набора символов по умолчанию этого столбца. 
+Необходимо указывать если вы хотите чтобы порядок сортировки для столбца отличался от порядка сортировки для набора символов по умолчанию этого столбца.
 
 |select_one
 |Оператор `SELECT` выбирающий один столбец и возвращающий только одну строку.
@@ -1293,7 +1293,7 @@ ALTER TABLE _tablename_
 
 Оператор `ALTER TABLE` изменяет структуру существующей таблицы.
 Одиночный оператор `ALTER TABLE` позволяет производить множество операций добавления/удаления столбцов и ограничений, а также модификаций столбцов.
-Список операций выполняемых при модификации таблицы разделяется запятой. 
+Список операций выполняемых при модификации таблицы разделяется запятой.
 
 [[fblangref-ddl-table-alter-versinc]]
 === Счётчик форматов
@@ -1304,7 +1304,7 @@ ALTER TABLE _tablename_
 
 [sidebar]
 .Сброс счётчика форматов
-Для сброса счётчика форматов необходимо сделать резервное копирование и восстановление базы данных (утилитой `gbak`). 
+Для сброса счётчика форматов необходимо сделать резервное копирование и восстановление базы данных (утилитой `gbak`).
 
 [[fblangref-ddl-table-alter-add]]
 === Предложение `ADD`
@@ -1314,10 +1314,10 @@ ALTER TABLE _tablename_
 Синтаксис определения столбца и синтаксис описания ограничения таблицы полностью совпадают с синтаксисом, описанным в операторе <<fblangref-ddl-table-create,CREATE TABLE>>.
 
 Если используется предложение `IF NOT EXISTS`, то оператор `CREATE TABLE _tablename_ ADD` попытается добавить новый столбец или ограничение без выдачи ошибки, если они уже существует.
-DDL триггеры не будут запускаться только если все `IF NOT EXISTS` будут истины, то есть если все добавляемые ограничения или столбцы уже существуют. 
+DDL триггеры не будут запускаться только если все `IF NOT EXISTS` будут истины, то есть если все добавляемые ограничения или столбцы уже существуют.
 
 .Воздействие на счётчик форматов:
-* При каждом добавлении нового столбца номер формата увеличивается на единицу. 
+* При каждом добавлении нового столбца номер формата увеличивается на единицу.
 * Добавление нового ограничения таблицы не влечёт за собой увеличение номера формата.
 
 .Добавление столбца в таблицу
@@ -1378,7 +1378,7 @@ ALTER TABLE COUNTRY
 ----
 ALTER TABLE JOB
 ADD CONSTRAINT CHK_SALARY CHECK (MIN_SALARY < MAX_SALARY),
-ADD FOREIGN KEY (JOB_COUNTRY) 
+ADD FOREIGN KEY (JOB_COUNTRY)
 REFERENCES COUNTRY (COUNTRY);
 ----
 ====
@@ -1386,7 +1386,7 @@ REFERENCES COUNTRY (COUNTRY);
 [WARNING]
 ====
 Будьте осторожны, при добавлении нового ограничения `CHECK` не осуществляется проверка соответствия ему ранее внесённых данных.
-Поэтому перед добавлением такого ограничения рекомендуем производить предварительную проверку данных в таблице. 
+Поэтому перед добавлением такого ограничения рекомендуем производить предварительную проверку данных в таблице.
 ====
 
 [[fblangref-ddl-table-alter-drop]]
@@ -1396,7 +1396,7 @@ REFERENCES COUNTRY (COUNTRY);
 Предложение `DROP` удаляет указанный столбец таблицы.
 Столбец таблицы не может быть удалён, если от него существуют зависимости.
 Другими словами для успешного удаления столбца на него должны отсутствовать ссылки.
-Ссылки на столбец могут содержаться: 
+Ссылки на столбец могут содержаться:
 
 * в ограничениях столбцов или таблицы;
 * в индексах;
@@ -1404,9 +1404,9 @@ REFERENCES COUNTRY (COUNTRY);
 * в представлениях.
 
 Если используется предложение `IF EXISTS`, то оператор `ALTER TABLE _tablename_ DROP` попытается удалить столбец таблицы без выдачи ошибки, если его не существует.
-DDL триггеры не будут запускаться только если все `IF EXISTS` будут истины, то есть если все удаляемые ограничения или столбцы не существуют. 
+DDL триггеры не будут запускаться только если все `IF EXISTS` будут истины, то есть если все удаляемые ограничения или столбцы не существуют.
 
-При каждом удалении столбца номер формата увеличивается на единицу. 
+При каждом удалении столбца номер формата увеличивается на единицу.
 
 .Удаление столбца таблицы
 [example]
@@ -1437,9 +1437,9 @@ DROP IF EXISTS CURRENCY;
 В этом случае необходимо удалить ограничение `FOREIGN KEY` до удаления `PRIMARY KEY` или `UNIQUE` ключа, на которые оно ссылается.
 
 Если используется предложение `IF EXISTS`, то оператор `ALTER TABLE _tablename_ DROP` попытается удалить ограничение таблицы без выдачи ошибки, если его не существует.
-DDL триггеры не будут запускаться только если все `IF EXISTS` будут истины, то есть если все удаляемые ограничения или столбцы не существуют. 
+DDL триггеры не будут запускаться только если все `IF EXISTS` будут истины, то есть если все удаляемые ограничения или столбцы не существуют.
 
-Удаление ограничения столбца или ограничения таблицы не влечёт за собой увеличение номера формата. 
+Удаление ограничения столбца или ограничения таблицы не влечёт за собой увеличение номера формата.
 
 .Удаление ограничения таблицы
 [example]
@@ -1490,10 +1490,10 @@ DROP CONSTRAINT IF EXISTS CHK_SALARY;
 
 (((ALTER TABLE, ALTER [COLUMN], TO)))
 Ключевое слово `TO` переименовывает существующий столбец.
-Новое имя столбца не должно присутствовать в таблице. 
+Новое имя столбца не должно присутствовать в таблице.
 
 Невозможно изменение имени столбца, если этот столбец включён в какое-либо ограничение -- первичный или уникальный ключ, внешний ключ, ограничение столбца или проверочное ограничение таблицы `CHECK`.
-Имя столбца также нельзя изменить, если этот столбец таблицы используется в каком-либо триггере, в хранимой процедуре или представлении. 
+Имя столбца также нельзя изменить, если этот столбец таблицы используется в каком-либо триггере, в хранимой процедуре или представлении.
 
 .Переименование столбца таблицы
 [example]
@@ -1511,7 +1511,7 @@ ALTER COLUMN MODELNAME TO NAME;
 (((ALTER TABLE, ALTER [COLUMN], TYPE)))
 Ключевое слово `TYPE` изменяет тип существующего столбца на другой допустимый тип.
 Не допустимы любые изменения типа, которые могут привести к потере данных.
-Например, количество символов в новом типе для столбца не может быть меньше, чем было установлено ранее. 
+Например, количество символов в новом типе для столбца не может быть меньше, чем было установлено ранее.
 
 Если столбец был объявлен как массив, то изменить ни его тип, ни размерность нельзя.
 
@@ -1552,7 +1552,7 @@ ALTER COLUMN ITEMID POSITION 5;
 ==== Установка и удаление значения по умолчанию
 
 (((ALTER TABLE, ALTER [COLUMN], DROP DEFAULT)))
-Предложение `DROP DEFAULT` удаляет значение по умолчанию для столбца таблицы. 
+Предложение `DROP DEFAULT` удаляет значение по умолчанию для столбца таблицы.
 
 * Если столбец основан на домене со значением по умолчанию -- доменное значение перекроет это удаление.
 * Если удаление значения по умолчанию производится над столбцом, у которого нет значения по умолчанию, или чьё значение по умолчанию основано на домене, то это приведёт к ошибке выполнения данного оператора.
@@ -1594,7 +1594,7 @@ ALTER COLUMN MODEL SET DEFAULT 1;
 Успешное добавление ограничения `NOT NULL` происходит, только после полной проверки данных таблицы, для того чтобы убедится, что столбец не содержит значений NULL.
 
 Явное ограничение `NOT NULL` на столбце, базирующегося на домене, преобладает над установками домена.
-В этом случае изменение домена для допустимости значения NULL, не распространяется на столбец таблицы. 
+В этом случае изменение домена для допустимости значения NULL, не распространяется на столбец таблицы.
 ====
 
 .Добавление ограничения `NOT NULL`
@@ -1625,7 +1625,7 @@ ALTER COLUMN ITEMID DROP NOT NULL;
 ==== Изменение столбцов идентификации
 
 (((ALTER TABLE, ALTER [COLUMN], SET GENERATED)))
-Для столбцов идентификации позволено изменять способ генерации, начальное значение и значение приращения. 
+Для столбцов идентификации позволено изменять способ генерации, начальное значение и значение приращения.
 
 Предложение `SET GENERATED` позволяет изменить способ генерации столбца идентификации.
 Существует два способа генерации столбца идентификации:
@@ -1702,7 +1702,7 @@ ALTER ID DROP INDENTITY;
 
 (((ALTER TABLE, ALTER [COLUMN], GENERATED ALWAYS AS))) (((ALTER TABLE, ALTER [COLUMN], COMPUTED BY)))
 Для вычисляемых столбцов (`GENERATED ALWAYS AS` или `COMPUTED BY`) позволяется изменить тип и выражение вычисляемого столбца.
-Невозможно изменить обычный столбец на вычисляемый и наоборот. 
+Невозможно изменить обычный столбец на вычисляемый и наоборот.
 
 .Изменение вычисляемых столбцов
 [example]
@@ -1710,9 +1710,9 @@ ALTER ID DROP INDENTITY;
 [source,sql]
 ----
 ALTER TABLE SALARY_HISTORY
-ALTER NEW_SALARY GENERATED ALWAYS 
+ALTER NEW_SALARY GENERATED ALWAYS
 AS (OLD_SALARY + OLD_SALARY * PERCENT_CHANGE / 100),
-ALTER SALARY_CHANGE COMPUTED 
+ALTER SALARY_CHANGE COMPUTED
 BY (OLD_SALARY * PERCENT_CHANGE / 100);
 ----
 ====
@@ -1720,7 +1720,7 @@ BY (OLD_SALARY * PERCENT_CHANGE / 100);
 [[fblangref-ddl-table-alter-alter-column-cannot]]
 ==== Не изменяемые атрибуты
 
-На данный момент не существует возможности изменить сортировку по умолчанию. 
+На данный момент не существует возможности изменить сортировку по умолчанию.
 
 [[fblangref-ddl-table-alter-sql-security]]
 === Предложение `ALTER SQL SECURITY`
@@ -1759,10 +1759,10 @@ ENABLE PUBLICATION;
 [[fblangref-ddl-table-alter-who]]
 === Кто может изменить таблицу?
 
-Выполнить оператор `ALTER TABLE` могут: 
+Выполнить оператор `ALTER TABLE` могут:
 
 * <<fblangref-security-administrators,Администраторы>>
-* Владелец таблицы; 
+* Владелец таблицы;
 * Пользователи с привилегией `ALTER ANY TABLE`.
 
 .См. также:
@@ -1794,12 +1794,9 @@ DROP TABLE [IF EXISTS] _tablename_
 |Имя таблицы.
 |===
 
-Оператор `DROP TABLE` удаляет существующую таблицу.
-Если таблица имеет зависимости, то удаление не будет произведено.
-При удалении таблицы будут также удалены все триггеры на её события и индексы, построенные для её полей.
+Оператор `DROP TABLE` удаляет существующую таблицу. Если таблица имеет зависимости, то удаление не будет произведено. При удалении таблицы будут также удалены все триггеры на её события и индексы, построенные для её полей.
 
-Если используется предложение `IF EXISTS`, то оператор `DROP TABLE` попытается удалить таблицу без выдачи ошибки, если её не существует.
-DDL триггеры не будут запускаться, если таблицы не существует.
+Если используется предложение `IF EXISTS`, то оператор `DROP TABLE` попытается удалить таблицу без выдачи ошибки, если её не существует. DDL триггеры не будут запускаться, если таблицы не существует.
 
 .Удаление таблицы
 [example]
@@ -1822,10 +1819,10 @@ DROP TABLE IF EXISTS COUNTRY;
 [[fblangref-ddl-table-drop-who]]
 === Кто может удалить таблицу?
 
-Выполнить оператор `DROP TABLE` могут: 
+Выполнить оператор `DROP TABLE` могут:
 
 * <<fblangref-security-administrators,Администраторы>>
-* Владелец таблицы; 
+* Владелец таблицы;
 * Пользователи с привилегией `DROP ANY TABLE`.
 
 
@@ -1854,9 +1851,7 @@ RECREATE [GLOBAL TEMPORARY] TABLE _tablename_
 
 Полное описание определений столбцов и ограничений таблицы смотрите в разделе <<fblangref-ddl-table-create,CREATE TABLE>>.
 
-Создаёт или пересоздаёт таблицу.
-Если таблица с таким именем уже существует, то оператор `RECREATE TABLE` попытается удалить её и создать новую.
-Оператор `RECREATE TABLE` не выполнится, если существующая таблица имеет зависимости.
+Создаёт или пересоздаёт таблицу. Если таблица с таким именем уже существует, то оператор `RECREATE TABLE` попытается удалить её и создать новую. Оператор `RECREATE TABLE` не выполнится, если существующая таблица имеет зависимости.
 
 [[fblangref-ddl-table-recreate-examples]]
 === Примеры
