@@ -1,18 +1,18 @@
 [[fblangref-tablevalue-functions]]
 = Табличные функции
 
-Табличные функции -- это функции, выдающие набор строк, которые состоят из одного или нескольких столбцов скалярных типов. Они применяются в запросах как таблицы, представления или подзапросы в предложении `FROM`. Столбцы, возвращённые табличными функциями, можно включить в выражения `SELECT`, `JOIN` или `WHERE` так же, как столбцы таблиц, представлений или подзапросов.
+Табличные функции -- это функции, возвращающие набор строк, которые состоят из одного или нескольких столбцов скалярных типов. Они применяются в запросах как таблицы, представления или подзапросы в предложении `FROM`. Столбцы, возвращённые табличными функциями, можно включить в выражения `SELECT`, `JOIN` или `WHERE` так же, как столбцы таблиц, представлений или подзапросов.
 
 В общем виде вызов табличной функции выглядит следующим образом:
 
 .Синтаксис
 [listing,subs="+quotes, macros"]
 ----
-<table value function> ::= 
+<table value function> ::=
   _function_name_ (<args>) [AS] <correlation name> [(<derived column list>)]
 
-<derived column list> ::=  
-  <derived column name> [, <derived column name> ... ] 
+<derived column list> ::=
+  <derived column name> [, <derived column name> ... ]
 ----
 
 [[fblangref-tablefuncs-tbl]]
@@ -29,7 +29,7 @@
 |Псевдоним набора записей, возвращаемого табличной функцией. Это обязательный параметр (согласно стандарту SQL).
 
 |derived column name
-|Псевдоним столбца для набора записей, возвращаемого табличной функцией. 
+|Псевдоним столбца для набора записей, возвращаемого табличной функцией.
 
 |===
 
@@ -47,11 +47,11 @@
 [listing,subs="+quotes, macros"]
 ----
 UNLIST (<input> [, <separator>] [<data type conversion>]) [AS] <correlation name> [(<derived column name>)]
- 
+
 <input> ::= <value>
- 
+
 <separator> ::= <value>
- 
+
 <data type conversion> ::= RETURNING <data type>
 ----
 
@@ -91,7 +91,7 @@ SELECT C0 FROM UNLIST('text1, text2, text3') AS U(C0);
 
 SELECT U.C0 FROM UNLIST('text1, text2, text3') AS U(C0);
 
-SELECT 
+SELECT
     COLOR.*
 FROM
     UNLIST('1,2,3,4,5' RETURNING INT) AS U(I)
@@ -110,13 +110,13 @@ AS
 DECLARE VARIABLE text VARCHAR(11);
 BEGIN
     text = '123:123:123';
-    FOR 
-        SELECT * FROM UNLIST( :text, ':' RETURNING INT) AS A 
-        INTO :PROC_RETURN_INT 
+    FOR
+        SELECT * FROM UNLIST( :text, ':' RETURNING INT) AS A
+        INTO :PROC_RETURN_INT
     DO
         SUSPEND;
 END^
- 	
+
 SET TERM ; ^
 
 SELECT * FROM TEST_PROC;
@@ -129,9 +129,9 @@ SELECT * FROM TEST_PROC;
 ----
 CREATE DOMAIN D1 AS INT;
 SELECT TEST_DOMAIN FROM UNLIST('1,2,3,4' RETURNING D1) AS A(TEST_DOMAIN);
- 
+
 CREATE TABLE TABLE_TEST (COL1 INT);
-SELECT TEST_TYPE_OF 
+SELECT TEST_TYPE_OF
 FROM UNLIST('1,2,3,4' RETURNING TYPE OF COLUMN TABLE_TEST.COL1) AS A(TEST_TYPE_OF);
 ----
 ====
