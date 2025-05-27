@@ -3,12 +3,15 @@
 
 Системные пакеты предоставляют служебные хранимые процедуры и функции.
 
-.List of System Packages
+.Список системных пакетов
 <<fblangref-build-in-package-blob-util-pkg>>::
 Утилиты для манипуляции BLOB
 
 <<fblangref-build-in-package-profiler-pkg>>::
 Профилировщик
+
+<<fblangref-build-in-packages-sql-pkg>>::
+Получение различной информации об SQL запросе
 
 <<fblangref-build-in-packages-time-zone-util-pkg>>::
 Утилиты поддержки часовых поясов
@@ -721,7 +724,7 @@ select pstat.*
 
 |LEVEL
 |`INTEGER`
-|Уровень отступа для источника данных. 
+|Уровень отступа для источника данных.
 Необходим при конструировании подробного плана в виде единой строки.
 
 |OBJECT_TYPE

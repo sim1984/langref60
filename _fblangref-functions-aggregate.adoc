@@ -139,6 +139,56 @@ GROUP BY dept_no
 .См. также:
 <<fblangref-dml-select,`SELECT`>>.
 
+
+[[fblangref-aggfuncs-anyvalue]]
+=== `ANY_VALUE()`
+
+.Доступно в
+DSQL
+(((Функция, `ANY_VALUE()`)))
+
+.Синтаксис
+[listing]
+----
+ANY_VALUE(<expression>)
+----
+
+[[fblangref-aggfuncs-tbl-anyvalue]]
+.Параметры функции ANY_VALUE
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|expr
+|Выражение.
+Может содержать столбец таблицы, литерал, переменную, выражение, неагрегатную функцию или UDF.
+Агрегатные функции в качестве выражения не допускаются.
+|===
+
+.Тип возвращаемого результата
+тот же что и аргумент функции `<expression>`
+
+Функция `ANY_VALUE` возвращает некоторое значение `<expression>` для группы строк. Эта функция является недетерминированной.
+
+Значения `NULL` игнорируются. Возвращается только в случае отсутствия записей значение выражения которых отличается от `NULL`.
+
+[[fblangref-aggfuncs-anyvalue-exmpl]]
+==== Примеры `ANY_VALUE`
+
+.Использование функции ANY_VALUE
+[example]
+====
+[source,sql]
+----
+SELECT
+  department,
+  ANY_VALUE(employee) employee
+FROM employee_department
+GROUP BY department
+----
+====
+
 [[fblangref-aggfuncs-count]]
 === `COUNT()`
 
@@ -161,7 +211,7 @@ COUNT([ALL | DISTINCT] <expr> | *)
 
 |expr
 |Выражение.
-Может содержать столбец таблицы, константу, переменную, выражение, неагрегатную функцию или UDF.
+Может содержать столбец таблицы, литерал, переменную, выражение, неагрегатную функцию или UDF.
 Агрегатные функции в качестве выражения не допускаются.
 |===
 
