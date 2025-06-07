@@ -29,7 +29,7 @@ GRANT <privileges>
 
 <table_privileges> ::=
   {ALL [PRIVILEGES] | <table_privilege_list> }
-    ON [TABLE] {_table_name_ | _view_name_}
+    ON [TABLE] [_schema_name_.]{_table_name_ | _view_name_}
 
 <table_privilege_list> ::=
   <table_privilege> [, <tableprivilege> ...]
@@ -40,16 +40,19 @@ GRANT <privileges>
   | REFERENCES [(_col_ [, _col_ ...)]
 
 <execute_privilege> ::= EXECUTE ON {
-    PROCEDURE _proc_name_
-  | FUNCTION _func_name_
-  | PACKAGE _package_name_ }
+    PROCEDURE [_schema_name_.]_proc_name_
+  | FUNCTION [_schema_name_.]_func_name_
+  | PACKAGE [_schema_name_.]_package_name_ }
 
 <usage_privilege> ::= USAGE ON {
-    EXCEPTION _exception_name_
-  | {GENERATOR | SEQUENCE} _sequence_name_ }
+    SCHEMA _schema_name_
+  | EXCEPTION [_schema_name_.]_exception_name_
+  | {GENERATOR | SEQUENCE} [_schema_name_.]_sequence_name_ }
 
 <ddl_privileges> ::=
-  {ALL [PRIVILEGES] | <ddl_privilege_list>} <object_type>
+  {ALL [PRIVILEGES] | <ddl_privilege_list>}
+  {[ON SCHEMA _schema_name_] <object_type> | <schemaless_object_type>}
+
 
 <ddl_privilege_list> ::=
   <ddl_privilege> [, <ddl_privilege> ...]
@@ -61,8 +64,11 @@ GRANT <privileges>
   | FILTER | FUNCTION | GENERATOR | PACKAGE
   | PROCEDURE | ROLE | SEQUENCE | TABLE | VIEW
 
+<schemaless_object_type> ::=
+    FILTER | ROLE | SCHEMA
+
 <db_ddl_privileges> ::=
-  {ALL [PRIVILEGES] | <db_ddl_privilege_list>} {DATABASE | SCHEMA}
+  {ALL [PRIVILEGES] | <db_ddl_privilege_list>} DATABASE
 
 <db_ddl_privilege_list> ::=
   <db_ddl_privilege> [, <db_ddl_privilege> ...]
@@ -72,11 +78,13 @@ GRANT <privileges>
 <grantee_list> ::= <grantee> [, <grantee> ...]
 
 <grantee> ::=
-    PROCEDURE _proc_name_  | FUNCTION _func_name_
-  | PACKAGE _package_name_ | TRIGGER _trig_name_
-  | VIEW _view_name_       | ROLE _role_name_
-  | [USER] _username_      | GROUP _Unix_group_
-  | PUBLIC
+    PROCEDURE [_schema_name_.]_proc_name_
+  | FUNCTION [_schema_name_.]_func_name_
+  | PACKAGE [_schema_name_.]_package_name_
+  | TRIGGER [_schema_name_.]_trig_name_
+  | VIEW [_schema_name_.]_view_name_
+  | ROLE _role_name_ | [USER] _username_
+  | GROUP _Unix_group_ | PUBLIC
   | <sys_privileges>
 
 <sys_privileges> ::= SYSTEM PRIVILEGE <sys_privileges_list>
@@ -110,6 +118,9 @@ GRANT <role_granted>
 ^| Параметр
 ^| Описание
 
+|schema_name
+|Имя схемы.
+
 |table_name
 |Имя таблицы, к которой должно быть предоставлена привилегия.
 
@@ -135,7 +146,10 @@ GRANT <role_granted>
 |Имя генератора (последовательности), для которого должна быть выдана привилегия USAGE.
 
 |object_type
-|Тип объекта метаданных.
+|Тип объекта метаданных, который находится в одной из схем базы данных.
+
+|schemaless_object_type
+|Тип объекта метаданных, который находится вне схемы базы данных.
 
 |object_list
 |Список объектов метаданных, которым будут даны привилегии.
@@ -175,20 +189,18 @@ GRANT <role_granted>
 
 Оператор GRANT предоставляет одну или несколько привилегий для объектов базы данных пользователям, ролям, хранимым процедурам, функциям, пакетам, триггерам и представлениям.
 
-Авторизованный пользователь не имеет никаких привилегий до тех пор, пока какие-либо права не будут предоставлены ему явно.
-При создании объекта только его создатель и SYSDBA имеет привилегии на него и может назначать привилегии другим пользователям, ролям или объектам.
+Авторизованный пользователь не имеет никаких привилегий до тех пор, пока какие-либо права не будут предоставлены ему явно. При создании объекта только его создатель и `SYSDBA` имеет привилегии на него и может назначать привилегии другим пользователям, ролям или объектам.
 
-Для различных типов объектов метаданных существует различный набор привилегий.
-Эти привилегии будут описаны далее отдельно для каждого из типов объектов метаданных.
+Для различных типов объектов метаданных существует различный набор привилегий. Эти привилегии будут описаны далее отдельно для каждого из типов объектов метаданных.
 
 [[fblangref-security-grant-to-clause]]
 === Предложение TO
 
 В предложении `TO` указывается список пользователей, ролей и объектов базы данных (процедур, функций, пакетов, триггеров и представлений) для которых будут выданы перечисленные привилегии.
-Необязательные предложения `USER` и `ROLE` позволяют уточнить, кому именно выдаётся привилегия.
-Если ключевое слово `USER` или `ROLE` не указано, то сервер проверяет, существует ли роль с данным именем, если таковой не существует, то привилегии назначаются пользователю.
-Существование пользователя, которому выдаются права, не проверяются при выполнении оператора GRANT.
-Если привилегия выдаётся объекту базы данных, то необходимо обязательно указывать тип объекта.
+
+Необязательные предложения `USER` и `ROLE` позволяют уточнить, кому именно выдаётся привилегия. Если ключевое слово `USER` или `ROLE` не указано, то сервер проверяет, существует ли роль с данным именем, если таковой не существует, то привилегии назначаются пользователю.
+
+Существование пользователя, которому выдаются права, не проверяются при выполнении оператора `GRANT`. Если привилегия выдаётся объекту базы данных, то необходимо обязательно указывать тип объекта.
 
 .Рекомендация
 [TIP]
@@ -199,8 +211,7 @@ GRANT <role_granted>
 [[fblangref-security-grant-public]]
 === Пользователь `PUBLIC`
 
-В SQL существует специальный пользователь `PUBLIC`, представляющий всех пользователей.
-Если какая-то операция разрешена пользователю `PUBLIC`, значит, любой аутентифицированный пользователь может выполнить эту операцию над указанным объектом.
+В SQL существует специальный пользователь `PUBLIC`, представляющий всех пользователей. Если какая-то операция разрешена пользователю `PUBLIC`, значит, любой аутентифицированный пользователь может выполнить эту операцию над указанным объектом.
 
 [IMPORTANT]
 ====
