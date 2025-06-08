@@ -92,24 +92,35 @@ REVOKE ALL ON ALL FROM <grantee_list>
 ====
 [source,sql]
 ----
--- отзыв привилегий SELECT, INSERT у таблицы
-REVOKE SELECT, INSERT ON TABLE SALES FROM USER ALEX
+-- отзыв привилегий SELECT, INSERT на таблицу SALES из текущей схемы
+-- у пользователя ALEX
+REVOKE SELECT, INSERT ON TABLE SALES FROM USER ALEX;
 
--- отзыв привилегии SELECT у ролей MANAGER и ENGINEER и пользователя IVAN
-REVOKE SELECT ON TABLE CUSTOMER
+-- отзыв привилегии SELECT на таблицу CUSTOMER из схемы SHOP
+-- у ролей MANAGER и ENGINEER и пользователя IVAN
+REVOKE SELECT ON TABLE SHOP.CUSTOMER
 FROM ROLE MANAGER, ROLE ENGINEER, USER IVAN;
 
--- отзыв привилегий SELECT и REFERENCES у пользователя PUBLIC
-REVOKE SELECT, REFERENCES (NAME) ON TABLE COUNTRY
+-- отзыв привилегий SELECT и REFERENCES на таблицу COUNTRY
+-- из схемы WAREHOUSE у пользователя PUBLIC
+REVOKE SELECT, REFERENCES (NAME) ON TABLE WAREHOUSE.COUNTRY
 FROM PUBLIC;
 
 -- отзыв привилегии UPDATE для столбцов FIRST_NAME, LAST_NAME
-REVOKE UPDATE (FIRST_NAME, LAST_NAME) ON TABLE EMPLOYEE
+-- таблицы EMPLOYEE из схемы SHOP у пользователя IVAN
+REVOKE UPDATE (FIRST_NAME, LAST_NAME) ON TABLE SHOP.EMPLOYEE
 FROM USER IVAN;
 
--- отзыв привилегии INSERT у хранимой процедуры ADD_EMP_PROJ
+-- отзыв привилегии INSERT для таблицы EMPLOYEE_PROJECT
+-- у хранимой процедуры ADD_EMP_PROJ
+-- таблица и хранимая процедура расположены в текущей схеме
 REVOKE INSERT ON EMPLOYEE_PROJECT
 FROM PROCEDURE ADD_EMP_PROJ;
+
+-- отзыв привилегии INSERT для таблицы EMPLOYEE_PROJECT из схемы SHOP
+-- у хранимой процедуры ADD_EMP_PROJ из схемы MANAGEMENT
+REVOKE INSERT ON SHOP.EMPLOYEE_PROJECT
+FROM PROCEDURE MANAGEMENT.ADD_EMP_PROJ;
 ----
 ====
 
@@ -118,12 +129,19 @@ FROM PROCEDURE ADD_EMP_PROJ;
 ====
 [source,sql]
 ----
--- отзыв привилегии EXECUTE на процедуру
+-- отзыв привилегии EXECUTE на процедуру ADD_EMP_PROJ
+-- расположенную в текущей схеме у пользователя IVAN
 REVOKE EXECUTE ON PROCEDURE ADD_EMP_PROJ
 FROM USER IVAN;
 
--- отзыв привилегии EXECUTE на пакет
-REVOKE EXECUTE ON PACKAGE DATE_UTILS
+-- отзыв привилегии EXECUTE на процедуру ADD_EMP_PROJ из схемы MAIN
+-- у роли MANAGER
+REVOKE EXECUTE ON PROCEDURE MAIN.ADD_EMP_PROJ
+FROM ROLE MANAGER;
+
+-- отзыв привилегии EXECUTE на пакет DATE_UTILS из схемы APP
+-- у пользователя ALEX
+REVOKE EXECUTE ON PACKAGE APP.DATE_UTILS
 FROM USER ALEX;
 ----
 ====
@@ -133,13 +151,19 @@ FROM USER ALEX;
 ====
 [source,sql]
 ----
--- Отзыв привилегии USAGE на последовательность выданной роли
+-- Отзыв привилегии USAGE на последовательность GEN_AGE
+-- выданной роли MANAGER
 REVOKE USAGE ON SEQUENCE GEN_AGE FROM ROLE MANAGER;
 
--- Отзыв привилегии USAGE на последовательность выданной триггеру
+-- Отзыв привилегии USAGE на схему MANAGEMENT для роли MANAGER
+REVOKE USAGE ON SCHEMA MANAGEMENT FROM ROLE MANAGER;
+
+-- Отзыв привилегии USAGE на последовательность GEN_AGE
+-- выданной триггеру TR_AGE_BI
 REVOKE USAGE ON SEQUENCE GEN_AGE FROM TRIGGER TR_AGE_BI;
 
--- Отзыв привилегии USAGE на исключение выданной пакету
+-- Отзыв привилегии USAGE на исключение E_ACCESS_DENIED
+-- выданной пакету PKG_BILL
 REVOKE USAGE ON EXCEPTION E_ACCESS_DENIED
 FROM PACKAGE PKG_BILL;
 ----
@@ -150,11 +174,20 @@ FROM PACKAGE PKG_BILL;
 ====
 [source,sql]
 ----
--- Отзыв у пользователя Joe привилегии на создание таблиц
-REVOKE CREATE TABLE FROM Joe;
+-- Отзыв у пользователя Bob привилегии на создание таблиц в текущей схеме
+REVOKE CREATE TABLE FROM Bob;
 
--- Отзыв у пользователя Joe привилегии на изменение любой процедуры
-REVOKE ALTER ANY PROCEDURE FROM Joe;
+-- Отзыв у пользователя Joe привилегии на создание таблиц в схеме Main
+REVOKE CREATE TABLE ON SCHEMA Main FROM Joe;
+
+-- Отзыв у пользователя Bob привилегии на изменение любой процедуры в текущей схеме
+REVOKE ALTER ANY PROCEDURE FROM Bob;
+
+-- Отзыв у пользователя Joe привилегии на изменение любой процедуры в схеме Main
+REVOKE ALTER ANY PROCEDURE ON SCHEMA Main FROM Joe;
+
+-- Отзыв привилегии на создание схем
+REVOKE CREATE SCHEMA FROM Alex;
 
 -- Отзыв привилегии пользователю на создание базы данных
 -- у пользователя Superuser
@@ -169,8 +202,8 @@ REVOKE CREATE DATABASE FROM USER Superuser;
 ----
 
 -- Отзыв у системной привилегии USER_MANAGEMENT всех прав
--- на представление PLG$SRP_VIEW
-REVOKE ALL ON PLG$SRP_VIEW FROM SYSTEM PRIVILEGE USER_MANAGEMENT;
+-- на представление PLG$SRP_VIEW из схемы PLG$SRP
+REVOKE ALL ON PLG$SRP.PLG$SRP_VIEW FROM SYSTEM PRIVILEGE USER_MANAGEMENT;
 ----
 ====
 
@@ -188,16 +221,16 @@ REVOKE ALL ON PLG$SRP_VIEW FROM SYSTEM PRIVILEGE USER_MANAGEMENT;
 ====
 [source,sql]
 ----
--- отмена возможности передавать любую из привилегии на таблицу
--- другим пользователям или ролям у роли ADMINISTRATOR
+-- отмена возможности передавать любую из привилегии на таблицу CUSTOMER
+-- из текущей схемы другим пользователям или ролям у роли ADMINISTRATOR
 REVOKE GRANT OPTION FOR ALL ON TABLE CUSTOMER
 FROM ROLE ADMINISTRATOR;
 
--- отзыв привилегии EXECUTE на функцию
+-- отзыв привилегии EXECUTE на функцию GET_BEGIN_DATE из схемы APP
 -- и лишение права передавать эту привилегию
 -- другим пользователям и ролям
 REVOKE GRANT OPTION FOR
-EXECUTE ON FUNCTION GET_BEGIN_DATE
+EXECUTE ON FUNCTION APP.GET_BEGIN_DATE
 FROM ROLE MANAGER;
 ----
 ====
@@ -261,8 +294,8 @@ REVOKE ADMIN OPTION FOR MANAGER FROM USER ALEX;
 ====
 [source,sql]
 ----
--- отзыв привилегии SELECT у пользователя IVAN,
--- которая была выдана пользователем ALEX
+-- отзыв привилегии SELECT на таблицу EMPLOYEE из текущей схемы
+-- у пользователя IVAN, которая была выдана пользователем ALEX
 REVOKE SELECT ON TABLE EMPLOYEE
 FROM USER IVAN GRANTED BY ALEX;
 ----
