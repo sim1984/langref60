@@ -7,6 +7,8 @@ include::ddl/_fblangref-ddl-database.adoc[leveloffset=+1]
 
 include::ddl/_fblangref-ddl-shadow.adoc[leveloffset=+1]
 
+include::ddl/_fblangref-ddl-schema.adoc[leveloffset=+1]
+
 include::ddl/_fblangref-ddl-domain.adoc[leveloffset=+1]
 
 include::ddl/_fblangref-ddl-table.adoc[leveloffset=+1]
