@@ -15,7 +15,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE PACKAGE BODY [IF NOT EXISTS] _package_name_
+CREATE PACKAGE BODY [IF NOT EXISTS] [_schema_name_.]_package_name_
 AS
 BEGIN
   [<package_item> ...]
@@ -28,7 +28,7 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE _collation_]
+  RETURNS <type> [NOT NULL] [COLLATE [_schema_name_.]_collation_]
   [DETERMINISTIC]
 
 <procedure_decl> ::=
@@ -41,7 +41,7 @@ END
 
 <function_impl> ::=
   FUNCTION _func_name_ [(<in_impl_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE _collation_]
+  RETURNS <type> [NOT NULL] [COLLATE [_schema_name_.]_collation_]
   [DETERMINISTIC]
   <routine-body>
 
@@ -62,9 +62,12 @@ END
 
 <outparam>  ::=  <param_decl>
 
-<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE _collation_]
+<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema_name_.]_collation_]
 
-<type> ::= <datatype> | [TYPE OF] _domain_name_ | TYPE OF COLUMN _rel_._col_
+<type> ::=
+    <datatype>
+  | [TYPE OF] [_schema_name_.]_domain_name_
+  | TYPE OF COLUMN [_schema_name_.]_rel_._col_
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -99,6 +102,9 @@ END
 |package_name
 |Имя пакета.
 Может содержать до 63 символов.
+
+|schema_name
+|Имя схемы.
 
 |function_decl
 |Объявление функции.
@@ -260,7 +266,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER PACKAGE BODY _package_name_
+ALTER PACKAGE BODY [_schema_name_.]_package_name_
 AS
 BEGIN
   [<package_item> ...]
@@ -273,7 +279,7 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [COLLATE _collation_]
+  RETURNS <type> [COLLATE [_schema_name_.]_collation_]
   [<function_options>]
 
 <procedure_decl> ::=
@@ -287,7 +293,7 @@ END
 
 <function_impl> ::=
   FUNCTION _func_name_ [(<in_impl_params>)]
-  RETURNS <type> [COLLATE _collation_]
+  RETURNS <type> [COLLATE [_schema_name_.]_collation_]
   [DETERMINISTIC]
   <routine-body>
 
@@ -351,7 +357,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER PACKAGE BODY _package_name_
+CREATE OR ALTER PACKAGE BODY [_schema_name_.]_package_name_
 AS
 BEGIN
   [<package_item> ...]
@@ -364,7 +370,7 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [COLLATE _collation_]
+  RETURNS <type> [COLLATE [_schema_name_.]_collation_]
   [<function_options>]
 
 <procedure_decl> ::=
@@ -378,7 +384,7 @@ END
 
 <function_impl> ::=
   FUNCTION _func_name_ [(<in_impl_params>)]
-  RETURNS <type> [COLLATE _collation_]
+  RETURNS <type> [COLLATE [_schema_name_.]_collation_]
   [DETERMINISTIC]
   <routine-body>
 
@@ -444,7 +450,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP PACKAGE BODY [IF EXISTS] _package_name_
+DROP PACKAGE BODY [IF EXISTS] [_schema_name_.]_package_name_
 ----
 
 .Параметры оператора `DROP PACKAGE BODY`
@@ -455,6 +461,9 @@ DROP PACKAGE BODY [IF EXISTS] _package_name_
 
 |package_name
 |Имя пакета.
+
+|schema_name
+|Имя схемы.
 |===
 
 Оператор `DROP PACKAGE BODY` удаляет тело пакета.
@@ -508,7 +517,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE PACKAGE BODY _package_name_
+RECREATE PACKAGE BODY [_schema_name_.]_package_name_
 AS
 BEGIN
   [<package_item> ...]
@@ -521,7 +530,7 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [COLLATE _collation_]
+  RETURNS <type> [COLLATE [_schema_name_.]_collation_]
   [<function_options>]
 
 <procedure_decl> ::=
@@ -535,7 +544,7 @@ END
 
 <function_impl> ::=
   FUNCTION _func_name_ [(<in_impl_params>)]
-  RETURNS <type> [COLLATE _collation_]
+  RETURNS <type> [COLLATE [_schema_name_.]_collation_]
   [DETERMINISTIC]
   <routine-body>
 

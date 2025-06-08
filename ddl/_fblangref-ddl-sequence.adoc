@@ -25,7 +25,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE {SEQUENCE | GENERATOR} [IF NOT EXISTS] _seq_name_
+CREATE {SEQUENCE | GENERATOR} [IF NOT EXISTS] [_schema_name_.]_seq_name_
 [START WITH _start_value_] [INCREMENT [BY] _increment_]
 ----
 
@@ -38,6 +38,9 @@ CREATE {SEQUENCE | GENERATOR} [IF NOT EXISTS] _seq_name_
 
 |seq_name
 |Имя последовательности (генератора). Может содержать до 63 символов.
+
+|schema_name
+|Имя схемы.
 
 |start_value
 |Начальное значение последовательности (генератора).
@@ -146,7 +149,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-ALTER {SEQUENCE | GENERATOR} _seq_name_
+ALTER {SEQUENCE | GENERATOR} [_schema_name_.]_seq_name_
 [RESTART [WITH _newvalue_]]
 [INCREMENT [BY] _increment_]
 ----
@@ -160,6 +163,9 @@ ALTER {SEQUENCE | GENERATOR} _seq_name_
 
 |seq_name
 |Имя последовательности (генератора).
+
+|schema_name
+|Имя схемы.
 
 |newvalue
 |Новое значение последовательности (генератора). 64 битное целое в диапазоне от -2^63^ до 2^63^ - 1
@@ -250,7 +256,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE OR ALTER {SEQUENCE | GENERATOR} _seq_name_
+CREATE OR ALTER {SEQUENCE | GENERATOR} [_schema_name_.]_seq_name_
 [{START WITH _start_value_ | RESTART}]
 [INCREMENT [BY] _increment_]
 ----
@@ -264,6 +270,9 @@ CREATE OR ALTER {SEQUENCE | GENERATOR} _seq_name_
 
 |seq_name
 |Имя последовательности (генератора). Может содержать до 63 символов.
+
+|schena_name
+|Имя схемы.
 
 |start_value
 |Начальное значение последовательности (генератора).
@@ -313,7 +322,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP {SEQUENCE | GENERATOR} [IF EXISTS] _seq_name_
+DROP {SEQUENCE | GENERATOR} [IF EXISTS] [_schema_name_.]_seq_name_
 ----
 
 [[fblangref-ddl-tbl-dropseq]]
@@ -325,6 +334,9 @@ DROP {SEQUENCE | GENERATOR} [IF EXISTS] _seq_name_
 
 |seq_name
 |Имя последовательности (генератора).
+
+|schema_name
+|Имя схемы.
 |===
 
 Оператор `DROP SEQUENCE` удаляет существующую последовательность (генератор). Слова `SEQUENCE` и `GENERATOR` являются синонимами. Вы можете использовать любое из них, но рекомендуется использовать `SEQUENCE`. При наличии зависимостей для существующей последовательности (генератора) удаления не будет выполнено.
@@ -378,7 +390,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-RECREATE {SEQUENCE | GENERATOR} _seq_name_
+RECREATE {SEQUENCE | GENERATOR} [_schema_name_.]_seq_name_
   [START WITH _start_value_]
   [INCREMENT [BY] _increment_];
 ----
@@ -392,6 +404,9 @@ RECREATE {SEQUENCE | GENERATOR} _seq_name_
 
 |seq_name
 |Имя последовательности (генератора). Может содержать до 63 символов.
+
+|schema_name
+|Имя схемы.
 
 |start_value
 |Начальное значение последовательности (генератора).
@@ -430,7 +445,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-SET GENERATOR _seq_name_ TO _new_val_
+SET GENERATOR [_schema_name_.]_seq_name_ TO _new_val_
 ----
 
 [[fblangref-ddl-tbl-setgen]]
@@ -442,6 +457,9 @@ SET GENERATOR _seq_name_ TO _new_val_
 
 |seq_name
 |Имя последовательности (генератора).
+
+|schema_name
+|Имя схемы.
 
 |new_val
 |Новое значение последовательности (генератора). 64 битное целое в диапазоне от -2^63^ .. 2^63^ - 1

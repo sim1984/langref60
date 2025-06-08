@@ -18,8 +18,8 @@ DSQL, ESQL.
 [listing,subs=+quotes]
 ----
 CREATE [UNIQUE] [ASC[ENDING] | DESC[ENDING]]
-INDEX [IF NOT EXISTS] _indexname_ [{ACTIVE | INACTIVE}]
-ON _tablename_
+INDEX [IF NOT EXISTS] [_schema_name_.]_indexname_ [{ACTIVE | INACTIVE}]
+ON [_schema_name_.]_tablename_
 {(<column_list>) | COMPUTED [BY] (<value_expression>)}
 [WHERE <search_condition>]
 
@@ -36,6 +36,9 @@ ON _tablename_
 |indexname
 |Имя индекса.
 Может содержать до 63 символов.
+
+|schema_name
+|Имя схемы.
 
 |tablename
 |Имя таблицы, для которой строится индекс.
@@ -358,7 +361,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-ALTER INDEX _indexname_ {ACTIVE | INACTIVE};
+ALTER INDEX [_schema_name_.]_indexname_ {ACTIVE | INACTIVE};
 ----
 
 [[fblangref-ddl-idx-alteridx]]
@@ -370,6 +373,9 @@ ALTER INDEX _indexname_ {ACTIVE | INACTIVE};
 
 |indexname
 |Имя индекса.
+
+|schema_name
+|Имя схемы.
 |===
 
 Оператор `ALTER INDEX` переводит индекс в активное/неактивное состояние. Возможность изменения структуры и порядка сортировки ключей этот оператор не предусматривает.
@@ -452,7 +458,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP INDEX [IF EXISTS] _indexname_
+DROP INDEX [IF EXISTS] [_schema_name_.]_indexname_
 ----
 
 .Параметры оператора `DROP INDEX`
@@ -463,6 +469,9 @@ DROP INDEX [IF EXISTS] _indexname_
 
 |indexname
 |Имя индекса.
+
+|schema_name
+|Имя схемы.
 |===
 
 Оператор `DROP INDEX` удаляет существующий индекс из базы данных. При наличии зависимостей для существующего индекса (если он используется в ограничении) удаление не будет выполнено.
@@ -516,7 +525,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-SET STATISTICS INDEX _indexname_
+SET STATISTICS INDEX [_schema_name_.]_indexname_
 ----
 
 .Параметры оператора `SET STATISTICS`
@@ -527,6 +536,9 @@ SET STATISTICS INDEX _indexname_
 
 |indexname
 |Имя индекса.
+
+|schema_name
+|Имя схемы, в которой находится индекс.
 |===
 
 Оператор `SET STATISTICS` пересчитывает значение селективности для указанного индекса.

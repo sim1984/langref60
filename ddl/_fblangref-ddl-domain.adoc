@@ -19,10 +19,10 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE DOMAIN [IF NOT EXISTS] _name_ [AS] <datatype>
+CREATE DOMAIN [IF NOT EXISTS] [_schema_name_.]_name_ [AS] <datatype>
   [DEFAULT {<literal> | NULL | <context_var>}]
   [NOT NULL] [CHECK (<dom_condition>)]
-  [COLLATE _collation_name_];
+  [COLLATE [_schema_name_.]_collation_name_];
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype> | <array_datatype>
@@ -63,8 +63,8 @@ CREATE DOMAIN [IF NOT EXISTS] _name_ [AS] <datatype>
   | <context_var>
   | <expression>
   | NULL
-  | NEXT VALUE FOR _genname_
-  | GEN_ID(_genname_, <val>)
+  | NEXT VALUE FOR [_schema_name_.]_genname_
+  | GEN_ID([_schema_name_.]_genname_, <val>)
   | CAST(<val> AS <cast_type>)
   | (<select_one>)
   | _func_(<val> [, <val> ...])
@@ -72,8 +72,8 @@ CREATE DOMAIN [IF NOT EXISTS] _name_ [AS] <datatype>
 
 <cast_type> ::=
    <datatype>
-  | [TYPE OF] _domain_
-  | TYPE OF COLUMN _rel_._col_
+  | [TYPE OF] [_schema_name_.]_domain_
+  | TYPE OF COLUMN [_schema_name_.]_rel_._col_
 ----
 
 
@@ -87,6 +87,9 @@ CREATE DOMAIN [IF NOT EXISTS] _name_ [AS] <datatype>
 |name
 |Имя домена.
 Может содержать до 63 символов.
+
+|schema_name
+|Имя схемы
 
 |datatype
 |Тип данных SQL.
@@ -277,7 +280,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER DOMAIN _domain_name_
+ALTER DOMAIN [_schema_name_.]_domain_name_
   [TO _new_name_]
   [TYPE <datatype>]
   [{SET DEFAULT {<literal> | NULL | <context_var>}} | DROP DEFAULT]
@@ -323,8 +326,8 @@ ALTER DOMAIN _domain_name_
   | <context_var>
   | <expression>
   | NULL
-  | NEXT VALUE FOR _genname_
-  | GEN_ID(genname, <val>)
+  | NEXT VALUE FOR [_schema_name_.]_genname_
+  | GEN_ID([_schema_name_.]_genname_, <val>)
   | CAST(<val> AS <cast_type>)
   | (<select_one>)
   | _func_(<val> [, <val> ...])
@@ -332,8 +335,8 @@ ALTER DOMAIN _domain_name_
 
 <cast_type> ::=
     <datatype>
-  | [TYPE OF] _domain_
-  | TYPE OF COLUMN _rel_._col_
+  | [TYPE OF] [_schema_name_.]_domain_
+  | TYPE OF COLUMN [_schema_name_.]_rel_._col_
 ----
 
 [[fblangref-ddl-tbl-alterdomn]]
@@ -345,6 +348,9 @@ ALTER DOMAIN _domain_name_
 
 |domain_name
 |Имя домена.
+
+|schema_name
+|Имя схемы.
 
 |new_name
 |Новое имя домена.
@@ -527,7 +533,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP DOMAIN [IF EXISTS] _domain_name_
+DROP DOMAIN [IF EXISTS] [_schema_name_.]_domain_name_
 ----
 
 
@@ -539,6 +545,9 @@ DROP DOMAIN [IF EXISTS] _domain_name_
 
 |domain_name
 |Имя домена.
+
+|schema_name
+|Имя схемы.
 |===
 
 Оператор `DROP DOMAIN` удаляет домен, существующий в базе данных.

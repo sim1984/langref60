@@ -20,7 +20,7 @@ DSQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE VIEW [IF NOT EXISTS] _viewname_ [<full_column_list>]
+CREATE VIEW [IF NOT EXISTS] [_schema_name_.]_viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -37,6 +37,9 @@ AS <select_statement>
 |viewname
 |Имя представления.
 Может содержать до 63 символов.
+
+|schema_name
+|Имя схемы.
 
 |select_statement
 |Оператор SELECT.
@@ -299,7 +302,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-ALTER VIEW _viewname_ [<full_column_list>]
+ALTER VIEW [_schema_name_.]_viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -315,6 +318,9 @@ AS <select_statement>
 
 |viewname
 |Имя существующего представления.
+
+|schema_name
+|Имя схемы.
 
 |select_statement
 |Оператор `SELECT`.
@@ -381,7 +387,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-CREATE OR ALTER VIEW _viewname_ [<full_column_list>]
+CREATE OR ALTER VIEW [_schema_name_.]_viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -398,6 +404,9 @@ AS <select_statement>
 |viewname
 |Имя представления.
 Может содержать до 63 символов.
+
+|schema_name
+|Имя схемы.
 
 |select_statement
 |Оператор `SELECT`.
@@ -449,7 +458,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP VIEW [IF EXISTS] _viewname_
+DROP VIEW [IF EXISTS] [_schema_name_.]_viewname_
 ----
 
 [[fblangref-ddl-view-dropview-tbl]]
@@ -461,6 +470,9 @@ DROP VIEW [IF EXISTS] _viewname_
 
 |viewname
 |Имя представления.
+
+|schema_name
+|Имя схемы.
 |===
 
 Оператор `DROP VIEW` удаляет существующее представление. Если представление имеет зависимости, то удаление не будет произведено.
@@ -514,7 +526,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-RECREATE VIEW _viewname_ [<full_column_list>]
+RECREATE VIEW [_schema_name_.]_viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -531,6 +543,9 @@ AS <select_statement>
 |viewname
 |Имя представления.
 Может содержать до 63 символов.
+
+|schema_name
+|Имя схемы.
 
 |select_statement
 |Оператор `SELECT`.

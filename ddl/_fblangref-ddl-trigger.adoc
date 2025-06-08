@@ -24,7 +24,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE TRIGGER [IF NOT EXISTS] _trigname_ {
+CREATE TRIGGER [IF NOT EXISTS] [_schema_name_.]_trigname_ {
     <relation_trigger_legacy>
   | <relation_trigger_sql2003>
   | <database_trigger>
@@ -32,7 +32,7 @@ CREATE TRIGGER [IF NOT EXISTS] _trigname_ {
 <routine body>
 
 <relation_trigger_legacy> ::=
-  FOR {_tablename_ | _viewname_}
+  FOR [_schema_name_.]{_tablename_ | _viewname_}
   [ACTIVE | INACTIVE]
   {BEFORE | AFTER} <mutation_list>
   [POSITION _number_]
@@ -40,7 +40,7 @@ CREATE TRIGGER [IF NOT EXISTS] _trigname_ {
 <relation_trigger_sql2003> ::=
   [ACTIVE | INACTIVE]
   {BEFORE | AFTER} <mutation_list>
-  ON {_tablename_ | _viewname_}
+  ON [_schema_name_.]{_tablename_ | _viewname_}
   [POSITION _number_]
 
 <database_trigger> ::=
@@ -118,6 +118,9 @@ CREATE TRIGGER [IF NOT EXISTS] _trigname_ {
 |trigname
 |Имя триггера.
 Может содержать до 63 символов.
+
+|schema_name
+|Имя схемы.
 
 |relation_trigger_legacy
 |Объявление табличного триггера (унаследованное).
@@ -811,7 +814,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER TRIGGER _trigname_
+ALTER TRIGGER [_schema_name_.]_trigname_
 [ACTIVE | INACTIVE]
 [{BEFORE | AFTER} <mutation_list>]
 [POSITION number]
@@ -966,7 +969,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER TRIGGER trigname {
+CREATE OR ALTER TRIGGER [_schema_name_.]_trigname_ {
     <relation_trigger_legacy>
   | <relation_trigger_sql2003>
   | <database_trigger>
@@ -1012,7 +1015,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP TRIGGER [IF EXISTS] _trigname_
+DROP TRIGGER [IF EXISTS] [_schema_name_.]_trigname_
 ----
 
 .Параметры оператора `DROP TRIGGER`
@@ -1023,6 +1026,9 @@ DROP TRIGGER [IF EXISTS] _trigname_
 
 |trigname
 |Имя триггера.
+
+|schema_name
+|Имя схемы.
 |===
 
 Оператор `DROP TRIGGER` удаляет существующий триггер.
@@ -1082,7 +1088,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE TRIGGER _trigname_ {
+RECREATE TRIGGER [_schema_name_.]_trigname_ {
     <relation_trigger_legacy>
   | <relation_trigger_sql2003>
   | <database_trigger>

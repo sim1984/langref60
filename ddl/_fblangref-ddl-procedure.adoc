@@ -19,7 +19,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE PROCEDURE [IF NOT EXISTS] _procname_ [( <in_params> )]
+CREATE PROCEDURE [IF NOT EXISTS] [_schema_name_.]_procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine body>
 
@@ -33,9 +33,12 @@ CREATE PROCEDURE [IF NOT EXISTS] _procname_ [( <in_params> )]
 
 <value> ::=  {_literal_ | NULL | _context_var_}
 
-<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE _collation_]
+<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema_name_.]_collation_]
 
-<type> ::= <datatype> | [TYPE OF] _domain_name_ | TYPE OF COLUMN _rel_._col_
+<type> ::=
+    <datatype>
+  | [TYPE OF] [_schema_name_.]_domain_name_
+  | TYPE OF COLUMN [_schema_name_.]_rel_._col_
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -77,6 +80,9 @@ CREATE PROCEDURE [IF NOT EXISTS] _procname_ [( <in_params> )]
 |procname
 |Имя хранимой процедуры.
 Может содержать до 63 символов.
+
+|schema_name
+|Имя схемы.
 
 |inparam
 |Описание входного параметра.
@@ -356,7 +362,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER PROCEDURE _procname_ [( <in_params> )]
+ALTER PROCEDURE [_schema_name_.]_procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 
@@ -427,7 +433,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER PROCEDURE _procname_ [( <in_params> )]
+CREATE OR ALTER PROCEDURE [_schema_name_.]_procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 
@@ -482,7 +488,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP PROCEDURE [IF EXISTS] _procname_
+DROP PROCEDURE [IF EXISTS] [_schema_name_.]_procname_
 ----
 
 .Параметры оператора `DROP PROCEDURE`
@@ -493,6 +499,9 @@ DROP PROCEDURE [IF EXISTS] _procname_
 
 |procname
 |Имя хранимой процедуры.
+
+|schema_name
+|Имя схемы.
 |===
 
 Оператор `DROP PROCEDURE` удаляет существующую хранимую процедуру. Если от хранимой процедуры существуют зависимости, то при попытке удаления такой процедуру будет выдана соответствующая ошибка.
@@ -546,7 +555,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE PROCEDURE _procname_ [( <in_params> )]
+RECREATE PROCEDURE [_schema_name_.]_procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 

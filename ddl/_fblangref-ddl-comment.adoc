@@ -19,14 +19,15 @@ DSQL, ESQL
 ----
 COMMENT ON <object> IS {'_sometext_' | NULL}
 <object> ::=
-    { DATABASE | SCHEMA }
-  | <basic-type> _objectname_
+    DATABASE
+  | <basic-type> [_schema_name_.]_objectname_
+  | <schema-lees-type> _objectname_
   | USER _username_ [USING PLUGIN _plugin_name_]
-  | COLUMN _relationname_._fieldname_
+  | COLUMN [_schema_name_.]_relationname_._fieldname_
   | [PROCEDURE | FUNCTION] PARAMETER
-    [_package_name_.] _routinename_._paramname_
+    [_schema_name_.][_package_name_.] _routinename_._paramname_
   | {PROCEDURE | [EXTERNAL] FUNCTION}
-    [_package_name_.]_routinename_
+    [_schema_name_.][_package_name_.]_routinename_
   | [GLOBAL] MAPPING _mappingname_
 
 <basic-type> ::=
@@ -34,15 +35,19 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
   | COLLATION
   | DOMAIN
   | EXCEPTION
-  | FILTER
   | GENERATOR
   | INDEX
   | PACKAGE
-  | ROLE
   | SEQUENCE
+  | SCHEMA
   | TABLE
   | TRIGGER
   | VIEW
+
+<schema-lees-type> ::=
+    SCHEMA
+  | FILTER
+  | ROLE
 
 ----
 
@@ -57,7 +62,13 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
 |Текст комментария.
 
 |basic-type
-|Тип объекта метаданных.
+|Тип объекта метаданных, который расположен внутри схемы.
+
+|schema-lees-type
+|Тип объекта метаданных, который не имеет схемы.
+
+|schema_name
+|Имя схемы объекта метаданных.
 
 |objectname
 |Имя объекта метаданных.
