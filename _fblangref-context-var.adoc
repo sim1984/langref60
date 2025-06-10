@@ -21,7 +21,7 @@ CURRENT_CONNECTION
 
 Переменная `CURRENT_CONNECTION` хранит уникальный идентификатор текущего соединения.
 Значение переменной хранится в странице заголовка базы и сбрасывается после restore.
-Переменная увеличивается на единицу при каждом последующем соединении с базой данных (соединения также могут быть внутренними вызванными самим ядром). Следовательно, переменная показывает количество подключений произошедших к базе после её восстановления (или после её создания). 
+Переменная увеличивается на единицу при каждом последующем соединении с базой данных (соединения также могут быть внутренними вызванными самим ядром). Следовательно, переменная показывает количество подключений произошедших к базе после её восстановления (или после её создания).
 
 .Использование переменной `CURRENT_CONNECTION`
 [example]
@@ -33,7 +33,7 @@ SELECT CURRENT_CONNECTION FROM RDB$DATABASE
 ====
 
 .См. также:
-<<fblangref-contextvars-current-transaction>>. 
+<<fblangref-contextvars-current-transaction>>.
 
 [[fblangref-contextvars-current-date]]
 == `CURRENT_DATE`
@@ -71,7 +71,7 @@ select current_date from rdb$database
 ====
 
 .См. также:
-<<fblangref-contextvars-current-timestamp>>, <<fblangref-contextvars-current-time>>. 
+<<fblangref-contextvars-current-timestamp>>, <<fblangref-contextvars-current-time>>.
 
 [[fblangref-contextvars-current-role]]
 == `CURRENT_ROLE`
@@ -128,6 +128,36 @@ FROM RDB$DATABASE;
 <<fblangref-scalarfuncs-get-context,`RDB$GET_CONTEXT()`>>,
 <<fblangref-scalarfuncs-roleinuse,`RDB$ROLE_IN_USE()`>>.
 
+[[fblangref-contextvars-current-schema]]
+== `CURRENT_SCHEMA`
+
+.Доступно в
+DSQL, PSQL
+(((Контекстные переменные, CURRENT_SCHEMA)))
+
+.Синтаксис
+[listing]
+----
+CURRENT_SCHEMA
+----
+
+.Тип возвращаемого результата
+`VARCHAR(63)`
+
+Контекстная переменная `CURRENT_SCHEMA` содержит текущую схему. Текущая  -- это первая валидная схема в пути поиска (`SEARCH_PATH`) для текущей сессии. Если валидных схем не найдено, то возвращается `NULL`.
+
+.Использование переменной `CURRENT_SCHEMA`
+[example]
+====
+[source,sql]
+----
+SELECT CURRENT_SCHEMA FROM RDB$DATABASE
+----
+====
+
+.См. также:
+<<fblangref-scalarfuncs-get-context,`RDB$GET_CONTEXT()`>>.
+
 [[fblangref-contextvars-current-time]]
 == `CURRENT_TIME`
 
@@ -167,7 +197,7 @@ CURRENT_TIME [(<precision>)]
 ====
 В блоке кода PSQL (процедура, триггер, исполняемый блок) значение `CURRENT_TIME` не меняется по мере выполнения.
 При вызове вложенного кода, значение также не изменится и будет равно значению в коде самого верхнего уровня.
-Для определения реального времени используйте `CAST('NOW' AS TIME)`. 
+Для определения реального времени используйте `CAST('NOW' AS TIME)`.
 ====
 
 .Использование переменной `CURRENT_TIME`
@@ -181,7 +211,7 @@ SELECT CURRENT_TIME(2) FROM RDB$DATABASE;
 ====
 
 .См. также:
-<<fblangref-contextvars-current-timestamp>>, <<fblangref-contextvars-current-date>>. 
+<<fblangref-contextvars-current-timestamp>>, <<fblangref-contextvars-current-date>>.
 
 [[fblangref-contextvars-current-timestamp]]
 == `CURRENT_TIMESTAMP`
@@ -223,7 +253,7 @@ CURRENT_TIMESTAMP [(<precision>)]
 ====
 В блоке кода PSQL (процедура, триггер, исполняемый блок) значение `CURRENT_TIMESTAMP` не меняется по мере выполнения.
 При вызове вложенного кода, значение также не изменится и будет равно значению в коде самого верхнего уровня.
-Для определения реального времени используйте `CAST('NOW' AS TIMESTAMP)`. 
+Для определения реального времени используйте `CAST('NOW' AS TIMESTAMP)`.
 ====
 
 .Использование переменной `CURRENT_TIMESTAMP`
@@ -237,7 +267,7 @@ SELECT CURRENT_TIMESTAMP(2) FROM RDB$DATABASE;
 ====
 
 .См. также:
-<<fblangref-contextvars-current-time>>, <<fblangref-contextvars-current-date>>. 
+<<fblangref-contextvars-current-time>>, <<fblangref-contextvars-current-date>>.
 
 [[fblangref-contextvars-current-transaction]]
 == `CURRENT_TRANSACTION`
@@ -255,7 +285,7 @@ CURRENT_TRANSACTION
 .Тип возвращаемого результата
 `BIGINT`
 
-Переменная `CURRENT_TRANSACTION` содержит уникальный номер текущей транзакции. 
+Переменная `CURRENT_TRANSACTION` содержит уникальный номер текущей транзакции.
 
 Значение `CURRENT_TRANSACTION`` ``хранится в странице заголовка базы данных и сбрасывается в 0 после восстановления (или создания базы). Оно увеличивается при старте новой транзакции.
 
@@ -271,7 +301,7 @@ NEW.TRANS_ID = CURRENT_TRANSACTION;
 ====
 
 .См. также:
-<<fblangref-contextvars-current-connection>>, <<fblangref-scalarfuncs-get-context,`RDB$GET_CONTEXT()`>>. 
+<<fblangref-contextvars-current-connection>>, <<fblangref-scalarfuncs-get-context,`RDB$GET_CONTEXT()`>>.
 
 [[fblangref-contextvars-current-user]]
 == `CURRENT_USER`
@@ -289,7 +319,7 @@ CURRENT_USER
 .Тип возвращаемого результата
 `VARCHAR(63)`
 
-Переменная `CURRENT_USER` содержит имя текущего подключенного пользователя базы данных. 
+Переменная `CURRENT_USER` содержит имя текущего подключенного пользователя базы данных.
 
 .Использование переменной `CURRENT_USER`
 [example]
@@ -301,7 +331,7 @@ NEW.ADDED_BY = CURRENT_USER;
 ====
 
 .См. также:
-<<fblangref-contextvars-user>>, <<fblangref-contextvars-current-role>>. 
+<<fblangref-contextvars-user>>, <<fblangref-contextvars-current-role>>.
 
 [[fblangref-contextvars-deleting]]
 == `DELETING`
@@ -704,14 +734,14 @@ ROW_COUNT
 
 [source,sql]
 ----
-...                        
-UPDATE t2 SET 
-    evt='upd', 
-    old_id = old.id, old_x = old.x, 
+...
+UPDATE t2 SET
+    evt='upd',
+    old_id = old.id, old_x = old.x,
     new_id = new.id, new_x = new.x
 WHERE new_id = old.id;
 
-INSERT INTO t2log(evt, affected_rows) VALUES('upd', ROW_COUNT); 
+INSERT INTO t2log(evt, affected_rows) VALUES('upd', ROW_COUNT);
 ...
 ----
 
@@ -720,17 +750,17 @@ INSERT INTO t2log(evt, affected_rows) VALUES('upd', ROW_COUNT);
 
 [source,sql]
 ----
-...                        
-DECLARE rc INT;                        
-...                        
-UPDATE t2 SET 
-    evt='upd', 
-    old_id = old.id, old_x = old.x, 
+...
+DECLARE rc INT;
+...
+UPDATE t2 SET
+    evt='upd',
+    old_id = old.id, old_x = old.x,
     new_id = new.id, new_x = new.x
 WHERE new_id = old.id;
 
 rc = ROW_COUNT;
-INSERT INTO t2log(evt, affected_rows) VALUES('upd', rc); 
+INSERT INTO t2log(evt, affected_rows) VALUES('upd', rc);
 ...
 ----
 ====
@@ -743,7 +773,7 @@ INSERT INTO t2log(evt, affected_rows) VALUES('upd', rc);
 ...
 UPDATE Figures SET Number = 0 WHERE id = :id;
 IF (row_count = 0) THEN
-  INSERT INTO Figures (id, Number) 
+  INSERT INTO Figures (id, Number)
   VALUES (:id, 0);
 ...
 ----
