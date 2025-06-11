@@ -33,6 +33,30 @@
 <<fblangref-sectables-user_attributes,`SEC$USER_ATTRIBUTES`>>::
 Сведения о дополнительных атрибутах пользователей.
 
+[[fblangref-sectables-db_creators]]
+== `SEC$DB_CREATORS`
+
+Список пользователей, которые могут создать новую базу данных.
+
+.Описание столбцов таблицы `SEC$DB_CREATORS`
+[cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
+|===
+^| Наименование столбца
+^| Тип данных
+^| Описание
+
+|SEC$USER
+|CHAR(63) CHARACTER SET UTF8
+|Имя пользователя.
+
+|SEC$USER_TYPE
+|SMALLINT
+|Тип пользователя:
+
+8 -- пользователь; +
+13 -- роль.
+
+|===
 
 [[fblangref-sectables-global_auth_mapping]]
 == `SEC$GLOBAL_AUTH_MAPPING`
@@ -47,27 +71,27 @@
 ^| Описание
 
 |SEC$MAP_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя глобального отображения.
 
 |SEC$MAP_USING
-|CHAR(1)
+|CHAR(1) CHARACTER SET UTF8
 |Является ли аутентификация общесерверной (S) или обычной (P).
 
 |SEC$MAP_PLUGIN
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя плагина аутентификации, из которого происходит отображение.
 
 |SEC$MAP_DB
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя базы данных, в которой прошла аутентификация. Из неё происходит отображение.
 
 |SEC$MAP_FROM_TYPE
-|CHAR(63)
-|Тип объекта, который будет отображён. 
+|CHAR(63) CHARACTER SET UTF8
+|Тип объекта, который будет отображён.
 
 |SEC$MAP_FROM
-|CHAR(255)
+|CHAR(255) CHARACTER SET UTF8
 |Имя объекта, из которого будет произведено отображение.
 
 |SEC$MAP_TO_TYPE
@@ -80,7 +104,7 @@
 
 
 |SEC$MAP_TO
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Наименование объекта, в который будет произведено отображение
 (имя пользователя или роли).
 
@@ -94,7 +118,7 @@
 
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Текстовое описание отображения.
 |===
 
@@ -111,19 +135,19 @@
 ^| Описание
 
 |SEC$USER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя.
 
 |SEC$FIRST_NAME
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Первое имя (имя).
 
 |SEC$MIDDLE_NAME
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Среднее имя (отчество).
 
 |SEC$LAST_NAME
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Последнее имя (фамилия).
 
 |SEC$ACTIVE
@@ -136,11 +160,11 @@
 безопасности.
 
 |SEC$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Комментарий к пользователю.
 
 |SEC$PLUGIN
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя плагина управления пользователями, с помощью которого был
 создан данный пользователь.
 |===
@@ -158,19 +182,19 @@
 ^| Описание
 
 |SEC$USER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя.
 
 |SEC$KEY
-|VARCHAR(63)
+|VARCHAR(63) CHARACTER SET UTF8
 |Имя атрибута.
 
 |SEC$VALUE
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET UTF8
 |Значение атрибута.
 
 |SEC$PLUGIN
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя плагина управления пользователями, с помощью которого был
 создан данный пользователь.
 |===

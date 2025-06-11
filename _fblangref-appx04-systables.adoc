@@ -5,7 +5,7 @@
 [[fblangref-systables]]
 = Системные таблицы
 
-При первоначальном создании базы данных система управления базами данных создаёт множество системных таблиц. В системных таблицах хранятся метаданные -- описания всех объектов базы данных. Системные таблицы содержат префикс `RDB$` в имени.
+При первоначальном создании базы данных система управления базами данных создаёт множество системных таблиц. В системных таблицах хранятся метаданные -- описания всех объектов базы данных. Системные таблицы расположены в схеме `SYSTEM`. Обычно имя системных таблиц начинается с префикса `RDB$`.
 
 
 .Системные таблицы
@@ -144,27 +144,27 @@
 ^| Описание
 
 |RDB$MAP_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя отображения.
 
 |RDB$MAP_USING
-|CHAR(1)
+|CHAR(1) CHARACTER SET UTF8
 |Является ли аутентификация общесерверной (S) или обычной (P).
 
 |RDB$MAP_PLUGIN
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя плагина аутентификации, из которого происходит отображение.
 
 |RDB$MAP_DB
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя базы данных, в которой прошла аутентификация. Из неё происходит отображение.
 
 |RDB$MAP_FROM_TYPE
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Тип объекта, который будет отображён.
 
 |RDB$MAP_FROM
-|CHAR(255)
+|CHAR(255) CHARACTER SET UTF8
 |Имя объекта, из которого будет произведено отображение.
 
 |RDB$MAP_TO_TYPE
@@ -176,7 +176,7 @@
 
 
 |RDB$MAP_TO
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Наименование объекта, в который будет произведено отображение
 (имя пользователя или роли).
 
@@ -186,8 +186,8 @@
 системе -- значение 1.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
-|Произвольное текстовое описание порядка сортировки.
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
+|Произвольное текстовое описание.
 |===
 
 [[fblangref-systables-backup_history]]
@@ -207,7 +207,7 @@
 |Присваиваемый ядром идентификатор.
 
 |RDB$TIMESTAMP
-|DATE
+|TIMESTAMP WITH TIME ZONE
 |Дата и время выполнения копирования.
 
 |RDB$BACKUP_LEVEL
@@ -215,7 +215,7 @@
 |Уровень копирования.
 
 |RDB$GUID
-|CHAR(38)
+|CHAR(38) CHARACTER SET NONE
 |Уникальный идентификатор.
 
 |RDB$SCN
@@ -223,7 +223,7 @@
 |Системный номер.
 
 |RDB$FILE_NAME
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET NONE
 |Полный путь и имя файла копии.
 |===
 
@@ -240,11 +240,11 @@
 ^| Описание
 
 |RDB$CHARACTER_SET_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя набора символов.
 
 |RDB$FORM_OF_USE
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Не используется.
 
 |RDB$NUMBER_OF_CHARACTERS
@@ -252,7 +252,7 @@
 |Количество символов в наборе. Для существующих наборов символов не используется.
 
 |RDB$DEFAULT_COLLATE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя порядка сортировки по умолчанию для набора символов.
 
 |RDB$CHARACTER_SET_ID
@@ -264,11 +264,11 @@
 |Системный флаг: имеет значение 1, если набор символов был определён в системе при создании базы данных; значение 0 для набора символов, определённого пользователем.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольное текстовое описание набора символов.
 
 |RDB$FUNCTION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя внешней функции для наборов символов, определённых пользователем, доступ к которым осуществляется через внешнюю функцию.
 
 |RDB$BYTES_PER_CHARACTER
@@ -276,12 +276,21 @@
 |Количество байтов для представления одного символа.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может ссылаться на класс безопасности, определённый в таблице `RDB$SECURITY_CLASSES` для применения ограничений управления доступом для всех пользователей этого набора символов.
 
 |RDB$OWNER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя -- владельца (создателя) набора символов.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в котором расположен набор символов.
+
+|RDB$DEFAULT_COLLATE_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы для порядка сортировки символов по умолчанию.
+
 |===
 
 [[fblangref-systables-check_constraints]]
@@ -298,13 +307,16 @@
 ^| Описание
 
 |RDB$CONSTRAINT_NAME
-|CHAR(63)
-|Имя ограничения. Задаётся пользователем или автоматически
-                                генерируется системой.
+|CHAR(63) CHARACTER SET UTF8
+|Имя ограничения. Задаётся пользователем или автоматически генерируется системой.
 
 |RDB$TRIGGER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Для ограничения `CHECK` -- это имя триггера, который поддерживает данное ограничение. Для ограничения `NOT NULL` -- это имя столбца, к которому применяется ограничение. Для ограничения внешнего ключа -- это имя триггера, который поддерживает предложения `ON UPDATE`, `ON DELETE`.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположено ограничение.
 |===
 
 [[fblangref-systables-collations]]
@@ -320,7 +332,7 @@
 ^| Описание
 
 |RDB$COLLATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя порядка сортировки.
 
 |RDB$COLLATION_ID
@@ -350,28 +362,32 @@
 |Признак: определён пользователем -- значение 0; определён в системе -- значение 1.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольное текстовое описание порядка сортировки.
 
 |RDB$FUNCTION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |В настоящий момент не используется.
 
 |RDB$BASE_COLLATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя базового порядка сортировки для данного порядка сортировки.
 
 |RDB$SPECIFIC_ATTRIBUTES
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Описание особых атрибутов.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может ссылаться на класс безопасности, определённый в таблице `RDB$SECURITY_CLASSES` для применения ограничений управления доступом для всех пользователей этой сортировки.
 
 |RDB$OWNER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя -- владельца (создателя) сортировки.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой распложен порядок сортировки.
 |===
 
 [[fblangref-systables-config]]
@@ -393,15 +409,15 @@
 |Уникальный идентификатор записи. Не имеет значения.
 
 |RDB$CONFIG_NAME
-|VARCHAR(63)
+|VARCHAR(63) CHARACTER SET ASCII
 |Наименование параметра, например `DefaultDbCachePages`, `TempCacheLimit` и т. д.
 
 |RDB$CONFIG_VALUE
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET UTF8
 |Фактическое значение настройки, может задаваться в конфигурации и при необходимости браться из ядра Firebird (в случае неверного значения).
 
 |RDB$CONFIG_DEFAULT
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET UTF8
 |Значение настройки по умолчанию, фиксированное в коде Firebird.
 
 |RDB$CONFIG_IS_SET
@@ -409,7 +425,7 @@
 |`TRUE`, если значение установлено пользователем, `FALSE` -- в противном случае.
 
 |RDB$CONFIG_SOURCE
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET UTF8
 |Имя конфигурационного файла, в котором был задан параметр, относительно корневой папки firebird, например: `firebird.conf`, `databases.conf` или специальное значение "`DPB`", если параметр был установлен в DPB, если значение параметра не было задано, то это поле содержит `NULL`.
 |===
 
@@ -427,7 +443,7 @@
 ^| Описание
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Текст примечания для базы данных.
 
 |RDB$RELATION_ID
@@ -435,11 +451,11 @@
 |Количество таблиц и представлений в базе данных.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Класс безопасности, определённый в `RDB$SECURITY_CLASSES`, для обращения к общим для базы данных ограничениям доступа.
 
 |RDB$CHARACTER_SET_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя набора символов по умолчанию для базы данных, установленного в предложении `DEFAULT CHARACTER SET` при создании базы данных. `NULL` -- набор символов `NONE`.
 
 |RDB$LINGER
@@ -453,6 +469,10 @@
 `NULL` -- режим по умолчанию (`INVOKER`); +
 `FALSE` -- `INVOKER`. Вновь создаваемые объекты выполняются с правами вызывающего пользователя; +
 `TRUE` -- `DEFINER`. Вновь создаваемые объекты выполняются с правами определяющего пользователя.
+
+|RDB$CHARACTER_SET_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы набора символов по умолчанию для базы данных.
 
 |===
 
@@ -470,7 +490,7 @@
 ^| Описание
 
 |RDB$USER
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя или роли, которому даны полномочия на создание базы данных.
 
 |RDB$USER_TYPE
@@ -496,15 +516,15 @@
 ^| Описание
 
 |RDB$DEPENDENT_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя представления, процедуры, триггера, ограничения `CHECK` или вычисляемого столбца, для которого описывается зависимость.
 
 |RDB$DEPENDED_ON_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Объект, зависящий от описываемого объекта -- таблица, на которую ссылается представление, процедура, триггер, ограничение `CHECK` или вычисляемый столбец.
 
 |RDB$FIELD_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя столбца в зависимой таблице, на который ссылается представление, процедура, триггер, ограничение `CHECK` или вычисляемый столбец.
 
 |RDB$DEPENDENT_TYPE
@@ -546,9 +566,17 @@
 19 -- тело пакета.
 
 |RDB$PACKAGE_NAME
-|CHAR(63)
-|Пакет процедуры или функции, для которой описывается
-                                зависимость.
+|CHAR(63) CHARACTER SET UTF8
+|Пакет процедуры или функции, для которой описывается зависимость.
+
+|RDB$DEPENDENT_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы объекта метаданных для которого описывается зависимость.
+
+|RDB$DEPENDED_ON_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы объекта метаданных, который зависит от описываемого объекта метаданных.
+
 |===
 
 [[fblangref-systables-exceptions]]
@@ -564,7 +592,7 @@
 ^| Описание
 
 |RDB$EXCEPTION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользовательского исключения.
 
 |RDB$EXCEPTION_NUMBER
@@ -572,11 +600,11 @@
 |Назначенный системой уникальный номер исключения.
 
 |RDB$MESSAGE
-|CHAR(1023)
+|CHAR(1023) CHARACTER SET NONE
 |Текст сообщения в исключении.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольное текстовое описание исключения.
 
 |RDB$SYSTEM_FLAG
@@ -584,12 +612,16 @@
 |Признак: 0 - определено пользователем; 1 или выше - определено системой.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может ссылаться на класс безопасности, определённый в таблице `RDB$SECURITY_CLASSES` для применения ограничений управления доступом для всех пользователей этого исключения.
 
 |RDB$OWNER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя -- владельца (создателя) исключения.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположено исключение.
 |===
 
 [[fblangref-systables-field_dimensions]]
@@ -606,8 +638,8 @@
 ^| Описание
 
 |RDB$FIELD_NAME
-|CHAR(63)
-|Имя столбца, являющегося массивом. Должно содержаться в поле RDB$FIELD_NAME таблицы RDB$FIELDS.
+|CHAR(63) CHARACTER SET UTF8
+|Имя домена, являющегося массивом. Должно содержаться в поле `RDB$FIELD_NAME` таблицы `RDB$FIELDS`.
 
 |RDB$DIMENSION
 |SMALLINT
@@ -620,6 +652,10 @@
 |RDB$UPPER_BOUND
 |INTEGER
 |Верхняя граница описываемой размерности.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой располагается домен.
 |===
 
 [[fblangref-systables-fields]]
@@ -641,35 +677,35 @@
 ^| Описание
 
 |RDB$FIELD_NAME
-|CHAR(63)
-|Уникальное имя домена, созданного пользователем, или домена, автоматически построенного ядром Firebird для столбца таблицы. Во втором случае имя будет начинаться с символов `RDB$`.
+|CHAR(63) CHARACTER SET UTF8
+|Имя домена, созданного пользователем, или домена, автоматически построенного ядром Firebird для столбца таблицы. Во втором случае имя будет начинаться с символов `RDB$`.
 
 |RDB$QUERY_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Не используется.
 
 |RDB$VALIDATION_BLR
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Двоичное представление (BLR) выражения SQL, задающее проверку значения `CHECK` у домена.
 
 |RDB$VALIDATION_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Оригинальный исходный текст на языке SQL, задающий проверку значения `CHECK`.
 
 |RDB$COMPUTED_BLR
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Двоичное представление (BLR) выражения SQL, которое используется сервером базы данных для вычисления при обращении к столбцу `COMPUTED BY`.
 
 |RDB$COMPUTED_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Оригинальный исходный текст выражения, которое определяет столбец `COMPUTED BY`.
 
 |RDB$DEFAULT_VALUE
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Значение по умолчанию в двоичном виде BLR.
 
 |RDB$DEFAULT_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Значение по умолчанию в исходном виде на языке SQL.
 
 |RDB$FIELD_LENGTH
@@ -736,15 +772,15 @@
 2 -- `DECIMAL`.
 
 |RDB$MISSING_VALUE
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Не используется.
 
 |RDB$MISSING_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Не используется.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольный текст комментария для домена (столбца таблицы).
 
 |RDB$SYSTEM_FLAG
@@ -752,7 +788,7 @@
 |Признак: значение 1 -- домен, автоматически созданный системой, значение 0 -- домен определён пользователем.
 
 |RDB$QUERY_HEADER
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Не используется.
 
 |RDB$SEGMENT_LENGTH
@@ -760,7 +796,7 @@
 |Для столбцов `BLOB` задаёт длину буфера `BLOB` в байтах. Для остальных типов данных содержит `NULL`.
 
 |RDB$EDIT_STRING
-|VARCHAR(127)
+|VARCHAR(127) CHARACTER SET NONE
 |Не используется.
 
 |RDB$EXTERNAL_LENGTH
@@ -819,12 +855,16 @@
 |Указывает общее количество цифр для числового типа данных с фиксированной точкой (`DECIMAL` и `NUMERIC`). Для целочисленных типов данных значением является 0, для всех остальных типов данных -- `NULL`.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может ссылаться на класс безопасности, определённый в таблице `RDB$SECURITY_CLASSES` для применения ограничений управления доступом для всех пользователей этого домена.
 
 |RDB$OWNER_NAME
-|CHAR(63)
-|Имя пользователя – владельца (создателя) домена.
+|CHAR(63) CHARACTER SET UTF8
+|Имя пользователя -- владельца (создателя) домена.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположен домен.
 |===
 
 [[fblangref-systables-files]]
@@ -840,7 +880,7 @@
 ^| Описание
 
 |RDB$FILE_NAME
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET NONE
 |Полный путь к файлу и имя вторичного файла базы данных в многофайловой базе данных или файла оперативной копии.
 
 |RDB$FILE_SEQUENCE
@@ -877,19 +917,19 @@
 ^| Описание
 
 |RDB$FUNCTION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Уникальное имя фильтра `BLOB`.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Написанная пользователем документация о фильтре `BLOB` и используемых двух подтипах.
 
 |RDB$MODULE_NAME
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET NONE
 |Имя динамической библиотеки / совместно используемого объекта, где расположен код фильтра `BLOB`.
 
 |RDB$ENTRYPOINT
-|CHAR(255)
+|CHAR(255) CHARACTER SET NONE
 |Точка входа в библиотеке фильтров для этого фильтра BLOB.
 
 |RDB$INPUT_SUB_TYPE
@@ -905,11 +945,11 @@
 |Признак: внешне определённый фильтр (т.е. определённый пользователем = значение 0, внутренне определённый = значение 1 или более)
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может ссылаться на класс безопасности, определённый в таблице `RDB$SECURITY_CLASSES` для применения ограничений управления доступом для всех пользователей этого `BLOB` фильтра.
 
 |RDB$OWNER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя -- владельца (создателя) `BLOB` фильтра.
 |===
 
@@ -935,7 +975,7 @@
 |Идентификатор формата таблицы. Форматов может быть 255 для таблиц и 32000 для представлений.
 
 |RDB$DESCRIPTOR
-|BLOB FORMAT
+|BLOB SUB_TYPE FORMAT
 |Отображение в виде BLOB столбцов и характеристик данных на момент, когда была создана запись формата.
 |===
 
@@ -952,7 +992,7 @@
 ^| Описание
 
 |RDB$FUNCTION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя функции.
 
 |RDB$ARGUMENT_POSITION
@@ -1024,23 +1064,23 @@
 |Длина аргумента `CHAR` или `VARCHAR` в символах (не в байтах).
 
 |RDB$PACKAGE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пакета функции (если функция упакованная), в которой используется параметр.
 
 |RDB$ARGUMENT_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя параметра.
 
 |RDB$FIELD_SOURCE
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя домена, созданного пользователем (при использовании ссылки на домен вместо типа), или домена, автоматически построенного системой для параметра функции. Во втором случае имя будет начинаться с символов `RDB$`.
 
 |RDB$DEFAULT_VALUE
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Значение по умолчанию на языке BLR.
 
 |RDB$DEFAULT_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Значение по умолчанию в исходном виде на языке SQL.
 
 |RDB$COLLATION_ID
@@ -1061,11 +1101,11 @@
 3 -- через дескриптор `BLOB`.
 
 |RDB$FIELD_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя столбца, на которое ссылается параметр с помощью предложения `TYPE OF COLUMN`.
 
 |RDB$RELATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя таблицы, на которую ссылается параметр с помощью предложения `TYPE OF COLUMN`.
 
 |RDB$SYSTEM_FLAG
@@ -1073,8 +1113,21 @@
 |Указывает, является ли параметр определённым системой (значение 1 и выше) или пользователем (значение 0).
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Текст произвольного примечания к параметру.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположена функция или её пакет.
+
+|RDB$RELATION_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы таблицы, на которую ссылается параметр с помощью предложения `TYPE OF COLUMN`.
+
+|RDB$FIELD_SOURCE_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы домена.
+
 |===
 
 [[fblangref-systables-functions]]
@@ -1090,7 +1143,7 @@
 ^| Описание
 
 |RDB$FUNCTION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя функции.
 
 |RDB$FUNCTION_TYPE
@@ -1098,19 +1151,19 @@
 |В настоящий момент не используется.
 
 |RDB$QUERY_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |В настоящий момент не используется.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольный текст комментария к функции.
 
 |RDB$MODULE_NAME
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET NONE
 |Имя внешнего модуля (динамической библиотеки), где расположен код функции.
 
 |RDB$ENTRYPOINT
-|CHAR(255)
+|CHAR(255) CHARACTER SET NONE
 |Имя точки входа в библиотеке, где находится эта функция.
 
 |RDB$RETURN_ARGUMENT
@@ -1125,11 +1178,11 @@
 1 -- определённая пользователем.
 
 |RDB$ENGINE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя движка для использования внешних функций. Обычно UDR.
 
 |RDB$PACKAGE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пакета, если функция является упакованной.
 
 |RDB$PRIVATE_FLAG
@@ -1140,7 +1193,7 @@
 1 -- если функция описана или реализована только в теле пакета (не описана в заголовке).
 
 |RDB$FUNCTION_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Исходный код функции на языке SQL.
 
 |RDB$FUNCTION_ID
@@ -1148,7 +1201,7 @@
 |Уникальный идентификатор функции.
 
 |RDB$FUNCTION_BLR
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Двоичное представление (BLR) кода функции.
 
 |RDB$VALID_BLR
@@ -1156,15 +1209,15 @@
 |Указывает, остаётся ли текст хранимой функции корректным после последнего изменения функции при помощи оператора `ALTER FUNCTION`.
 
 |RDB$DEBUG_INFO
-|BLOB
+|BLOB SUB_TYPE 9
 |Содержит отладочную информацию о переменных, используемых в хранимой функции.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может указывать на класс безопасности, определённый в системной таблице `RDB$SECURITY_CLASSES`, для применения ограничений управления доступом.
 
 |RDB$OWNER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя -- владельца (создателя) функции.
 
 |RDB$LEGACY_FLAG
@@ -1188,6 +1241,10 @@
 `TRUE` -- с правами определяющего пользователя (`SQL SECURITY DEFINER`); +
 `FALSE` -- с правами вызывающего пользователя (`SQL SECURITY INVOKER`); +
 `NULL` -- привилегии выполнения наследуется от пакета.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположена функция или её пакет.
 |===
 
 [[fblangref-systables-generators]]
@@ -1203,7 +1260,7 @@
 ^| Описание
 
 |RDB$GENERATOR_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Уникальное имя генератора.
 
 |RDB$GENERATOR_ID
@@ -1219,15 +1276,15 @@
 6 -- внутренний генератор для identity столбца.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольный текст примечания к генератору.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может указывать на класс безопасности, определённый в системной таблице `RDB$SECURITY_CLASSES`, для применения ограничений управления доступом.
 
 |RDB$OWNER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя -- владельца (создателя) генератора.
 
 |RDB$INITIAL_VALUE
@@ -1237,6 +1294,10 @@
 |RDB$GENERATOR_INCREMENT
 |INTEGER
 |Шаг приращения генератора при использовании оператора `NEXT VALUE FOR`.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположена последовательность (генератор).
 |===
 
 [[fblangref-systables-index_segments]]
@@ -1253,11 +1314,11 @@
 ^| Описание
 
 |RDB$INDEX_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя индекса, к которому относится данный сегмент. Должно соответствовать главной записи в системной таблице `RDB$INDICES`.
 
 |RDB$FIELD_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя одного из столбцов, входящего в состав индекса. Должно соответствовать значению в столбце `RDB$FIELD_NAME` в таблице `RDB$RELATION_FIELDS`.
 
 |RDB$FIELD_POSITION
@@ -1267,6 +1328,10 @@
 |RDB$STATISTICS
 |DOUBLE PRECISION
 |Последнее известное (рассчитанное) значение селективности индекса по данному столбцу.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположен индекс.
 |===
 
 [[fblangref-systables-indices]]
@@ -1282,11 +1347,11 @@
 ^| Описание
 
 |RDB$INDEX_NAME
-|CHAR(63)
-|Уникальное имя индекса, заданное пользователем или автоматически сгенерированное системой.
+|CHAR(63) CHARACTER SET UTF8
+|Имя индекса, заданное пользователем или автоматически сгенерированное системой.
 
 |RDB$RELATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя таблицы, к которой применяется индекс. Соответствует `RDB$RELATION_NAME` в строке таблицы `RDB$RELATIONS`.
 
 |RDB$INDEX_ID
@@ -1301,7 +1366,7 @@
 1 -- уникальный.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольный текст комментария к индексу.
 
 |RDB$SEGMENT_COUNT
@@ -1325,7 +1390,7 @@
 1 -- descending.
 
 |RDB$FOREIGN_KEY
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя ассоциированного ограничения внешнего ключа, если существует.
 
 |RDB$SYSTEM_FLAG
@@ -1333,11 +1398,11 @@
 |Указывает, является ли индекс определённым системой (значение 1 или выше) или пользователем (значение 0).
 
 |RDB$EXPRESSION_BLR
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Выражение, записанное на языке двоичного представления (BLR). Используется для вычисления значений ключей для индексов по выражению.
 
 |RDB$EXPRESSION_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Исходный текст выражения для вычисляемых индексов.
 
 |RDB$STATISTICS
@@ -1346,12 +1411,21 @@
 
 
 |RDB$CONDITION_BLR
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Выражение, записанное на языке двоичного представления (BLR). Используется для ограничения набора индексируемых записей.
 
 |RDB$CONDITION_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Исходный текст выражения для ограничения набора индексируемых записей.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположен индекс.
+
+|RDB$FOREIGN_KEY_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы для таблицы на которую ссылается внешний ключ, если существует.
+
 |===
 
 [[fblangref-systables-keywords]]
@@ -1367,7 +1441,7 @@
 ^| Описание
 
 |RDB$KEYWORD_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET ASCII
 |Ключевое слово.
 
 |RDB$KEYWORD_RESERVED
@@ -1390,7 +1464,7 @@
 ^| Описание
 
 |RDB$FILE_NAME
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET NONE
 |Не используется.
 
 |RDB$FILE_SEQUENCE
@@ -1427,15 +1501,15 @@
 ^| Описание
 
 |RDB$PACKAGE_NAME
-|CHAR(63)
-|Уникальное имя пакета.
+|CHAR(63) CHARACTER SET UTF8
+|Имя пакета.
 
 |RDB$PACKAGE_HEADER_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Исходный код заголовка пакета на языке SQL.
 
 |RDB$PACKAGE_BODY_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Исходный код тела пакета на языке SQL.
 
 |RDB$VALID_BODY_FLAG
@@ -1443,11 +1517,11 @@
 |Указывает, остаётся ли текст тела пакета корректным после последнего изменения заголовка пакета или его пересоздания.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может указывать на класс безопасности, определённый в системной таблице `RDB$SECURITY_CLASSES`, для применения ограничений управления доступом.
 
 |RDB$OWNER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя -- владельца (создателя) пакета.
 
 |RDB$SYSTEM_FLAG
@@ -1455,7 +1529,7 @@
 |Указывает, что пакет определён пользователем (значение 0) или системой (значение 1 или выше).
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольный текст примечания к пакету.
 
 |RDB$SQL_SECURITY
@@ -1464,6 +1538,10 @@
 
 `TRUE` -- с правами определяющего пользователя (`SQL SECURITY DEFINER`); +
 `FALSE` -- с правами вызывающего пользователя (`SQL SECURITY INVOKER`).
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположен пакет.
 |===
 
 [[fblangref-systables-pages]]
@@ -1508,11 +1586,11 @@
 ^| Описание
 
 |RDB$PARAMETER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя параметра.
 
 |RDB$PROCEDURE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя процедуры, в которой используется параметр.
 
 |RDB$PARAMETER_NUMBER
@@ -1524,11 +1602,11 @@
 |Указывает, является ли параметр входным (значение 0) или выходным (значение 1).
 
 |RDB$FIELD_SOURCE
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя домена, созданного пользователем (при использовании ссылки на домен вместо типа), или домена, автоматически построенного системой для параметра процедуры. Во втором случае имя будет начинаться с символов `RDB$`.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Текст произвольного примечания к параметру.
 
 |RDB$SYSTEM_FLAG
@@ -1536,11 +1614,11 @@
 |Указывает, является ли параметр определённым системой (значение 1 и выше) или пользователем (значение 0).
 
 |RDB$DEFAULT_VALUE
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Значение по умолчанию на языке BLR.
 
 |RDB$DEFAULT_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Значение по умолчанию в исходном виде на языке SQL.
 
 |RDB$COLLATION_ID
@@ -1561,16 +1639,29 @@
 3 -- через дескриптор BLOB.
 
 |RDB$FIELD_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя столбца, на которое ссылается параметр с помощью предложения `TYPE OF COLUMN`.
 
 |RDB$RELATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя таблицы, на которую ссылается параметр с помощью предложения `TYPE OF COLUMN`.
 
 |RDB$PACKAGE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пакета процедуры (если процедура упакованная), в которой используется параметр.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположена процедура или её пакет.
+
+|RDB$RELATION_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы таблицы, на которую ссылается параметр с помощью предложения `TYPE OF COLUMN`.
+
+|RDB$FIELD_SOURCE_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы домена.
+
 |===
 
 [[fblangref-systables-procedures]]
@@ -1586,7 +1677,7 @@
 ^| Описание
 
 |RDB$PROCEDURE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя хранимой процедуры.
 
 |RDB$PROCEDURE_ID
@@ -1602,27 +1693,27 @@
 |Указывает количество выходных параметров или их отсутствие (значение `NULL`).
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольный текст примечания к процедуре.
 
 |RDB$PROCEDURE_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Исходный код процедуры на языке SQL.
 
 |RDB$PROCEDURE_BLR
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Двоичное представление (BLR) кода процедуры.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может указывать на класс безопасности, определённый в системной таблице `RDB$SECURITY_CLASSES`, для применения ограничений управления доступом.
 
 |RDB$OWNER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя -- владельца (создателя) процедуры.
 
 |RDB$RUNTIME
-|BLOB
+|BLOB SUB_TYPE 5
 |Описание метаданных процедуры. Внутреннее использование для оптимизации.
 
 |RDB$SYSTEM_FLAG
@@ -1641,19 +1732,19 @@
 |Указывает, остаётся ли текст хранимой процедуры корректным после последнего изменения процедуры при помощи оператора `ALTER PROCEDURE`.
 
 |RDB$DEBUG_INFO
-|BLOB
+|BLOB SUB_TYPE 9
 |Содержит отладочную информацию о переменных, используемых в хранимой процедуре.
 
 |RDB$ENGINE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя движка для использования внешних процедур. Обычно UDR.
 
 |RDB$ENTRYPOINT
-|CHAR(255)
+|CHAR(255) CHARACTER SET NONE
 |Имя точки входа в библиотеке, где находится эта процедура.
 
 |RDB$PACKAGE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пакета, если процедура является упакованной.
 
 |RDB$PRIVATE_FLAG
@@ -1670,6 +1761,11 @@
 `TRUE` -- с правами определяющего пользователя (`SQL SECURITY DEFINER`); +
 `FALSE` -- с правами вызывающего пользователя (`SQL SECURITY INVOKER`); +
 `NULL` -- привилегии выполнения наследуется от пакета.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположена процедура или её пакет.
+
 |===
 
 [[fblangref-systables-publication_tables]]
@@ -1685,12 +1781,16 @@
 ^| Описание
 
 |RDB$PUBLICATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя публикации.
 
 |RDB$TABLE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя таблицы.
+
+|RDB$TABLE_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы для таблицы.
 |===
 
 [[fblangref-systables-publications]]
@@ -1707,11 +1807,11 @@
 ^| Описание
 
 |RDB$PUBLICATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя публикации.
 
 |RDB$OWNER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Владелец. Имя пользователя, создавшего публикацию.
 
 |RDB$SYSTEM_FLAG
@@ -1748,24 +1848,33 @@
 ^| Описание
 
 |RDB$CONSTRAINT_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя ограничения внешнего ключа. Задаётся пользователем или автоматически генерируется системой.
 
 |RDB$CONST_NAME_UQ
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя ограничения первичного или уникального ключа, на которое ссылается предложение `REFERENCES` в данном ограничении.
 
 |RDB$MATCH_OPTION
-|CHAR(7)
+|CHAR(7) CHARACTER SET NONE
 |Не используется. Текущим значением является `FULL` во всех случаях.
 
 |RDB$UPDATE_RULE
-|CHAR(11)
+|CHAR(11) CHARACTER SET NONE
 |Действия по ссылочной целостности, применимые к данному внешнему ключу, когда изменяется первичный (уникальный) ключ родительской таблицы: `RESTRICT`, `NO ACTION`, `CASCADE`, `SET NULL`, `SET DEFAULT`.
 
 |RDB$DELETE_RULE
-|CHAR(11)
+|CHAR(11) CHARACTER SET NONE
 |Действия по ссылочной целостности, применимые к данному внешнему ключу, когда удаляется первичный (уникальный) ключ родительской таблицы: `RESTRICT`, `NO ACTION`, `CASCADE`, `SET NULL`, `SET DEFAULT`.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположено ограничение.
+
+|RDB$CONST_SCHEMA_NAME_UQ
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположено ограничение первичного или уникального ключа, на которое ссылается предложение `REFERENCES` в данном ограничении.
+
 |===
 
 [[fblangref-systables-relation_constraints]]
@@ -1781,28 +1890,33 @@
 ^| Описание
 
 |RDB$CONSTRAINT_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя ограничения на уровне таблицы, заданное пользователем или автоматически присвоенное системой.
 
 |RDB$CONSTRAINT_TYPE
-|CHAR(11)
+|CHAR(11) CHARACTER SET NONE
 |Содержит название типа ограничения: `PRIMARY KEY`, `UNIQUE`, `FOREIGN KEY`, `CHECK`, `NOT NULL`.
 
 |RDB$RELATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя таблицы, к которой применяется это ограничение.
 
 |RDB$DEFERRABLE
-|CHAR(3)
+|CHAR(3) CHARACTER SET NONE
 |В настоящий момент во всех случаях NO.
 
 |RDB$INITIALLY_DEFERRED
-|CHAR(3)
+|CHAR(3) CHARACTER SET NONE
 |В настоящий момент во всех случаях NO.
 
 |RDB$INDEX_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя индекса, который поддерживает это ограничение (содержит `NULL`, если ограничением является `CHECK` или `NOT NULL`).
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположено ограничение (имя схемы таблицы для которой создано ограничение).
+
 |===
 
 [[fblangref-systables-relation_fields]]
@@ -1818,28 +1932,27 @@
 ^| Описание
 
 |RDB$FIELD_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя столбца.
 
 |RDB$RELATION_NAME
-|CHAR(63)
-|Имя таблицы (представления), где присутствует описываемый
-столбец.
+|CHAR(63) CHARACTER SET UTF8
+|Имя таблицы (представления), где присутствует описываемый столбец.
 
 |RDB$FIELD_SOURCE
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Содержит имя домена (определённого пользователем или созданного автоматически системой), на котором основывается данный столбец.
 
 |RDB$QUERY_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |В настоящей версии системы не используется.
 
 |RDB$BASE_FIELD
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Только для представления. Имя столбца из базовой таблицы
 
 |RDB$EDIT_STRING
-|VARCHAR(127)
+|VARCHAR(127) CHARACTER SET NONE
 |Не используется.
 
 |RDB$FIELD_POSITION
@@ -1847,7 +1960,7 @@
 |Позиция столбца в таблице или представлении. Нумерация начинается с 0.
 
 |RDB$QUERY_HEADER
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Не используется.
 
 |RDB$UPDATE_FLAG
@@ -1863,11 +1976,11 @@
 |Для столбца представления это внутренний идентификатор базовой таблицы, откуда приходит это поле.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Примечание к столбцу таблицы или представления.
 
 |RDB$DEFAULT_VALUE
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Записанное в двоичном виде (BLR) значение по умолчанию -- предложение `DEFAULT`, если оно присутствует при описании столбца таблицы (представления).
 
 |RDB$SYSTEM_FLAG
@@ -1875,11 +1988,11 @@
 |Указывает, определено пользователем (значение 0) или системой (значение 1 или выше).
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может ссылаться на класс безопасности, определённый в `RDB$SECURITY_CLASSES` для применения ограничений управления доступом для всех пользователей этого столбца.
 
 |RDB$COMPLEX_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Не используется.
 
 |RDB$NULL_FLAG
@@ -1887,7 +2000,7 @@
 |Указывает, допускает ли столбец значения `NULL` (значение `NULL`) или не допускает (значение 1).
 
 |RDB$DEFAULT_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Исходный текст предложения `DEFAULT`, если присутствует.
 
 |RDB$COLLATION_ID
@@ -1895,7 +2008,7 @@
 |Идентификатор последовательности сортировки в составе набора символов для столбца не по умолчанию.
 
 |RDB$GENERATOR_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя внутреннего генератора для реализации identity столбца.
 
 |RDB$IDENTITY_TYPE
@@ -1906,6 +2019,15 @@
 `GENERATED ALWAYS` хранит значение 1.
 
 Для не `IDENTITY` столбцов хранит `NULL`.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы таблицы.
+
+|RDB$FIELD_SOURCE_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы домена.
+
 |===
 
 [[fblangref-systables-relations]]
@@ -1921,15 +2043,15 @@
 ^| Описание
 
 |RDB$VIEW_BLR
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Для представления содержит на языке BLR спецификации запроса. Для таблицы в поле содержится `NULL`.
 
 |RDB$VIEW_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Для представления содержит оригинальный исходный текст запроса на языке SQL (включая пользовательские комментарии). Для таблицы в поле содержится `NULL`.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольный текст примечания к таблице (представлению).
 
 |RDB$RELATION_ID
@@ -1953,31 +2075,31 @@
 |Количество столбцов в таблице (представлении).
 
 |RDB$RELATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя таблицы или представления.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может ссылаться на класс безопасности, определённый в таблице `RDB$SECURITY_CLASSES` для применения ограничений управления доступом для всех пользователей этой таблицы (представления).
 
 |RDB$EXTERNAL_FILE
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET NONE
 |Полный путь к внешнему файлу данных, если таблица описана с предложением `EXTERNAL FILE`.
 
 |RDB$RUNTIME
-|BLOB
+|BLOB SUB_TYPE 5
 |Описание метаданных таблицы. Внутреннее использование для оптимизации.
 
 |RDB$EXTERNAL_DESCRIPTION
-|BLOB
+|BLOB SUB_TYPE 8
 |Произвольное примечание к внешнему файлу таблицы.
 
 |RDB$OWNER_NAME
-|CHAR(31)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя -- владельца (создателя) таблицы или представления.
 
 |RDB$DEFAULT_CLASS
-|CHAR(31)
+|CHAR(63) CHARACTER SET UTF8
 |Класс безопасности по умолчанию. Применяется, когда новый столбец добавляется в таблицу.
 
 |RDB$FLAGS
@@ -2002,6 +2124,11 @@
 
 `TRUE` -- с правами определяющего пользователя (`SQL SECURITY DEFINER`); +
 `FALSE` или `NULL` -- с правами вызывающего пользователя (`SQL SECURITY INVOKER`).
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположена таблица или представление.
+
 |===
 
 [[fblangref-systables-roles]]
@@ -2017,15 +2144,15 @@
 ^| Описание
 
 |RDB$ROLE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя роли.
 
 |RDB$OWNER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя-владельца роли.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольный текст примечания к роли.
 
 |RDB$SYSTEM_FLAG
@@ -2033,7 +2160,7 @@
 |Системный флаг.
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Может ссылаться на класс безопасности, определённый в таблице `RDB$SECURITY_CLASSES` для применения ограничений управления доступом для всех пользователей этой роли.
 
 |RDB$SYSTEM_PRIVILEGES
@@ -2070,6 +2197,57 @@
 
 |===
 
+[[fblangref-systables-schemas]]
+== `RDB$SCHEMAS`
+
+Схемы базы данных.
+
+.Описание столбцов таблицы `RDB$SECURITY_CLASSES`
+[cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
+|===
+^| Наименование столбца
+^| Тип данных
+^| Описание
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы.
+
+|RDB$OWNER_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя пользователя -- владелец схемы.
+
+|RDB$CHARACTER_SET_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя набора символов, который по умолчанию используется для объектов схемы.
+
+|RDB$CHARACTER_SET_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы для набора символов, который по умолчанию используется для объектов схемы.
+
+|RDB$SQL_SECURITY
+|BOOLEAN
+|Режим `SQL SECURITY` по умолчанию (`DEFINER` или `INVOKER`) для вновь создаваемым объектам внутри схемы.
+Это значение перекрывает значение установленное на уровне базы данных (см. `RDB$DATABASE.RDB$SQL_SECURITY`).
+
+`NULL` -- наследует от установок на уровне базы данных; +
+`FALSE` -- `INVOKER`. Вновь создаваемые объекты выполняются с правами вызывающего пользователя; +
+`TRUE` -- `DEFINER`. Вновь создаваемые объекты выполняются с правами определяющего пользователя.
+
+|RDB$SECURITY_CLASS
+|CHAR(63) CHARACTER SET UTF8
+|Имя класса безопасности.
+
+|RDB$SYSTEM_FLAG
+|SMALLINT
+|Указывает, что схема определена пользователем (значение 0) или системой (значение 1 или выше).
+
+|RDB$DESCRIPTION
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
+|Произвольное текстовое описание схемы.
+
+|===
+
 [[fblangref-systables-security_classes]]
 == `RDB$SECURITY_CLASSES`
 
@@ -2083,15 +2261,15 @@
 ^| Описание
 
 |RDB$SECURITY_CLASS
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя класса безопасности.
 
 |RDB$ACL
-|BLOB ACL
+|BLOB SUB_TYPE ACL
 |Список управления доступом, связанный с классом безопасности. Перечисляет пользователей и их полномочия.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольный текст примечания к классу безопасности.
 |===
 
@@ -2112,7 +2290,7 @@
 |Идентификатор часового пояса.
 
 |RDB$TIME_ZONE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Наименование часового пояса
 |===
 
@@ -2129,7 +2307,7 @@
 ^| Описание
 
 |RDB$TRANSACTION_ID
-|INTEGER
+|BIGINT
 |Уникальный идентификатор отслеживаемой транзакции.
 
 |RDB$TRANSACTION_STATE
@@ -2145,7 +2323,7 @@
 |Не используется.
 
 |RDB$TRANSACTION_DESCRIPTION
-|BLOB
+|BLOB SUB_TYPE 7
 |Описывает подготовленную транзакцию и может быть поступающее пользовательское сообщение `isc_prepare_transaction2` даже если это не распределённая транзакция. Может быть использовано в случае потери соединения, которое не может быть восстановлено.
 |===
 
@@ -2162,7 +2340,7 @@
 ^| Описание
 
 |RDB$TRIGGER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя триггера, с которым связано данное сообщение.
 
 |RDB$MESSAGE_NUMBER
@@ -2170,8 +2348,12 @@
 |Номер сообщения в пределах одного триггера (от 1 до 32767).
 
 |RDB$MESSAGE
-|VARCHAR(1023)
+|VARCHAR(1023) CHARACTER SET NONE
 |Текст сообщения триггера.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположен триггер.
 |===
 
 [[fblangref-systables-triggers]]
@@ -2187,11 +2369,11 @@
 ^| Описание
 
 |RDB$TRIGGER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя триггера.
 
 |RDB$RELATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя таблицы или представления, для которого используется триггер. Если триггер применяется не к событию таблицы, а к событию базы данных, то в этом поле находится `NULL`.
 
 |RDB$TRIGGER_SEQUENCE
@@ -2225,15 +2407,15 @@
 Описание событий DDL триггеров смотри ниже.
 
 |RDB$TRIGGER_SOURCE
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Хранит исходный код триггера в PSQL.
 
 |RDB$TRIGGER_BLR
-|BLOB BLR
+|BLOB SUB_TYPE BLR
 |Хранит триггер в двоичном коде BLR.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Текст примечания триггера.
 
 |RDB$TRIGGER_INACTIVE
@@ -2253,15 +2435,15 @@
 |Указывает, остаётся ли текст триггера корректным после последнего изменения триггера при помощи оператора `ALTER TRIGGER`.
 
 |RDB$DEBUG_INFO
-|BLOB
+|BLOB SUB_TYPE 9
 |Содержит отладочную информацию о переменных, используемых в триггере.
 
 |RDB$ENGINE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя движка для использования внешних триггеров. Обычно UDR.
 
 |RDB$ENTRYPOINT
-|CHAR(255)
+|CHAR(255) CHARACTER SET NONE
 |Имя точки входа в библиотеке, где находится этот триггер.
 
 |RDB$SQL_SECURITY
@@ -2271,6 +2453,10 @@
 `TRUE` -- с правами определяющего пользователя (`SQL SECURITY DEFINER`); +
 `FALSE` -- с правами вызывающего пользователя (`SQL SECURITY INVOKER`); +
 `NULL` -- привилегии выполнения наследуется от таблицы.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в которой расположен триггер. Для табличных триггеров всегда совпадает со схемой таблицы.
 |===
 
 Для DDL триггеров тип триггера (`RDB$TRIGGER_TYPE`) получается путём побитового ИЛИ над фазой события (0 - `BEFORE`, 1 - `AFTER`) и всех перечисленных типов событий:
@@ -2346,7 +2532,7 @@
 ^| Описание
 
 |RDB$FIELD_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя перечисляемого типа. Совпадает с именем столбца, для которого определён данный перечислимый тип.
 
 |RDB$TYPE
@@ -2363,11 +2549,11 @@
 5 -- процедура.
 
 |RDB$TYPE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Текстовое представление для перечислимого типа.
 
 |RDB$DESCRIPTION
-|BLOB TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Произвольный текст примечания к перечислимому типу.
 
 |RDB$SYSTEM_FLAG
@@ -2388,7 +2574,7 @@
 ^| Описание
 
 |RDB$USER
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Пользователь, роль или объект которому предоставляется данное полномочие. Если в качестве грантополучателя используется системная привилегия, то вместо имени системной привилегии в данное поле попадает значение перечисляемого типа `RDB$SYSTEM_PRIVILEGES`:
 
 1 -- `USER_MANAGEMENT`; +
@@ -2416,11 +2602,11 @@
 23 -- `CREATE_PRIVILEGED_ROLES`.
 
 |RDB$GRANTOR
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пользователя, предоставляющего полномочие.
 
 |RDB$PRIVILEGE
-|CHAR(6)
+|CHAR(6) CHARACTER SET NONE
 |Привилегия, предоставляемая в полномочии:
 
 A -- all (все привилегии); +
@@ -2442,11 +2628,11 @@ M -- membership (членство).
 1 – содержит.
 
 |RDB$RELATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя объекта (таблица, роль, процедура) на который предоставляется полномочие.
 
 |RDB$FIELD_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя столбца, к которому применяется привилегия на уровне столбца (только привилегии `UPDATE` и `REFERENCES`).
 
 Если предоставляется членство в роли, то в данном столбце содержится `NULL` если роль предоставляется обычным образом, и `D` если роль предоставляется с использованием ключевого слова `DEFAULT`.
@@ -2484,6 +2670,14 @@ M -- membership (членство).
 17 -- сортировка; +
 18 -- пакет.
 
+|RDB$RELATION_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы объекта на который предоставляет привилегия.
+
+|RDB$USER_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы объекта которому предоставляет привилегия.
+
 |===
 
 [[fblangref-systables-view_relations]]
@@ -2499,11 +2693,11 @@ M -- membership (членство).
 ^| Описание
 
 |RDB$VIEW_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя представления.
 
 |RDB$RELATION_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя таблицы, представления или хранимой процедуры на которое ссылается данное представление.
 
 |RDB$VIEW_CONTEXT
@@ -2511,7 +2705,7 @@ M -- membership (членство).
 |Псевдоним (контекст), используемый для ссылки на столбец представления. Имеет то же значение, что и псевдоним, используемый в самом тексте представления на языке BLR в операторе запроса этого представления.
 
 |RDB$CONTEXT_NAME
-|CHAR(255)
+|CHAR(255) CHARACTER SET UTF8
 |Текстовый вариант псевдонима, указанного в столбце `RDB$VIEW_CONTEXT`.
 
 |RDB$CONTEXT_TYPE
@@ -2523,8 +2717,17 @@ M -- membership (членство).
 2 -- хранимая процедура.
 
 |RDB$PACKAGE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пакета для упакованной хранимой процедуры.
+
+|RDB$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в котором расположено представление.
+
+|RDB$RELATION_SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы в котором расположена таблица, представление или хранимая процедура на которое ссылается данное представление.
+
 |===
 
 :sectnums:
