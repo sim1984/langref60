@@ -1,7 +1,7 @@
 [[fblangref-build-in-packages]]
 = Системные пакеты
 
-Системные пакеты предоставляют служебные хранимые процедуры и функции.
+Системные пакеты предоставляют служебные хранимые процедуры и функции. Они располагаются в системной схеме `SYSTEM`.
 
 .Список системных пакетов
 <<fblangref-build-in-package-blob-util-pkg>>::
@@ -21,8 +21,7 @@
 == Пакет `RDB$BLOB_UTIL`
 
 (((RDB$BLOB_UTIL)))
-Пакет `RDB$BLOB_UTIL` предназначен для управления BLOB-объектами так, как это не могут сделать стандартные функции Firebird
-такие, как `BLOB_APPEND` и `SUBSTRING`, или они работают очень медленно.
+Пакет `RDB$BLOB_UTIL` предназначен для управления BLOB-объектами так, как это не могут сделать стандартные функции Firebird такие, как `BLOB_APPEND` и `SUBSTRING`, или они работают очень медленно.
 
 Эти подпрограммы работают с двоичными данными напрямую, даже с текстовыми BLOB.
 
@@ -32,8 +31,7 @@
 
 Преимущество по сравнению с `BLOB_APPEND` заключается в том, что можно установить собственные параметры `SEGMENTED` и `TEMP_STORAGE`.
 
-Функция `BLOB_APPEND` всегда создает BLOB во временном хранилище. Это может быть не лучшим подходом,
-если созданный BLOB будет храниться в постоянной таблице, поскольку для этого потребуется копирование.
+Функция `BLOB_APPEND` всегда создает BLOB во временном хранилище. Это может быть не лучшим подходом, если созданный BLOB будет храниться в постоянной таблице, поскольку для этого потребуется копирование.
 
 Возвращенный BLOB из этой функции, даже если `TEMP_STORAGE = FALSE`, может использоваться с `BLOB_APPEND` для добавления данных.
 
@@ -59,8 +57,7 @@
 === Функция `RDB$BLOB_UTIL.OPEN_BLOB`
 
 Функция `RDB$BLOB_UTIL.OPEN_BLOB` используется для открытия существующего BLOB для чтения.
-Она возвращает дескриптор (целое число, связанное с транзакцией), подходящий для использования с другими функциями этого пакета,
-такими как `SEEK`, `READ_DATA` и `CLOSE_HANDLE`.
+Она возвращает дескриптор (целое число, связанное с транзакцией), подходящий для использования с другими функциями этого пакета, такими как `SEEK`, `READ_DATA` и `CLOSE_HANDLE`.
 
 .Входные параметры функции `RDB$BLOB_UTIL.OPEN_BLOB`
 [cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
@@ -98,8 +95,7 @@
 
 === Функция `RDB$BLOB_UTIL.READ_DATA`
 
-Функция `RDB$BLOB_UTIL.READ_DATA` используется для чтения фрагментов данных из дескриптора BLOB,
-открытого с помощью `RDB$BLOB_UTIL.OPEN_BLOB`. Когда BLOB полностью прочитан и данных больше нет, она возвращает `NULL`.
+Функция `RDB$BLOB_UTIL.READ_DATA` используется для чтения фрагментов данных из дескриптора BLOB, открытого с помощью `RDB$BLOB_UTIL.OPEN_BLOB`. Когда BLOB полностью прочитан и данных больше нет, она возвращает `NULL`.
 
 Если в `LENGTH` передается положительное число, то возвращается `VARBINARY` максимальной длины `LENGTH`.
 
@@ -159,8 +155,7 @@
 
 Процедура `RDB$BLOB_UTIL.CANCEL_BLOB` используется для немедленного освобождения временного BLOB-объекта, например созданного с помощью `BLOB_APPEND`.
 
-Обратите внимание, что если тот же BLOB используется после отмены, с использованием той же переменной или другой с той же ссылкой на идентификатор BLOB,
-то будет вызвана ошибка "invalid blob id error".
+Обратите внимание, что если тот же BLOB используется после отмены, с использованием той же переменной или другой с той же ссылкой на идентификатор BLOB, то будет вызвана ошибка "invalid blob id error".
 
 .Входные параметры процедуры `RDB$BLOB_UTIL.CANCEL_BLOB`
 [cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
@@ -203,7 +198,7 @@ execute block returns (b blob)
 as
 begin
     -- Create a BLOB handle in the temporary space.
-    b = rdb$blob_util.new_blob(false, true);
+    b = system.rdb$blob_util.new_blob(false, true);
 
     -- Add chunks of data.
     b = blob_append(b, '12345');
@@ -225,25 +220,25 @@ as
     declare bhandle integer;
 begin
     -- Open the BLOB and get a BLOB handle.
-    bhandle = rdb$blob_util.open_blob(b);
+    bhandle = system.rdb$blob_util.open_blob(b);
 
     -- Get chunks of data as string and return.
 
-    s = rdb$blob_util.read_data(bhandle, 3);
+    s = system.rdb$blob_util.read_data(bhandle, 3);
     suspend;
 
-    s = rdb$blob_util.read_data(bhandle, 3);
+    s = system.rdb$blob_util.read_data(bhandle, 3);
     suspend;
 
-    s = rdb$blob_util.read_data(bhandle, 3);
+    s = system.rdb$blob_util.read_data(bhandle, 3);
     suspend;
 
     -- Here EOF is found, so it returns NULL.
-    s = rdb$blob_util.read_data(bhandle, 3);
+    s = system.rdb$blob_util.read_data(bhandle, 3);
     suspend;
 
     -- Close the BLOB handle.
-    execute procedure rdb$blob_util.close_handle(bhandle);
+    call system.rdb$blob_util.close_handle(bhandle);
 end
 ----
 ====
@@ -261,32 +256,32 @@ as
     declare bhandle integer;
 begin
     -- Create a stream BLOB handle.
-    b = rdb$blob_util.new_blob(false, true);
+    b = system.rdb$blob_util.new_blob(false, true);
 
     -- Add data.
     b = blob_append(b, '0123456789');
 
     -- Open the BLOB.
-    bhandle = rdb$blob_util.open_blob(b);
+    bhandle = system.rdb$blob_util.open_blob(b);
 
     -- Seek to 5 since the start.
-    rdb$blob_util.seek(bhandle, 0, 5);
-    s = rdb$blob_util.read_data(bhandle, 3);
+    system.rdb$blob_util.seek(bhandle, 0, 5);
+    s = system.rdb$blob_util.read_data(bhandle, 3);
     suspend;
 
     -- Seek to 2 since the start.
-    rdb$blob_util.seek(bhandle, 0, 2);
-    s = rdb$blob_util.read_data(bhandle, 3);
+    system.rdb$blob_util.seek(bhandle, 0, 2);
+    s = system.rdb$blob_util.read_data(bhandle, 3);
     suspend;
 
     -- Advance 2.
-    rdb$blob_util.seek(bhandle, 1, 2);
-    s = rdb$blob_util.read_data(bhandle, 3);
+    system.rdb$blob_util.seek(bhandle, 1, 2);
+    s = system.rdb$blob_util.read_data(bhandle, 3);
     suspend;
 
     -- Seek to -1 since the end.
-    rdb$blob_util.seek(bhandle, 2, -1);
-    s = rdb$blob_util.read_data(bhandle, 3);
+    system.rdb$blob_util.seek(bhandle, 2, -1);
+    s = system.rdb$blob_util.read_data(bhandle, 3);
     suspend;
 end!
 
@@ -308,11 +303,11 @@ as
     declare b blob;
 begin
     b = blob_append(null, 'writable');
-    bool = rdb$blob_util.is_writable(b);
+    bool = system.rdb$blob_util.is_writable(b);
     suspend;
 
     insert into t (b) values ('not writable') returning b into b;
-    bool = rdb$blob_util.is_writable(b);
+    bool = system.rdb$blob_util.is_writable(b);
     suspend;
 end!
 
@@ -328,8 +323,7 @@ set term ;!
 
 [NOTE]
 ====
-* Пакет `RDB$PROFILER` для управления профилировщиком является стандартным, хотя сам профилировщик
-является подключаемым модулем. Используемый профилировщик зависит от настройки `DefaultProfilerPlugin`
+* Пакет `RDB$PROFILER` для управления профилировщиком является стандартным, хотя сам профилировщик является подключаемым модулем. Используемый профилировщик зависит от настройки `DefaultProfilerPlugin`
 в файле `firebird.conf` или `databases.conf` или от параметра `PLUGIN_NAME` в функции `START_SESSION`.
 * Firebird поставляется с подключаемым модулем профилировщика под названием Default_Profiler.
 * Пользователям разрешено профилировать свои собственные подключения. Для профилирования подключений других пользователей требуется системная привилегия `PROFILE_ANY_ATTACHMENT`.
@@ -463,8 +457,7 @@ set term ;!
 
 После обновления данные сохраняются в таблицах `PLG$PROF_SESSIONS`, `PLG$PROF_STATEMENTS`, `PLG$PROF_RECORD_SOURCES`, `PLG$PROF_REQUESTS`, `PLG$PROF_PSQL_STATS` и `PLG$PROF_RECORD_SOURCE_STATS` и могут быть прочитаны и проанализированы пользователем.
 
-Данные обновляются с помощью автономной транзакции, поэтому если процедура вызывается в snapshot транзакции,
-данные не будут доступны для прямого чтения в той же транзакции.
+Данные обновляются с помощью автономной транзакции, поэтому если процедура вызывается в snapshot транзакции, данные не будут доступны для прямого чтения в той же транзакции.
 
 После сброса завершенные сеансы удаляются из памяти.
 
@@ -489,8 +482,7 @@ set term ;!
 |===
 
 
-Если параметр `FLUSH` имеет значение `TRUE`, таблицы моментальных снимков обновляются данными до текущего момента.
-В противном случае данные остаются только в памяти для последующего обновления.
+Если параметр `FLUSH` имеет значение `TRUE`, таблицы моментальных снимков обновляются данными до текущего момента. В противном случае данные остаются только в памяти для последующего обновления.
 
 Вызов `RDB$PROFILER.PAUSE_SESSION(TRUE)` имеет тот же смысл, что и вызов `RDB$PROFILER.PAUSE_SESSION(FALSE)`, за которым следует `RDB$PROFILER.FLUSH` (с использованием того же `ATTACHMENT_ID`).
 
@@ -550,27 +542,22 @@ set term ;!
 
 Для сбора данных профиля пользователь должен сначала запустить сеанс профиля с помощью `RDB$PROFILER.START_SESSION`. Эта функция возвращает идентификатор сеанса профиля, который позже сохраняется в таблицах моментальных снимков профилировщика для запроса и анализа пользователем. Сеанс профилировщика может быть локальным (то же соединение) или удаленным (другое соединение).
 
-Удаленное профилирование просто перенаправляет команды на удаленное соединение. Это позволяет клиенту одновременно профилировать несколько сеансов.
-Кроме того, локально или удаленно запущенный сеанс профилировщика может получать команды, выданные в другом соединении.
+Удаленное профилирование просто перенаправляет команды на удаленное соединение. Это позволяет клиенту одновременно профилировать несколько сеансов. Кроме того, локально или удаленно запущенный сеанс профилировщика может получать команды, выданные в другом соединении.
 
-Для удаленных команд требуется, чтобы целевой сеанс находился в состоянии ожидания,
-то есть не выполнял других запросов. Когда они не простаивают, вызов блокируется в ожидании этого состояния.
+Для удаленных команд требуется, чтобы целевой сеанс находился в состоянии ожидания, то есть не выполнял других запросов. Когда они не простаивают, вызов блокируется в ожидании этого состояния.
 
 Если удаленное соединение исходит от другого пользователя, вызывающий пользователь должен иметь системную привилегию `PROFILE_ANY_ATTACHMENT`.
 
 После запуска сеанса в памяти начинает собираться статистика PSQL и SQL операторов. Обратите внимание, что сеанс профилировщика собирает данные только об операторах, выполненных только в том соединении, которое связанно с сеансом профилировщика.
 
-Данные агрегируются и сохраняются для каждого запроса. При запросе таблиц моментальных снимков пользователь может выполнять
-дополнительную агрегацию по операторам или использовать вспомогательные представления, которые делают это автоматически.
+Данные агрегируются и сохраняются для каждого запроса. При запросе таблиц моментальных снимков пользователь может выполнять дополнительную агрегацию по операторам или использовать вспомогательные представления, которые делают это автоматически.
 
 Сеанс профилирования может быть приостановлен для временного отключения сбора статистики. Его можно возобновить позже, чтобы вернуть сбор статистики в том же сеансе.
 
 Новый сеанс профилировщика может быть запущен, когда уже есть активный сеанс. В этом случае текущий сеанс завершается как будто была вызвана процедура
 `RDB$PROFILER.FINISH_SESSION(FALSE)`, поэтому таблицы моментальных снимков не обновляются в этот момент.
 
-Чтобы проанализировать собранные данные, пользователь должен сбросить данные в таблицы моментальных снимков,
-что можно сделать, завершив или приостановив сеанс (с параметром `FLUSH`, установленным в `TRUE`) или вызвав `RDB$PROFILER.FLUSH`.
-Данные сбрасываются с помощью автономной транзакции (транзакция, запущенная и завершенная для конкретной цели обновления данных профилировщика).
+Чтобы проанализировать собранные данные, пользователь должен сбросить данные в таблицы моментальных снимков, что можно сделать, завершив или приостановив сеанс (с параметром `FLUSH`, установленным в `TRUE`) или вызвав `RDB$PROFILER.FLUSH`. Данные сбрасываются с помощью автономной транзакции (транзакция, запущенная и завершенная для конкретной цели обновления данных профилировщика).
 
 === Пример
 
@@ -613,7 +600,7 @@ set term ;!
 +
 [source,sql]
 ----
-select rdb$profiler.start_session('Profile Session 1') from rdb$database;
+select system.rdb$profiler.start_session('Profile Session 1') from rdb$database;
 
 set term !;
 
@@ -626,7 +613,7 @@ end!
 
 set term ;!
 
-execute procedure rdb$profiler.finish_session(true);
+call system.rdb$profiler.finish_session(true);
 
 execute procedure ins;
 
@@ -639,52 +626,52 @@ select mod(id, 5),
   group by mod(id, 5)
   order by sum(val);
 
-execute procedure rdb$profiler.finish_session(true);
+call system.rdb$profiler.finish_session(true);
 ----
 
 3. Анализ результатов профилирования.
 +
 ----
-set transaction read committed;
+SET TRANSACTION READ COMMITTED;
 
-select * from plg$prof_sessions;
+SELECT * FROM PLG$PROFILER.PLG$PROF_SESSIONS;
 
-select * from plg$prof_psql_stats_view;
+SELECT * FROM PLG$PROFILER.PLG$PROF_PSQL_STATS_VIEW;
 
-select * from plg$prof_record_source_stats_view;
+SELECT * FROM PLG$PROFILER.PLG$PROF_RECORD_SOURCE_STATS_VIEW;
 
-select preq.*
-  from plg$prof_requests preq
-  join plg$prof_sessions pses
-    on pses.profile_id = preq.profile_id and
-       pses.description = 'Profile Session 1';
+SELECT PREQ.*
+  FROM PLG$PROFILER.PLG$PROF_REQUESTS PREQ
+  JOIN PLG$PROFILER.PLG$PROF_SESSIONS PSES
+    ON PSES.PROFILE_ID = PREQ.PROFILE_ID AND
+       PSES.DESCRIPTION = 'Profile Session 1';
 
-select pstat.*
-  from plg$prof_psql_stats pstat
-  join plg$prof_sessions pses
-    on pses.profile_id = pstat.profile_id and
-       pses.description = 'Profile Session 1'
-  order by pstat.profile_id,
-           pstat.request_id,
-           pstat.line_num,
-           pstat.column_num;
+SELECT PSTAT.*
+  FROM PLG$PROFILER.PLG$PROF_PSQL_STATS PSTAT
+  JOIN PLG$PROFILER.PLG$PROF_SESSIONS PSES
+    ON PSES.PROFILE_ID = PSTAT.PROFILE_ID AND
+       PSES.DESCRIPTION = 'Profile Session 1'
+  ORDER BY PSTAT.PROFILE_ID,
+           PSTAT.REQUEST_ID,
+           PSTAT.LINE_NUM,
+           PSTAT.COLUMN_NUM;
 
-select pstat.*
-  from plg$prof_record_source_stats pstat
-  join plg$prof_sessions pses
-    on pses.profile_id = pstat.profile_id and
-       pses.description = 'Profile Session 2'
-  order by pstat.profile_id,
-           pstat.request_id,
-           pstat.cursor_id,
-           pstat.record_source_id;
+SELECT PSTAT.*
+  FROM PLG$PROFILER.PLG$PROF_RECORD_SOURCE_STATS PSTAT
+  JOIN PLG$PROFILER.PLG$PROF_SESSIONS PSES
+    ON PSES.PROFILE_ID = PSTAT.PROFILE_ID AND
+       PSES.DESCRIPTION = 'Profile Session 2'
+  ORDER BY PSTAT.PROFILE_ID,
+           PSTAT.REQUEST_ID,
+           PSTAT.CURSOR_ID,
+           PSTAT.RECORD_SOURCE_ID;
 ----
 
 [[fblangref-build-in-packages-sql-pkg]]
 == Пакет `RDB$SQL`
 
 (((RDB$SQL)))
-Пакет `RDB$SQL` содержит процедуры и функции для получения различной информации о переданном SQL запросе.
+Пакет `RDB$SQL` содержит процедуры и функции для работы с динамическим SQL запросом.
 
 [[fblangref-build-in-packages-sql-explain]]
 === Процедура `RDB$SQL.EXPLAIN`
@@ -769,13 +756,62 @@ select pstat.*
 [source,sql]
 ----
 SELECT *
-FROM RDB$SQL.EXPLAIN(Q'{
+FROM SYSTEM.RDB$SQL.EXPLAIN(Q'{
   SELECT *
   FROM HORSE
     JOIN COLOR ON COLOR.CODE_COLOR = HORSE.CODE_COLOR
     JOIN BREED ON BREED.CODE_BREED = HORSE.CODE_BREED
   WHERE HORSE.CODE_DEPARTURE = ?
 }')
+----
+====
+
+[[fblangref-build-in-packages-sql-parse_unqualified_names]]
+=== Процедура `RDB$SQL.PARSE_UNQUALIFIED_NAMES`
+
+`RDB$SQL.PARSE_UNQUALIFIED_NAMES` -- это процедура выбора, которая анализирует список неквалифицированных имен SQL и возвращает одну запись для каждого имени. Входные данные должны соответствовать правилам анализа имен, а выходные данные имен без кавычек отображаются в верхнем регистре.
+
+.Входные параметры процедуры `RDB$SQL.PARSE_UNQUALIFIED_NAMES`
+[cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
+|===
+^| Параметр
+^| Тип
+^| Описание
+
+|NAMES
+|VARCHAR(8191) CHARACTER SET UTF8
+|Строка содержащая список неквалифицированных имён, перечисленных через запятую.
+
+|===
+
+.Выходные параметры процедуры `RDB$SQL.PARSE_UNQUALIFIED_NAMES`
+[cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
+|===
+^| Параметр
+^| Тип
+^| Описание
+
+|NAME
+|CHAR(63) CHARACTER SET UTF8
+|Идентификатор.
+
+|===
+
+.Использование процедуры `RDB$SQL.PARSE_UNQUALIFIED_NAMES`
+====
+[source,sql]
+----
+SELECT NAME
+FROM SYSTEM.rdb$sql.parse_unqualified_names('schema1, schema2, "schema3", "schema 4", "schema ""5"""');
+
+-- SCHEMA1
+-- SCHEMA2
+-- schema3
+-- "schema 4"
+-- "schema "5"
+
+SELECT NAME
+FROM SYSTEM.RDB$SQL.PARSE_UNQUALIFIED_NAMES(RDB$GET_CONTEXT('SYSTEM', 'SEARCH_PATH'))
 ----
 ====
 
@@ -799,8 +835,8 @@ FROM RDB$SQL.EXPLAIN(Q'{
 ====
 [source,sql]
 ----
-SELECT rdb$time_zone_util.database_version()
-FROM rdb$database;
+SELECT system.rdb$time_zone_util.database_version()
+FROM system.rdb$database;
 ----
 
 [listing]
@@ -875,7 +911,7 @@ SELECT
   RDB$ZONE_OFFSET AS ZONE_OFF,
   RDB$DST_OFFSET AS DST_OFF,
   RDB$EFFECTIVE_OFFSET AS OFF
-FROM rdb$time_zone_util.transitions(
+FROM system.rdb$time_zone_util.transitions(
     'America/Sao_Paulo',
     timestamp '2017-01-01',
     timestamp '2019-01-01');

@@ -5,7 +5,7 @@
 [[fblangref-appx07-plgtables]]
 = Таблицы плагинов
 
-Таблицы плагинов — это таблицы или представления, созданные для или с помощью различных плагинов для движка Firebird. Стандартные таблицы плагинов имеют префикс `PLG$` (но могут иметь и другие).
+Таблицы плагинов -- это таблицы или представления, созданные для или с помощью различных плагинов для движка Firebird.
 
 Таблицы плагинов не всегда существуют. Например, некоторые таблицы существуют только в базе данных безопасности, а другие таблицы будут созданы только при первом использовании плагина.
 
@@ -16,7 +16,7 @@
 [[fblangref-appx07-defaultprofiler]]
 == Плагин профилирования `Default_Profiler`
 
-Таблицы профилировщика, перечисленные в этом приложении (имеющие префикс `PLG$PROF_`), создаются плагином `Default_Profiler`. Если создан собственный плагин профилировщика, он может использовать другие имена таблиц.
+Таблицы и представления профилировщика, перечисленные в этом приложении, создаются плагином `Default_Profiler`. Эти таблицы расположены в схеме `PLG$PROFILER` и имеют префикс `PLG$PROF_` в имени. Если создан собственный плагин профилировщика, он может использовать другую схему и другие имена таблиц и представлений.
 
 Таблицы моментальных снимков, а также представления и последовательности, автоматически создаются при первом использовании профилировщика. Они принадлежат текущему пользователю с разрешениями на чтение/запись для `PUBLIC`.
 
@@ -646,6 +646,8 @@
 
 == Плагин управления пользователями `Srp`
 
+Таблицы и представления используемые плагином управления пользователями `Srp` хранятся в схеме `PLG$SRP`.
+
 [[fblangref-appx07-plgsrp]]
 === Таблица `PLG$SRP`
 
@@ -699,8 +701,7 @@
 [[fblangref-appx07-plgsrpview]]
 === Представление `PLG$SRP_VIEW`
 
-Представление `PLG$SRP_VIEW` определяет какие пользователи доступны для просмотра через виртуальную таблицу `SEC$USERS` и
-изменения с помощью оператор `ALTER USER ...`.
+Представление `PLG$SRP_VIEW` определяет какие пользователи доступны для просмотра через виртуальную таблицу `SEC$USERS` и изменения с помощью оператор `ALTER USER ...`.
 
 .Описание столбцов представления `PLG$SRP_VIEW`
 [cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
@@ -751,21 +752,23 @@
 
 [source,sql]
 ----
-SELECT 
-  PLG$USER_NAME, 
-  PLG$VERIFIER, 
-  PLG$SALT, 
-  PLG$COMMENT, 
-  PLG$FIRST, 
-  PLG$MIDDLE, 
-  PLG$LAST, 
-  PLG$ATTRIBUTES, 
-  PLG$ACTIVE 
-FROM PLG$SRP 
+SELECT
+  PLG$USER_NAME,
+  PLG$VERIFIER,
+  PLG$SALT,
+  PLG$COMMENT,
+  PLG$FIRST,
+  PLG$MIDDLE,
+  PLG$LAST,
+  PLG$ATTRIBUTES,
+  PLG$ACTIVE
+FROM PLG$SRP
 WHERE RDB$SYSTEM_PRIVILEGE(USER_MANAGEMENT) OR CURRENT_USER = PLG$SRP.PLG$USER_NAME
 ----
 
 == Плагин управления пользователями `Legacy_UserManager`
+
+Таблицы и представления используемые плагином управления пользователями `Legacy_UserManager` хранятся в схеме `PLG$LEGACY_SEC`.
 
 [[fblangref-appx07-plgusers]]
 === Таблица `PLG$USERS`
@@ -880,15 +883,15 @@ WHERE RDB$SYSTEM_PRIVILEGE(USER_MANAGEMENT) OR CURRENT_USER = PLG$SRP.PLG$USER_N
 
 [source,sql]
 ----
-SELECT 
-  PLG$USER_NAME, 
-  PLG$GROUP_NAME, 
-  PLG$UID, 
-  PLG$GID, 
+SELECT
+  PLG$USER_NAME,
+  PLG$GROUP_NAME,
+  PLG$UID,
+  PLG$GID,
   PLG$PASSWD,
-  PLG$COMMENT, 
-  PLG$FIRST_NAME, 
-  PLG$MIDDLE_NAME, 
+  PLG$COMMENT,
+  PLG$FIRST_NAME,
+  PLG$MIDDLE_NAME,
   PLG$LAST_NAME
 FROM PLG$USERS
 WHERE CURRENT_USER = 'SYSDBA'
