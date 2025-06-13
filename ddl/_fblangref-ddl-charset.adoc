@@ -1,6 +1,8 @@
 [[fblangref-ddl-charset]]
 = CHARACTER SET
 
+// TODO: Набор символов тоже привязаны к сортировке, но пока не ясно как они могут появится в других схемах.
+
 [[fblangref-ddl-charset-alter]]
 == `ALTER CHARACTER SET`
 

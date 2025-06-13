@@ -5577,7 +5577,7 @@ DSQL, ESQL, PSQL
 [listing,subs="+quotes,attributes"]
 ----
 <execute procedure> ::=
-    EXECUTE PROCEDURE [<package name> .] <procedure name>
+    EXECUTE PROCEDURE [<schema_name> .] [<package name> .] <procedure name>
     [{ (<arguments>) | <arguments> }]
    [RETURNING_VALUES { <outvar-list> | ( <outvar-list> ) }]
 
@@ -5611,6 +5611,9 @@ DSQL, ESQL, PSQL
 |===
 ^| Параметр
 ^| Описание
+
+|schema_name
+|Имя схемы хранимой процедуры или пакета.
 
 |package name
 |Имя пакета.
@@ -5771,7 +5774,7 @@ DSQL, ESQL, PSQL
 [listing,subs="+quotes,macros"]
 ----
 <call statement> ::=
-    CALL [<package name> .] <procedure name> (<arguments>)
+    CALL [<schema_name> .] [<package name> .] <procedure name> (<arguments>)
 
 <arguments> ::=
     <positional arguments> |
@@ -5797,6 +5800,9 @@ DSQL, ESQL, PSQL
 |===
 ^| Параметр
 ^| Описание
+
+|schema_name
+|Имя схемы хранимой процедуры или пакета.
 
 |package name
 |Имя пакета.

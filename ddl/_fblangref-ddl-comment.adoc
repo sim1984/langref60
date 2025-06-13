@@ -114,7 +114,9 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
 
 * <<fblangref-security-administrators,Администраторы>>
 * Владелец объекта, для которого добавляется комментарий;
-* Пользователи с привилегией `ALTER ANY <object_type>`.
+* Владелец схемы в которой содержится объект для которого добавляется комментарий;
+* Пользователи с привилегией `ALTER ANY <object_type>` для объектов которые не имеют схемы;
+* Пользователи с привилегией `ALTER ANY <object_type>` в схеме в которой располагается объект которому добавляется комментарий.
 
 
 [[fblangref-ddl-commenton-examples]]
@@ -129,7 +131,16 @@ COMMENT ON DATABASE IS 'Это тестовая (''my.fdb'') БД';
 ----
 ====
 
-.Добавление комментария для таблицы.
+.Добавление комментария для схемы APP.
+[example]
+====
+[source,sql]
+----
+COMMENT ON SCHEMA APP IS 'Схема содержащая специфичные настройки приложения';
+----
+====
+
+.Добавление комментария для таблицы текущей схемы.
 [example]
 ====
 [source,sql]
@@ -138,7 +149,16 @@ COMMENT ON TABLE METALS IS 'Справочник металлов';
 ----
 ====
 
-.Добавление комментария для поля таблицы.
+.Добавление комментария для таблицы из схемы PRODUCTION.
+[example]
+====
+[source,sql]
+----
+COMMENT ON TABLE PRODUCTION.METALS IS 'Справочник металлов';
+----
+====
+
+.Добавление комментария для поля таблицы из текущей схемы.
 [example]
 ====
 [source,sql]
@@ -148,7 +168,17 @@ IS '0 = чистый металл, 1 = сплав';
 ----
 ====
 
-.Добавление комментария для параметра процедуры.
+.Добавление комментария для поля таблицы из схемы PRODUCTION.
+[example]
+====
+[source,sql]
+----
+COMMENT ON COLUMN PRODUCTION.METALS.ISALLOY
+IS '0 = чистый металл, 1 = сплав';
+----
+====
+
+.Добавление комментария для параметра процедуры из текущей схемы.
 [example]
 ====
 [source,sql]
@@ -158,7 +188,17 @@ IS 'Код сотрудника';
 ----
 ====
 
-.Добавление комментария для пакета, его процедур и функций, и их параметров.
+.Добавление комментария для параметра процедуры из схемы MANAGEMENT.
+[example]
+====
+[source,sql]
+----
+COMMENT ON PARAMETER MANAGEMENT.ADD_EMP_PROJ.EMP_NO
+IS 'Код сотрудника';
+----
+====
+
+.Добавление комментария для пакета, его процедур и функций, и их параметров из текущей схемы.
 [example]
 ====
 [source,sql]
@@ -173,6 +213,25 @@ IS 'Установка диапазона дат';
 
 COMMENT ON
 PROCEDURE PARAMETER APP_VAR.SET_DATERANGE.ADATEBEGIN
+IS 'Дата начала';
+----
+====
+
+.Добавление комментария для пакета, его процедур и функций, и их параметров из схемы APP.
+[example]
+====
+[source,sql]
+----
+COMMENT ON PACKAGE APP.APP_VAR IS 'Переменные приложения';
+
+COMMENT ON FUNCTION APP.APP_VAR.GET_DATEBEGIN
+IS 'Возвращает дату начала периода';
+
+COMMENT ON PROCEDURE APP.APP_VAR.SET_DATERANGE
+IS 'Установка диапазона дат';
+
+COMMENT ON
+PROCEDURE PARAMETER APP.APP_VAR.SET_DATERANGE.ADATEBEGIN
 IS 'Дата начала';
 ----
 ====
