@@ -46,8 +46,8 @@ GRANT <privileges>
 
 <usage_privilege> ::= USAGE ON {
     SCHEMA _schema_name_
-  | EXCEPTION [_schema_name_.]_exception_name_
-  | {GENERATOR | SEQUENCE} [_schema_name_.]_sequence_name_ }
+  | EXCEPTION [_schema_name_.] _exception_name_
+  | {GENERATOR | SEQUENCE} [_schema_name_.] _sequence_name_ }
 
 <ddl_privileges> ::=
   {ALL [PRIVILEGES] | <ddl_privilege_list>}
@@ -78,11 +78,11 @@ GRANT <privileges>
 <grantee_list> ::= <grantee> [, <grantee> ...]
 
 <grantee> ::=
-    PROCEDURE [_schema_name_.]_proc_name_
-  | FUNCTION [_schema_name_.]_func_name_
-  | PACKAGE [_schema_name_.]_package_name_
-  | TRIGGER [_schema_name_.]_trig_name_
-  | VIEW [_schema_name_.]_view_name_
+    PROCEDURE [_schema_name_.] _proc_name_
+  | FUNCTION [_schema_name_.] _func_name_
+  | PACKAGE [_schema_name_.] _package_name_
+  | TRIGGER [_schema_name_.] _trig_name_
+  | VIEW [_schema_name_.] _view_name_
   | ROLE _role_name_ | [USER] _username_
   | GROUP _Unix_group_ | PUBLIC
   | <sys_privileges>

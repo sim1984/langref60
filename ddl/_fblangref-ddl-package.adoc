@@ -22,7 +22,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE PACKAGE [IF NOT EXISTS] [_schema_name_.]_package_name_
+CREATE PACKAGE [IF NOT EXISTS] [_schema_name_.] _package_name_
 [<rights clause>]
 AS
 BEGIN
@@ -55,12 +55,12 @@ END
 
 <outparam>  ::=  <param_decl>
 
-<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema_name_.]_collation_]
+<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema_name_.] _collation_]
 
 <type> ::=
     <datatype>
-  | [TYPE OF] [_schema_name_.]_domain_name_
-  | TYPE OF COLUMN [_schema_name_.]_rel_._col_
+  | [TYPE OF] [_schema_name_.] _domain_name_
+  | TYPE OF COLUMN [_schema_name_.] _rel_._col_
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -276,7 +276,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER PACKAGE [_schema_name_.]_package_name_
+ALTER PACKAGE [_schema_name_.] _package_name_
 [<rights clause>]
 AS
 BEGIN
@@ -347,7 +347,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER PACKAGE [_schema_name_.]_package_name_
+CREATE OR ALTER PACKAGE [_schema_name_.] _package_name_
 [<rights clause>]
 AS
 BEGIN
@@ -360,7 +360,7 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [COLLATE [_schema_name_.]_collation_]
+  RETURNS <type> [COLLATE [_schema_name_.] _collation_]
   [DETERMINISTIC]
 
 <procedure_decl> ::=
@@ -408,7 +408,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP PACKAGE [IF EXISTS] [_schema_name_.]_package_name_
+DROP PACKAGE [IF EXISTS] [_schema_name_.] _package_name_
 ----
 
 .Параметры оператора `DROP PACKAGE`
@@ -477,7 +477,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE PACKAGE [_schema_name_.]_package_name_
+RECREATE PACKAGE [_schema_name_.] _package_name_
 [<rights clause>]
 AS
 BEGIN
@@ -490,7 +490,7 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [COLLATE [_schema_name_.]_collation_]
+  RETURNS <type> [COLLATE [_schema_name_.] _collation_]
   [DETERMINISTIC]
 
 <procedure_decl> ::=

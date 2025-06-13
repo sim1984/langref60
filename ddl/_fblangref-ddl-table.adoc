@@ -19,7 +19,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.]_tablename_
+CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.] _tablename_
   [EXTERNAL [FILE] '_filespec_']
   (<col_def> [, <col_def> | <tconstraint> ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]
@@ -32,7 +32,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.]_tablename_
   | <identity_col_def>
 
 <regular_col_def> ::=
-  _colname_ { <datatype> | [_schema_name_.]_domain_name_ }
+  _colname_ { <datatype> | [_schema_name_.] _domain_name_ }
   [DEFAULT {<literal> | NULL | <context_var>}]
   [NOT NULL]
   [<col_constraint>]
@@ -40,7 +40,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.]_tablename_
 
 
 <computed_col_def> ::=
-  _colname_ [{ <datatype> | [_schema_name_.]_domain_name_ }]
+  _colname_ [{ <datatype> | [_schema_name_.] _domain_name_ }]
   {COMPUTED [BY] | GENERATED ALWAYS AS} (<expression>)
 
 <identity_col_def> ::=
@@ -79,7 +79,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.]_tablename_
 {   UNIQUE (<col_list>) [<using_index>]
   | PRIMARY KEY (<col_list>) [<using_index>]
   | FOREIGN KEY (<col_list>)
-    REFERENCES [_schema_name_.]_other_table_ [(<col_list>)]
+    REFERENCES [_schema_name_.] _other_table_ [(<col_list>)]
       [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [<using_index>]
@@ -120,16 +120,16 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.]_tablename_
   | <context_var>
   | <expression>
   | NULL
-  | NEXT VALUE FOR [_schema_name_.]_genname_
-  | GEN_ID([_schema_name_.]_genname_, <val>)
+  | NEXT VALUE FOR [_schema_name_.] _genname_
+  | GEN_ID([_schema_name_.] _genname_, <val>)
   | CAST(<val> AS <cast_type>)
   | (<select_one>)
-  | [_schema_name_.]_func_(<val> [, <val> ...])
+  | [_schema_name_.] _func_(<val> [, <val> ...])
 
 <cast_type> ::=
    <datatype>
-  | [TYPE OF] [_schema_name_.]_domain_name_
-  | TYPE OF COLUMN [_schema_name_.]_rel_._colname_
+  | [TYPE OF] [_schema_name_.] _domain_name_
+  | TYPE OF COLUMN [_schema_name_.] _rel_._colname_
 ----
 
 
@@ -845,7 +845,7 @@ SQL SECURITY DEFINER;
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE GLOBAL TEMPORARY TABLE [IF NOT EXISTS] name
+CREATE GLOBAL TEMPORARY TABLE [IF NOT EXISTS] [_schema_name_.] _tablename_
   (<column_def> [, {<column_def> | <table_constraint>} ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]
   [SQL SECURITY {DEFINER | INVOKER}]
@@ -898,7 +898,7 @@ WHERE t.rdb$field_name = 'RDB$RELATION_TYPE'
   AND coalesce (r.rdb$system_flag, 0) = 0
 ----
 
-Поле RDB$TYPE_NAME будет отображать PERSISTENT для обычной таблицы, VIEW для представления, GLOBAL_TEMPORARY_PRESERVE для GTT уровня соединения, и GLOBAL_TEMPORARY_DELETE для GTT уровня транзакции.
+Поле `RDB$TYPE_NAME` будет отображать PERSISTENT для обычной таблицы, VIEW для представления, GLOBAL_TEMPORARY_PRESERVE для GTT уровня соединения, и GLOBAL_TEMPORARY_DELETE для GTT уровня транзакции.
 ====
 
 [[fblangref-ddl-table-create-gtt-examples]]
@@ -954,7 +954,7 @@ CREATE GLOBAL TEMPORARY TABLE MYTXGTT (
 * Если он установлен в значение `None`, то запрещён любой доступ к внешнему файлу.
 * Значение `Restrict` рекомендуется для ограничения доступа к внешним файлам только каталогами, созданными специально для этой цели администратором сервера. Например:
 +
-** `ExternalFileAccess = Restrict _externalfiles_` ограничит доступ директорией [path]_externalfiles_ корневого каталога Firebird.
+** `ExternalFileAccess = Restrict _externalfiles_` ограничит доступ директорией `externalfiles` корневого каталога Firebird.
 ** `ExternalFileAccess = Restrict d:\databases\outfiles; e:\infiles` ограничит доступ только двумя директориями Windows. Обратите внимание, что любые пути являющиеся отображением сетевых путей не будут работать. Также не будут работать пути заключённые в одинарные или двойные кавычки.
 * Значение `Full` позволяет доступ к внешним файлам в любом месте файловой системы хоста. Это создаёт уязвимость и не рекомендуется к использованию.
 
@@ -1055,7 +1055,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,attributes,macros"]
 ----
-ALTER TABLE [_schema_name_.]_tablename_
+ALTER TABLE [_schema_name_.] _tablename_
   <operation> [, <operation>];
 
 <operation> ::=
@@ -1074,7 +1074,7 @@ ALTER TABLE [_schema_name_.]_tablename_
   | <identity_col_def>
 
 <regular_col_def> ::=
-  colname { <datatype> | [_schema_name_.]_domainname_ }
+  colname { <datatype> | [_schema_name_.] _domainname_ }
   [DEFAULT {literal | NULL | <context_var>}]
   [NOT NULL]
   [<col_constraint>]
@@ -1097,7 +1097,7 @@ ALTER TABLE [_schema_name_.]_tablename_
   | <identity_col_mod>
 
 <regular_col_mod> ::=
-  |  TYPE { <datatype>  | [_schema_name_.]_domain_name_ }
+  |  TYPE { <datatype>  | [_schema_name_.] _domain_name_ }
   |  SET DEFAULT {_literal_ | NULL | <context_var>}
   |  DROP DEFAULT
   |  SET NOT NULL
@@ -1128,7 +1128,7 @@ ALTER TABLE [_schema_name_.]_tablename_
   [CONSTRAINT _constr_name_]
   {   UNIQUE [<using_index>]
     | PRIMARY KEY [<using_index>]
-    | REFERENCES [_schema_name_.]_other_table_ [(_other_col_)]
+    | REFERENCES [_schema_name_.] _other_table_ [(_other_col_)]
         [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [<using_index>]
@@ -1140,7 +1140,7 @@ ALTER TABLE [_schema_name_.]_tablename_
   {   UNIQUE (<col_list>) [<using_index>]
     | PRIMARY KEY (<col_list>) [<using_index>]
     | FOREIGN KEY (<col_list>)
-      REFERENCES [_schema_name_.]_other_table_ [(<col_list>)]
+      REFERENCES [_schema_name_.] _other_table_ [(<col_list>)]
         [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [<using_index>]
@@ -1181,17 +1181,17 @@ ALTER TABLE [_schema_name_.]_tablename_
   | <context_var>
   | <expression>
   | NULL
-  | NEXT VALUE FOR [_schema_name_.]_genname_
-  | GEN_ID([_schema_name_.]_genname_, <val>)
+  | NEXT VALUE FOR [_schema_name_.] _genname_
+  | GEN_ID([_schema_name_.] _genname_, <val>)
   | CAST(<val> AS <datatype>)
   | (<select_one>)
-  | [_schema_name_.]func(<val> [, <val> ...])
+  | [_schema_name_.] func(<val> [, <val> ...])
 
 
 <cast_type> ::=
    <datatype>
-  | [TYPE OF] [_schema_name_.]_domain_name_
-  | TYPE OF COLUMN [_schema_name_.]_rel_._colname_
+  | [TYPE OF] [_schema_name_.] _domain_name_
+  | TYPE OF COLUMN [_schema_name_.] _rel_._colname_
 ----
 
 [[fblangref-ddl-tbl-altertbl]]
@@ -1783,7 +1783,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP TABLE [IF EXISTS] [_schema_name_.]_tablename_
+DROP TABLE [IF EXISTS] [_schema_name_.] _tablename_
 ----
 
 .Параметры оператора `DROP TABLE`
@@ -1849,7 +1849,7 @@ DSQL.
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-RECREATE [GLOBAL TEMPORARY] TABLE [_schema_name_.]_tablename_
+RECREATE [GLOBAL TEMPORARY] TABLE [_schema_name_.] _tablename_
   [EXTERNAL [FILE] '_filespec_']
   (<col_def> [, <col_def> | <tconstraint> ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]

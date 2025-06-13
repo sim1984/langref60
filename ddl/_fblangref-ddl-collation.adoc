@@ -18,9 +18,9 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-CREATE COLLATION [IF NOT EXISTS] [_schema_name_.]_collname_
-FOR [_schema_name_.]_charset_
-[FROM [_schema_name_.]_basecoll_ | FROM EXTERNAL ('_extname_')]
+CREATE COLLATION [IF NOT EXISTS] [_schema_name_.] _collname_
+FOR [_schema_name_.] _charset_
+[FROM [_schema_name_.] _basecoll_ | FROM EXTERNAL ('_extname_')]
 [NO PAD | PAD SPACE]
 [CASE [IN]SENSITIVE]
 [ACCENT [IN]SENSITIVE]
@@ -244,7 +244,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP COLLATION [IF EXISTS] [_schema_name_.]_collname_
+DROP COLLATION [IF EXISTS] [_schema_name_.] _collname_
 ----
 
 [[fblangref-ddl-tbl-collatdrp]]

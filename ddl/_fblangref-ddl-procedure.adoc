@@ -19,7 +19,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE PROCEDURE [IF NOT EXISTS] [_schema_name_.]_procname_ [( <in_params> )]
+CREATE PROCEDURE [IF NOT EXISTS] [_schema_name_.] _procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine body>
 
@@ -37,8 +37,8 @@ CREATE PROCEDURE [IF NOT EXISTS] [_schema_name_.]_procname_ [( <in_params> )]
 
 <type> ::=
     <datatype>
-  | [TYPE OF] [_schema_name_.]_domain_name_
-  | TYPE OF COLUMN [_schema_name_.]_rel_._col_
+  | [TYPE OF] [_schema_name_.] _domain_name_
+  | TYPE OF COLUMN [_schema_name_.] _rel_._col_
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -362,7 +362,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER PROCEDURE [_schema_name_.]_procname_ [( <in_params> )]
+ALTER PROCEDURE [_schema_name_.] _procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 
@@ -433,7 +433,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER PROCEDURE [_schema_name_.]_procname_ [( <in_params> )]
+CREATE OR ALTER PROCEDURE [_schema_name_.] _procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 
@@ -488,7 +488,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP PROCEDURE [IF EXISTS] [_schema_name_.]_procname_
+DROP PROCEDURE [IF EXISTS] [_schema_name_.] _procname_
 ----
 
 .Параметры оператора `DROP PROCEDURE`
@@ -555,7 +555,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE PROCEDURE [_schema_name_.]_procname_ [( <in_params> )]
+RECREATE PROCEDURE [_schema_name_.] _procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 

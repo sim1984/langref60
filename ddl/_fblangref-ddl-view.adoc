@@ -20,7 +20,7 @@ DSQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE VIEW [IF NOT EXISTS] [_schema_name_.]_viewname_ [<full_column_list>]
+CREATE VIEW [IF NOT EXISTS] [_schema_name_.] _viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -303,7 +303,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-ALTER VIEW [_schema_name_.]_viewname_ [<full_column_list>]
+ALTER VIEW [_schema_name_.] _viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -391,7 +391,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-CREATE OR ALTER VIEW [_schema_name_.]_viewname_ [<full_column_list>]
+CREATE OR ALTER VIEW [_schema_name_.] _viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -464,7 +464,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP VIEW [IF EXISTS] [_schema_name_.]_viewname_
+DROP VIEW [IF EXISTS] [_schema_name_.] _viewname_
 ----
 
 [[fblangref-ddl-view-dropview-tbl]]
@@ -534,7 +534,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-RECREATE VIEW [_schema_name_.]_viewname_ [<full_column_list>]
+RECREATE VIEW [_schema_name_.] _viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 

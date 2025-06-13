@@ -19,7 +19,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE DOMAIN [IF NOT EXISTS] [_schema_name_.]_name_ [AS] <datatype>
+CREATE DOMAIN [IF NOT EXISTS] [_schema_name_.] _domain_name_ [AS] <datatype>
   [DEFAULT {<literal> | NULL | <context_var>}]
   [NOT NULL] [CHECK (<dom_condition>)]
   [COLLATE [_schema_name_.]_collation_name_];
@@ -84,7 +84,7 @@ CREATE DOMAIN [IF NOT EXISTS] [_schema_name_.]_name_ [AS] <datatype>
 ^|Параметр
 ^|Описание
 
-|name
+|domain_name
 |Имя домена.
 Может содержать до 63 символов.
 
@@ -280,7 +280,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER DOMAIN [_schema_name_.]_domain_name_
+ALTER DOMAIN [_schema_name_.] _domain_name_
   [TO _new_name_]
   [TYPE <datatype>]
   [{SET DEFAULT {<literal> | NULL | <context_var>}} | DROP DEFAULT]
@@ -535,7 +535,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP DOMAIN [IF EXISTS] [_schema_name_.]_domain_name_
+DROP DOMAIN [IF EXISTS] [_schema_name_.] _domain_name_
 ----
 
 

@@ -14,8 +14,8 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-ALTER CHARACTER SET [_schema_.]_charset_
-SET DEFAULT COLLATION [_schema_.]__collation_
+ALTER CHARACTER SET [_schema_.] _charset_
+SET DEFAULT COLLATION [_schema_.] _collation_
 ----
 
 [[fblangref-ddl-tbl-charsetalter]]
