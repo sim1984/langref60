@@ -57,7 +57,7 @@ ON [_schema_name_.] _tablename_
 Оператор `CREATE INDEX` создаёт индекс для таблицы, который может быть использован для ускорения поиска, сортировки и/или группирования. Кроме того, индекс может быть использован при определении ограничений, таких как первичный ключ, внешний ключ или ограничениях уникальности. Индекс может быть построен на столбцах любого типа кроме `BLOB` и массивов.
 Имя индекса должно быть уникальным среди всех имён индексов внутри схемы.
 
-Имя схемы для индекса (явно указанное или текущая схема) должно быть тем же самым, что и имя схемы для таблицы для которой создаётся этот индекс, в противном случае будет выдана соответствующая ошибка.
+Явно указанное имя схемы для индекса должно быть тем же самым, что и имя схемы для таблицы, для которой создаётся этот индекс, в противном случае будет выдана соответствующая ошибка. Если схема для индекса не указана явно, то она берётся из схемы таблицы.
 
 Если используется предложение `IF NOT EXISTS`, то оператор `CREATE INDEX` попытается создать новый индекс без выдачи ошибки, если он уже существует. DDL триггеры не будут запускаться, если индекс уже существует.
 
@@ -143,13 +143,6 @@ ADD CONSTRAINT PK_COUNTRY PRIMARY KEY (ID);
 ^h| 4
 ^h| 6
 
-| 4096
-| 1015
-| 507
-| 338
-| 253
-| 169
-
 | 8192
 | 2039
 | 1019
@@ -188,11 +181,6 @@ ADD CONSTRAINT PK_COUNTRY PRIMARY KEY (ID);
 |  2
 |  3
 
-| 4096
-| 203
-| 145
-| 113
-
 | 8192
 | 408
 | 291
@@ -203,10 +191,10 @@ ADD CONSTRAINT PK_COUNTRY PRIMARY KEY (ID);
 | 584
 | 454
 
-|32768
-|1637
-|1169
-|909
+| 32768
+| 1637
+| 1169
+| 909
 |===
 
 [[fblangref-ddl-index-creat-_who]]
@@ -227,7 +215,15 @@ ADD CONSTRAINT PK_COUNTRY PRIMARY KEY (ID);
 ====
 [source,sql]
 ----
+-- индекс создаётся в схеме таблицы SALARY_HISTORY, которая найдена в путях поиска (SEARCH_PATH)
 CREATE INDEX IDX_UPDATER ON SALARY_HISTORY (UPDATER_ID);
+
+-- индекс создаётся в схеме MANAGEMENT
+CREATE INDEX IDX_UPDATER ON MANAGEMENT.SALARY_HISTORY (UPDATER_ID);
+
+-- индекс создаётся в схеме MANAGEMENT.
+-- Схема для индекса и таблицы должна быть одна и та же
+CREATE INDEX MANAGEMENT.IDX_UPDATER ON MANAGEMENT.SALARY_HISTORY (UPDATER_ID);
 ----
 ====
 
@@ -236,9 +232,15 @@ CREATE INDEX IDX_UPDATER ON SALARY_HISTORY (UPDATER_ID);
 ====
 [source,sql]
 ----
+-- индекс создаётся в схеме таблицы SALARY_HISTORY, которая найдена в путях поиска (SEARCH_PATH)
 CREATE INDEX IF NOT EXISTS IDX_UPDATER ON SALARY_HISTORY (UPDATER_ID);
+
+-- индекс создаётся в схеме MANAGEMENT
+CREATE INDEX IF NOT EXISTS IDX_UPDATER ON MANAGEMENT.SALARY_HISTORY (UPDATER_ID);
 ----
 ====
+
+В остальных примерах схема индекса определяется точно так же.
 
 .Создание индекса в неактивном состоянии
 [example]
@@ -434,7 +436,11 @@ ALTER INDEX [_schema_name_.] _indexname_ {ACTIVE | INACTIVE};
 ====
 [source,sql]
 ----
+-- первый найденный индекс с именем IDX_UPDATER в одной из схем в пути поиска
 ALTER INDEX IDX_UPDATER INACTIVE;
+
+-- индекс с именем IDX_UPDATER в схеме MANAGEMENT
+ALTER INDEX MANAGEMENT.IDX_UPDATER INACTIVE;
 ----
 ====
 
@@ -443,7 +449,11 @@ ALTER INDEX IDX_UPDATER INACTIVE;
 ====
 [source,sql]
 ----
+-- первый найденный индекс с именем IDX_UPDATER в одной из схем в пути поиска
 ALTER INDEX IDX_UPDATER ACTIVE;
+
+-- индекс с именем IDX_UPDATER в схеме MANAGEMENT
+ALTER INDEX MANAGEMENT.IDX_UPDATER ACTIVE;
 ----
 ====
 
@@ -505,7 +515,11 @@ DROP INDEX [IF EXISTS] [_schema_name_.] _indexname_
 ====
 [source,sql]
 ----
+-- первый найденный индекс с именем IDX_UPDATER в одной из схем в пути поиска
 DROP INDEX IDX_UPDATER;
+
+-- индекс с именем IDX_UPDATER в схеме MANAGEMENT
+DROP INDEX MANAGEMENT.IDX_UPDATER;
 ----
 ====
 
@@ -514,7 +528,11 @@ DROP INDEX IDX_UPDATER;
 ====
 [source,sql]
 ----
+-- первый найденный индекс с именем IDX_UPDATER в одной из схем в пути поиска
 DROP INDEX IF EXISTS IDX_UPDATER;
+
+-- индекс с именем IDX_UPDATER в схеме MANAGEMENT
+DROP INDEX IF EXISTS MANAGEMENT.IDX_UPDATER;
 ----
 ====
 
@@ -588,7 +606,11 @@ SET STATISTICS INDEX [_schema_name_.] _indexname_
 ====
 [source,sql]
 ----
+-- первый найденный индекс с именем IDX_UPDATER в одной из схем в пути поиска
 SET STATISTICS INDEX IDX_UPDATER;
+
+-- индекс с именем IDX_UPDATER в схеме MANAGEMENT
+SET STATISTICS INDEX MANAGEMENT.IDX_UPDATER;
 ----
 ====
 

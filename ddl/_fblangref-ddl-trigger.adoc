@@ -176,6 +176,17 @@ CREATE TRIGGER [IF NOT EXISTS] [_schema_name_.] _trigname_ {
 
 Оператор `CREATE TRIGGER` создаёт новый триггер. Триггер может быть создан для события (или событий) отношения (таблицы или представления), для события (событий) изменения метаданных или для одного из событий базы данных.
 
+Явно указанное имя схемы для DML триггера должно быть тем же самым, что и имя схемы для таблицы, для которой создаётся этот триггер, в противном случае будет выдана соответствующая ошибка. Если схема для DML триггер не указана явно, то она берётся из схемы таблицы.
+
+Для триггеров на события базы данных или события изменения метаданных имя схемы определяется по общим правилам. То есть, если перед именем триггера указана схема, то он будет создан в указанной схеме, в противном случае триггер будет создана в текущей схеме (первая валидная схема в пути поиска).
+
+Имя триггера должно быть уникальным среди имён триггеров внутри заданной (текущей) схемы.
+
+[IMPORTANT]
+====
+Поскольку `CREATE TRIGGER` является DDL оператором, то после того как создаваемый триггер привязано к схеме во время подготовки оператора, путь поиска неявно и временно изменяется. Эта корректировка устанавливает путь поиска на схему триггера. Кроме того, если если схема `SYSTEM` уже присутствовала в пути поиска, то она добавляется как последняя схема. Это обозначает, что имена объектов метаданных, используемые внутри оператора `CREATE TRIGGER` будут разрешаться относительно этого нового пути поиска.
+====
+
 Если используется предложение `IF NOT EXISTS`, то оператор `CREATE TRIGGER` попытается создать новый триггер без выдачи ошибки, если он уже существует. DDL триггеры не будут запускаться, если создаваемый триггер уже существует.
 
 Оператор `CREATE TRIGGER`, как и его родственники `ALTER TRIGGER`, `CREATE OR ALTER TRIGGER` и `RECREATE TRIGGER` являются составными операторами, содержащими заголовок и тело.
@@ -193,6 +204,8 @@ CREATE TRIGGER [IF NOT EXISTS] [_schema_name_.] _trigname_ {
 
 Тело триггера состоит из необязательных объявлений локальных переменных, подпрограмм и именованных курсоров, и одного или нескольких операторов, или блоков операторов, заключённых во внешнем блоке, который начинается с ключевого слова `BEGIN` и заканчивается ключевым словом `END`. Объявления и внутренние операторы завершаются точкой с запятой (;).
 
+Внутри тела триггера неквалифицированные имена разрешаются относительно схемы в которой создаётся триггер или системной схемы (`SYSTEM`). Таким образом, если вы хотите в теле триггера использовать объекты метаданных из других схем. то необходимо полностью квалифицировать имена этих объектов (записывать вместе с именем схемы).
+
 [[fblangref-ddl-trigger-term]]
 === Терминатор оператора
 
@@ -205,7 +218,7 @@ CREATE TRIGGER [IF NOT EXISTS] [_schema_name_.] _trigname_ {
 
 DML триггеры выполняются на уровне строки (записи) каждый раз, когда изменяется образ строки. Они могут быть определены и для таблиц и представлений.
 
-Имя схемы для DML триггера (явно указанное или текущая схема) должно быть тем же самым, что и имя схемы для таблицы (представления) для которой создаётся этот триггер, в противном случае будет выдана соответствующая ошибка.
+Явно указанное имя схемы для DML триггера должно быть тем же самым, что и имя схемы для таблицы, для которой создаётся этот триггер, в противном случае будет выдана соответствующая ошибка. Если схема для DML триггер не указана явно, то она берётся из схемы таблицы.
 
 [[fblangref-ddl-trigger-table-forms]]
 ==== Форма объявления
@@ -276,7 +289,7 @@ DML триггеры могут создать:
 * Владелец схемы таблицы (представления) для которой создаётся триггер;
 * Пользователи с привилегией `ALTER ANY {TABLE | VIEW}` для схемы таблицы (представления) для которой создаётся триггер.
 
-[[fblangref-ddl-trigger-table-creat-_examples]]
+[[fblangref-ddl-trigger-table-create_examples]]
 ==== Примеры
 
 .Создание DML триггера в Legacy стиле
@@ -284,6 +297,7 @@ DML триггеры могут создать:
 ====
 [source,sql]
 ----
+-- триггер создаётся в схеме таблицы CUSTOMER, которая найдена в путях поиска (SEARCH_PATH)
 CREATE TRIGGER SET_CUST_NO FOR CUSTOMER
 ACTIVE BEFORE INSERT POSITION 0
 AS
@@ -291,6 +305,30 @@ BEGIN
   IF (NEW.CUST_NO IS NULL) THEN
     NEW.CUST_NO = GEN_ID(CUST_NO_GEN, 1);
 END
+^
+
+-- триггер создаётся в схеме MANAGEMENT
+CREATE TRIGGER SET_CUST_NO FOR MANAGEMENT.CUSTOMER
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+  -- CUST_NO_GEN должен быть в схеме MANAGEMENT
+  IF (NEW.CUST_NO IS NULL) THEN
+    NEW.CUST_NO = GEN_ID(CUST_NO_GEN, 1);
+END
+^
+
+-- триггер создаётся в схеме MANAGEMENT
+-- Схема для триггера и таблицы должна быть одна и та же
+CREATE TRIGGER MANAGEMENT.SET_CUST_NO FOR MANAGEMENT.CUSTOMER
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+  -- CUST_NO_GEN должен быть в схеме MANAGEMENT
+  IF (NEW.CUST_NO IS NULL) THEN
+    NEW.CUST_NO = GEN_ID(CUST_NO_GEN, 1);
+END
+^
 ----
 ====
 
@@ -299,25 +337,53 @@ END
 ====
 [source,sql]
 ----
-CREATE TRIGGER set_cust_no
-ACTIVE BEFORE INSERT ON customer POSITION 0
+-- триггер создаётся в схеме таблицы CUSTOMER, которая найдена в путях поиска (SEARCH_PATH)
+CREATE TRIGGER SET_CUST_NO
+ACTIVE BEFORE INSERT ON CUSTOMER POSITION 0
 AS
 BEGIN
-  IF (NEW.cust_no IS NULL) THEN
-    NEW.cust_no = GEN_ID(cust_no_gen, 1);
+  IF (NEW.CUST_NO IS NULL) THEN
+    NEW.CUST_NO = GEN_ID(CUST_NO_GEN, 1);
 END
+^
+
+-- триггер создаётся в схеме MANAGEMENT
+CREATE TRIGGER SET_CUST_NO
+ACTIVE BEFORE INSERT ON MANAGEMENT.CUSTOMER POSITION 0
+AS
+BEGIN
+  -- CUST_NO_GEN должен быть в схеме MANAGEMENT
+  IF (NEW.CUST_NO IS NULL) THEN
+    NEW.CUST_NO = GEN_ID(CUST_NO_GEN, 1);
+END
+^
+
+-- триггер создаётся в схеме MANAGEMENT
+-- Схема для триггера и таблицы должна быть одна и та же
+CREATE TRIGGER MANAGEMENT.SET_CUST_NO
+ACTIVE BEFORE INSERT ON MANAGEMENT.CUSTOMER POSITION 0
+AS
+BEGIN
+  -- CUST_NO_GEN должен быть в схеме MANAGEMENT
+  IF (NEW.CUST_NO IS NULL) THEN
+    NEW.CUST_NO = GEN_ID(CUST_NO_GEN, 1);
+END
+^
 ----
 ====
 
-.Создание DML триггера, если его не существует
+В остальных примерах схема триггера определяется точно так же.
+
+.Создание DML триггера, если его не существует в схеме MANAGEMENT
 [example]
 ====
 [source,sql]
 ----
-CREATE TRIGGER IF NOT EXISTS SET_CUST_NO FOR CUSTOMER
+CREATE TRIGGER IF NOT EXISTS SET_CUST_NO FOR MANAGEMENT.CUSTOMER
 ACTIVE BEFORE INSERT POSITION 0
 AS
 BEGIN
+  -- CUST_NO_GEN должен быть в схеме MANAGEMENT
   IF (NEW.CUST_NO IS NULL) THEN
     NEW.CUST_NO = GEN_ID(CUST_NO_GEN, 1);
 END
@@ -329,32 +395,34 @@ END
 ====
 [source,sql]
 ----
-CREATE TRIGGER set_cust_no
-ACTIVE BEFORE INSERT ON customer POSITION 0
+CREATE TRIGGER SET_CUST_NO
+ACTIVE BEFORE INSERT ON CUSTOMER POSITION 0
 SQL SECURITY DEFINER
 AS
 BEGIN
-  IF (NEW.cust_no IS NULL) THEN
-    NEW.cust_no = GEN_ID(cust_no_gen, 1);
+  IF (NEW.CUST_NO IS NULL) THEN
+    NEW.CUST_NO = GEN_ID(CUST_NO_GEN, 1);
 END
 ----
 ====
 
-.Создание DML триггера на несколько событий
+.Создание DML триггера на несколько событий в схеме MANAGEMENT
 [example]
 ====
 [source,sql]
 ----
-CREATE TRIGGER TR_CUST_LOG
+CREATE TRIGGER MANAGEMENT.TR_CUST_LOG
 ACTIVE AFTER INSERT OR UPDATE OR DELETE
-ON CUSTOMER POSITION 10
+ON MANAGEMENT.CUSTOMER POSITION 10
 AS
 BEGIN
-  INSERT INTO CHANGE_LOG (LOG_ID,
+  -- схема таблицы CHANGE_LOG и последовательности SEQ_CHANGE_LOG
+  -- отличается от схемы триггера, поэтому указываем полное квалифицированное имя
+  INSERT INTO PUBLIC.CHANGE_LOG (LOG_ID,
                           ID_TABLE,
                           TABLE_NAME,
                           MUTATION)
-  VALUES (NEXT VALUE FOR SEQ_CHANGE_LOG,
+  VALUES (NEXT VALUE FOR PUBLIC.SEQ_CHANGE_LOG,
           OLD.CUST_NO,
           'CUSTOMER',
           CASE
@@ -513,17 +581,23 @@ END
 
 Контекст `DDL_TRIGGER` работает как стек. Перед возбуждением DDL триггера, значения, относящиеся к выполняемой команде, помещаются в этот стек. После завершения работы триггера значения выталкиваются. Таким образом в случае каскадных DDL операторов, когда каждая пользовательская DDL команда возбуждает DDL триггер, и этот триггер запускает другие DDL команды, с помощью `EXECUTE STATEMENT`, значения переменных в пространстве имён `DDL_TRIGGER` будут соответствовать команде, которая вызвала последний DDL триггер в стеке вызовов.
 
+[NOTE]
+====
+DDL триггеры созданные в любой из схем равнозначны. Это обозначает что любой из них перехватывает события изменения метаданных из всех схем.
+====
+
 ===== Переменные доступные в пространстве имён DDL_TRIGGER
 
-* `EVENT_TYPE` – тип события (CREATE, ALTER, DROP)
-* `OBJECT_TYPE` – тип объекта (TABLE, VIEW и д.р.)
-* `DDL_EVENT` – имя события (`<ddl event item>`),
+* `EVENT_TYPE` -- тип события (CREATE, ALTER, DROP);
+* `OBJECT_TYPE` -- тип объекта (TABLE, VIEW и д.р.);
+* `DDL_EVENT` -- имя события (`<ddl event item>`),
 +
 где `<ddl event item>` = `EVENT_TYPE || ' ' || OBJECT_TYPE`
-* `OBJECT_NAME` – имя объекта метаданных
-* `OLD_OBJECT_NAME` – имя объекта метаданных до переименования
-* `NEW_OBJECT_NAME` – имя объекта метаданных после переименования
-* `SQL_TEXT` – текст SQL запроса
+* `OBJECT_NAME` -- имя объекта метаданных;
+* `OLD_OBJECT_NAME` -- имя объекта метаданных до переименования;
+* `NEW_OBJECT_NAME` -- имя объекта метаданных после переименования;
+* `SCHEMA_NAME` -- имя схемы, которому принадлежит объект метаданных;
+* `SQL_TEXT` -- текст SQL запроса.
 
 [float]
 [[fblangref-ddl-trigger-ddl-suppression]]
@@ -537,7 +611,7 @@ isql -nodbtriggers
 nbackup -T
 ----
 
-Эти ключи могут использоваться только SYSDBA или владельцем базы данных.
+Эти ключи могут использоваться только `SYSDBA` или владельцем базы данных.
 
 [[fblangref-ddl-trigger-create-ddl-who]]
 ==== Кто может создать триггеры на события изменения метаданных?
@@ -556,18 +630,19 @@ nbackup -T
 ====
 [source,sql]
 ----
+CREATE SCHEMA DDL_EVENTS;
 
-CREATE EXCEPTION e_invalid_sp_name
+CREATE EXCEPTION DDL_EVENTS.E_INVALID_SP_NAME
   'Неверное имя хранимой процедуры (должно начинаться с SP_)';
 
 SET TERM !;
 
-CREATE TRIGGER trig_ddl_sp BEFORE CREATE PROCEDURE
+CREATE TRIGGER DDL_EVENTS.TRIG_DDL_SP BEFORE CREATE PROCEDURE
 AS
 BEGIN
   IF (rdb$get_context('DDL_TRIGGER', 'OBJECT_NAME')
       NOT STARTING 'SP_') THEN
-    EXCEPTION e_invalid_sp_name;
+    EXCEPTION E_INVALID_SP_NAME;
 END!
 
 -- Test
@@ -581,17 +656,19 @@ AS
 BEGIN
 END!
 ----
+
+----
+Statement failed, SQLSTATE = HY000
+unsuccessful metadata update
+-CREATE PROCEDURE "PUBLIC"."TEST" failed
+-exception 48
+-"DDL_EVENTS"."E_INVALID_SP_NAME"
+-Неверное имя хранимой процедуры (должно начинаться с SP_)
+-At trigger "DDL_EVENTS"."TRIG_DDL_SP" line: 6, col: 5
 ----
 
--- Statement failed, SQLSTATE = 42000
--- exception 1
--- -E_INVALID_SP_NAME
--- -Неверное имя хранимой процедуры (должно начинаться с SP_)
--- -At trigger 'TRIG_DDL_SP' line: 4, col: 5
-----
 [source,sql]
 ----
-
 SET TERM ;!
 ----
 ====
@@ -601,16 +678,15 @@ SET TERM ;!
 ====
 [source,sql]
 ----
-
-CREATE EXCEPTION e_access_denied 'Access denied';
+CREATE EXCEPTION E_ACCESS_DENIED 'Access denied';
 
 SET TERM !;
 
-CREATE TRIGGER trig_ddl BEFORE ANY DDL STATEMENT
+CREATE TRIGGER DDL_EVENTS.TRIG_DDL BEFORE ANY DDL STATEMENT
 AS
 BEGIN
   IF (current_user <> 'SUPER_USER') THEN
-    EXCEPTION e_access_denied;
+    EXCEPTION PUBLIC.E_ACCESS_DENIED;
 END!
 
 -- Test
@@ -619,18 +695,19 @@ AS
 BEGIN
 END!
 ----
+
+----
+Statement failed, SQLSTATE = HY000
+unsuccessful metadata update
+-CREATE PROCEDURE "PUBLIC"."SP_TEST" failed
+-exception 49
+-"PUBLIC"."E_ACCESS_DENIED"
+-Access denied
+-At trigger "DDL_EVENTS"."TRIG_DDL" line: 5, col: 5
 ----
 
--- The last command raises this exception and procedure SP_TEST is not created
--- Statement failed, SQLSTATE = 42000
--- exception 1
--- -E_ACCESS_DENIED
--- -Access denied
--- -At trigger 'TRIG_DDL' line: 4, col: 5
-----
 [source,sql]
 ----
-
 SET TERM ;!
 ----
 ====
@@ -647,9 +724,9 @@ SET TERM ;!
 
 [source,sql]
 ----
-CREATE SEQUENCE ddl_seq;
+CREATE SEQUENCE DDL_EVENTS.DDL_SEQ;
 
-CREATE TABLE ddl_log (
+CREATE TABLE DDL_EVENTS.DDL_LOG (
   id BIGINT NOT NULL PRIMARY KEY,
   moment TIMESTAMP NOT NULL,
   user_name VARCHAR(63) NOT NULL,
@@ -659,24 +736,25 @@ CREATE TABLE ddl_log (
   object_name VARCHAR(63) NOT NULL,
   old_object_name VARCHAR(63),
   new_object_name VARCHAR(63),
+  schema_name VARCHAR(63),
   sql_text BLOB sub_type text NOT NULL,
   ok CHAR(1) NOT NULL
 );
 
 SET TERM !;
 
-CREATE TRIGGER trig_ddl_log_before BEFORE ANY DDL STATEMENT
+CREATE TRIGGER DDL_EVENTS.TRIG_DDL_LOG_BEFORE BEFORE ANY DDL STATEMENT
 AS
-  DECLARE id TYPE OF COLUMN ddl_log.id;
+  DECLARE id TYPE OF COLUMN DDL_LOG.id;
 BEGIN
   -- Мы должны производить изменения в AUTONOMOUS TRANSACTION,
   -- таким образом, если произойдёт исключение и команда
   -- не будет запущена, она всё равно будет зарегистрирована.
   IN AUTONOMOUS TRANSACTION DO
   BEGIN
-    INSERT INTO ddl_log (
+    INSERT INTO DDL_LOG (
       id, moment, user_name, event_type, object_type, ddl_event,
-      object_name, old_object_name, new_object_name, sql_text, ok)
+      object_name, old_object_name, new_object_name, schema_name, sql_text, ok)
     VALUES (NEXT VALUE FOR ddl_seq,
             current_timestamp, current_user,
             rdb$get_context('DDL_TRIGGER', 'EVENT_TYPE'),
@@ -685,6 +763,7 @@ BEGIN
             rdb$get_context('DDL_TRIGGER', 'OBJECT_NAME'),
             rdb$get_context('DDL_TRIGGER', 'OLD_OBJECT_NAME'),
             rdb$get_context('DDL_TRIGGER', 'NEW_OBJECT_NAME'),
+            rdb$get_context('DDL_TRIGGER', 'SCHEMA_NAME'),
             rdb$get_context('DDL_TRIGGER', 'SQL_TEXT'),
             'N')
     RETURNING id INTO id;
@@ -696,7 +775,7 @@ END!
 -- созданный выше триггер будет запущен для этой DDL.
 -- Хорошей идеей является использование –nodbtriggers
 -- при работе с ним
-CREATE TRIGGER trig_ddl_log_after AFTER ANY DDL STATEMENT
+CREATE TRIGGER DDL_EVENTS.TRIG_DDL_LOG_AFTER AFTER ANY DDL STATEMENT
 AS
 BEGIN
   -- Здесь нам требуется автономная транзакция,
@@ -706,7 +785,7 @@ BEGIN
   -- если пользовательская транзакции не запущена
   -- с режимом изоляции  READ COMMITTED.
   IN AUTONOMOUS TRANSACTION DO
-    UPDATE ddl_log SET ok = 'Y'
+    UPDATE DDL_LOG SET ok = 'Y'
     WHERE
       id = rdb$get_context('USER_SESSION', 'trig_ddl_log_id');
 END!
@@ -716,7 +795,7 @@ COMMIT!
 SET TERM ;!
 
 -- Удаляем запись о создании trig_ddl_log_after.
-DELETE FROM ddl_log;
+DELETE FROM DDL_EVENTS.DDL_LOG;
 COMMIT;
 
 -- Тест
@@ -746,6 +825,22 @@ RECREATE TABLE t1 (
   n INTEGER
 );
 
+-- создание таблицы t1 в схеме APP
+CREATE TABLE APP.t1 (
+  n1 INTEGER,
+  n2 INTEGER
+);
+
+-- этой действие не будет зарегистрировано,
+-- так как таблица t1 уже существует в схеме APP
+CREATE TABLE IF NOT EXISTS APP.t1 (
+  n1 INTEGER,
+  n2 INTEGER
+);
+
+-- а это будет
+DROP TABLE IF EXISTS APP.t1;
+
 CREATE DOMAIN dom1 AS INTEGER;
 
 ALTER DOMAIN dom1 TYPE BIGINT;
@@ -754,49 +849,117 @@ ALTER DOMAIN dom1 TO dom2;
 
 COMMIT;
 
+SET LIST ON;
+
 SELECT
   id,
   ddl_event,
+  schema_name as "schema",
   object_name as name,
   sql_text,
   ok
-FROM ddl_log
+FROM DDL_EVENTS.DDL_LOG
 ORDER BY id;
 ----
 
 ----
- ID DDL_EVENT                 OBJECT_NAME                      SQL_TEXT OK
-=== ========================= ======================= ================= ======
-  2 CREATE TABLE              T1                                   80:3 Y
-====================================================
-SQL_TEXT:
-recreate table t1 (
-    n1 integer,
-    n2 integer
+ID                              1
+DDL_EVENT                       CREATE TABLE
+schema                          PUBLIC
+NAME                            T1
+SQL_TEXT                        15c:0
+-- Эта команда будет зарегистрирована единожды
+-- (т.к. T1 не существует, RECREATE вызовет событие CREATE)
+-- с OK = Y.
+RECREATE TABLE t1 (
+  n1 INTEGER,
+  n2 INTEGER
 )
-====================================================
-  3 CREATE TABLE              T1                                   80:2 N
-====================================================
-SQL_TEXT:
-create table t1 (
-    n1 integer,
-    n2 integer
+OK                              Y
+
+ID                              2
+DDL_EVENT                       CREATE TABLE
+schema                          PUBLIC
+NAME                            T1
+SQL_TEXT                        15c:1
+-- Оператор не выполнится, т.к. T1 уже существует,
+-- таким образом OK будет иметь значение N.
+CREATE TABLE t1 (
+  n1 INTEGER,
+  n2 INTEGER
 )
-====================================================
-  4 DROP TABLE                T1                                   80:6 Y
-====================================================
-SQL_TEXT:
-recreate table t1 (
-    n integer
+OK                              N
+
+ID                              3
+DDL_EVENT                       DROP TABLE
+schema                          PUBLIC
+NAME                            T1
+SQL_TEXT                        15c:2
+-- Это действие будет зарегистрировано дважды
+-- (т.к. T1 существует, действие RECREATE рассматривается
+-- как DROP и CREATE) с полем OK = Y.
+RECREATE TABLE t1 (
+  n INTEGER
 )
-====================================================
-  5 CREATE TABLE              T1                                   80:9 Y
-====================================================
-SQL_TEXT:
-recreate table t1 (
-    n integer
+OK                              Y
+
+ID                              4
+DDL_EVENT                       CREATE TABLE
+schema                          PUBLIC
+NAME                            T1
+SQL_TEXT                        15c:3
+-- Это действие будет зарегистрировано дважды
+-- (т.к. T1 существует, действие RECREATE рассматривается
+-- как DROP и CREATE) с полем OK = Y.
+RECREATE TABLE t1 (
+  n INTEGER
 )
-====================================================
+OK                              Y
+
+ID                              5
+DDL_EVENT                       CREATE TABLE
+schema                          APP
+NAME                            T1
+SQL_TEXT                        15c:4
+-- создание таблицы t1 в схеме APP
+CREATE TABLE APP.t1 (
+  n1 INTEGER,
+  n2 INTEGER
+)
+OK                              Y
+
+ID                              6
+DDL_EVENT                       DROP TABLE
+schema                          APP
+NAME                            T1
+SQL_TEXT                        15c:5
+-- а это будет
+DROP TABLE IF EXISTS APP.t1
+OK                              Y
+
+ID                              7
+DDL_EVENT                       CREATE DOMAIN
+schema                          PUBLIC
+NAME                            DOM1
+SQL_TEXT                        15c:6
+CREATE DOMAIN dom1 AS INTEGER
+OK                              Y
+
+ID                              8
+DDL_EVENT                       ALTER DOMAIN
+schema                          PUBLIC
+NAME                            DOM1
+SQL_TEXT                        15c:7
+ALTER DOMAIN dom1 TYPE BIGINT
+OK                              Y
+
+ID                              9
+DDL_EVENT                       ALTER DOMAIN
+schema                          PUBLIC
+NAME                            DOM1
+SQL_TEXT                        15c:8
+ALTER DOMAIN dom1 TO dom2
+OK                              Y
 ----
 
 ====
@@ -830,6 +993,13 @@ ALTER TRIGGER [_schema_name_.] _trigname_
 
 Полное описание оператора см. <<fblangref-ddl-trigger-create,CREATE TRIGGER>>.
 ----
+
+Оператор `ALTER TRIGGER` изменяет существующий триггер. Если указано только имя триггера, то его поиск производится в путях поиска (`SEARCH_PATH`). Будет изменён первый найденный триггер с заданным именем среди схем перечисленных в путях поиска.
+
+[IMPORTANT]
+====
+Поскольку `ALTER TRIGGER` является DDL оператором, то после того как модифицируемый триггер привязано к схеме во время подготовки оператора, путь поиска неявно и временно изменяется. Эта корректировка устанавливает путь поиска на схему триггера. Кроме того, если если схема `SYSTEM` уже присутствовала в пути поиска, то она добавляется как последняя схема. Это обозначает, что имена объектов метаданных, используемые внутри оператора `ALTER TRIGGER` будут разрешаться относительно этого нового пути поиска.
+====
 
 [[fblangref-ddl-trigger-alter-changes]]
 === Допустимые изменения
@@ -887,7 +1057,11 @@ DML триггеры могут изменить:
 ====
 [source,sql]
 ----
-ALTER TRIGGER set_cust_no INACTIVE;
+-- первый найденный триггер с именем SET_CUST_NO в одной из схем в пути поиска
+ALTER TRIGGER SET_CUST_NO INACTIVE;
+
+-- триггер с именем SET_CUST_NO в схеме MANAGEMENT
+ALTER TRIGGER MANAGEMENT.SET_CUST_NO INACTIVE;
 ----
 ====
 
@@ -896,7 +1070,11 @@ ALTER TRIGGER set_cust_no INACTIVE;
 ====
 [source,sql]
 ----
-ALTER TRIGGER set_cust_no POSITION 14;
+-- первый найденный триггер с именем SET_CUST_NO в одной из схем в пути поиска
+ALTER TRIGGER SET_CUST_NO POSITION 14;
+
+-- триггер с именем SET_CUST_NO в схеме MANAGEMENT
+ALTER TRIGGER MANAGEMENT.SET_CUST_NO POSITION 14;
 ----
 ====
 
@@ -905,7 +1083,12 @@ ALTER TRIGGER set_cust_no POSITION 14;
 ====
 [source,sql]
 ----
+-- первый найденный триггер с именем TR_CUST_LOG в одной из схем в пути поиска
 ALTER TRIGGER TR_CUST_LOG
+INACTIVE AFTER INSERT OR UPDATE;
+
+-- триггер с именем TR_CUST_LOG в схеме MANAGEMENT
+ALTER TRIGGER MANAGEMENT.TR_CUST_LOG
 INACTIVE AFTER INSERT OR UPDATE;
 ----
 ====
@@ -985,6 +1168,10 @@ CREATE OR ALTER TRIGGER [_schema_name_.] _trigname_ {
 
 Оператор `CREATE OR ALTER TRIGGER` создаёт новый триггер, если он не существует, или изменяет и перекомпилирует его в противном случае, при этом существующие права и зависимости сохраняются.
 
+Триггер создаётся или изменяется в указанной схеме. Если указано только имя триггера, то его поиск производится только в текущей схеме (первая валидная схема в путях поиска). Имя триггера должно быть уникальным среди имён триггеров внутри заданной (текущей) схемы.
+
+Имя схемы для DML триггера (явно указанное или текущая схема) должно быть тем же самым, что и имя схемы для таблицы (представления) для которой создаётся этот триггер, в противном случае будет выдана соответствующая ошибка. Для триггеров на события базы данных или события изменения метаданных данного ограничение нет.
+
 [[fblangref-ddl-trigger-createoralter-examples]]
 === Примеры
 
@@ -1037,6 +1224,8 @@ DROP TRIGGER [IF EXISTS] [_schema_name_.] _trigname_
 
 Оператор `DROP TRIGGER` удаляет существующий триггер.
 
+Если указано только имя триггера, то его поиск производится в путях поиска (`SEARCH_PATH`). Будет удалён первый найденный триггер с заданным именем среди схем перечисленных в путях поиска.
+
 Если используется предложение `IF EXISTS`, то оператор `DROP TRIGGER` попытается удалить триггер без выдачи ошибки, если его не существует. DDL триггеры не будут запускаться, если удаляемый триггер не существует.
 
 [[_fblangref_ddl_trigger_drop_who]]
@@ -1064,7 +1253,11 @@ DML триггеры могут удалить:
 ====
 [source,sql]
 ----
-DROP TRIGGER set_cust_no;
+-- первый найденный триггер с именем SET_CUST_NO в одной из схем в пути поиска
+DROP TRIGGER SET_CUST_NO;
+
+-- триггер с именем SET_CUST_NO в схеме MANAGEMENT
+DROP TRIGGER MANAGEMENT.SET_CUST_NO;
 ----
 ====
 
@@ -1073,7 +1266,11 @@ DROP TRIGGER set_cust_no;
 ====
 [source,sql]
 ----
-DROP TRIGGER IF EXISTS set_cust_no;
+-- первый найденный триггер с именем SET_CUST_NO в одной из схем в пути поиска
+DROP TRIGGER IF EXISTS SET_CUST_NO;
+
+-- триггер с именем SET_CUST_NO в схеме MANAGEMENT
+DROP TRIGGER IF EXISTS MANAGEMENT.SET_CUST_NO;
 ----
 ====
 
@@ -1104,6 +1301,9 @@ RECREATE TRIGGER [_schema_name_.] _trigname_ {
 ----
 
 Оператор `RECREATE TRIGGER` создаёт новый триггер, если триггер с указанным именем не существует, в противном случае оператор `RECREATE TRIGGER` попытается удалить его и создать новый.
+
+Триггер создаётся или пересоздаётся в указанной схеме. Если указано только имя триггера, то его поиск производится только в текущей схеме (первая валидная схема в путях поиска). Имя триггера должно быть уникальным среди имён всех триггеров внутри заданной (текущей) схемы.
+
 
 [[fblangref-ddl-trigger-recreate-examples]]
 === Примеры

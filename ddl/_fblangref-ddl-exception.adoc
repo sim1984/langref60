@@ -177,9 +177,10 @@ ALTER EXCEPTION [_schema_name_.] _exception_name_ '<message>'
 ====
 [source,sql]
 ----
+-- первое найденное исключение с именем E_LARGE_VALUE в одной из схем в пути поиска
 ALTER EXCEPTION E_LARGE_VALUE 'Значение превышает максимально допустимое';
 
--- изменение исключения в схеме APP
+-- изменение исключения с именем E_LARGE_VALUE в схеме APP
 ALTER EXCEPTION APP.E_LARGE_VALUE 'Значение превышает максимально допустимое';
 ----
 ====
@@ -219,7 +220,12 @@ CREATE OR ALTER EXCEPTION [_schema_name_.] _exception_name_ '<message>'
 ====
 [source,sql]
 ----
+-- в текущей схеме
 CREATE OR ALTER EXCEPTION E_LARGE_VALUE
+'Значение превышает максимально допустимое';
+
+-- в схеме MANAGEMENT
+CREATE OR ALTER EXCEPTION MANAGEMENT.E_LARGE_VALUE
 'Значение превышает максимально допустимое';
 ----
 ====
@@ -282,7 +288,11 @@ DROP EXCEPTION [IF EXISTS] [_schema_name_.] _exception_name_
 ====
 [source,sql]
 ----
+-- первое найденное исключение с именем E_LARGE_VALUE в одной из схем в пути поиска
 DROP EXCEPTION E_LARGE_VALUE;
+
+-- исключение с именем E_LARGE_VALUE в схеме MANAGEMENT
+DROP EXCEPTION MANAGEMENT.E_LARGE_VALUE;
 ----
 ====
 
@@ -328,7 +338,12 @@ RECREATE EXCEPTION [_schema_name_.] _exception_name_ '<message>'
 ====
 [source,sql]
 ----
+-- в текущей схеме
 RECREATE EXCEPTION E_LARGE_VALUE
+'Значение превышает максимально допустимое';
+
+-- в схеме MANAGEMENT
+RECREATE EXCEPTION MANAGEMENT.E_LARGE_VALUE
 'Значение превышает максимально допустимое';
 ----
 ====
