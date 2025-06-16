@@ -43,12 +43,12 @@
 ^| Описание
 
 |SEGMENTED
-|`BOOLEAN NOT NULL`
-|Тип BLOB. Если TRUE - будет создан сегментированный BLOB, FALSE - потоковый.
+|BOOLEAN NOT NULL
+|Тип BLOB. Если `TRUE` - будет создан сегментированный BLOB, `FALSE` - потоковый.
 
 |TEMP_STORAGE
-|`BOOLEAN NOT NULL`
-|В каком хранилище создаётся BLOB. TRUE - во временном, FALSE - в постоянном (для записи в обычную таблицу).
+|BOOLEAN NOT NULL
+|В каком хранилище создаётся BLOB. `TRUE` - во временном, `FALSE` - в постоянном (для записи в обычную таблицу).
 |===
 
 .Тип возвращаемого результата
@@ -67,7 +67,7 @@
 ^| Описание
 
 |BLOB
-|`BLOB NOT NULL`
+|BLOB NOT NULL
 |Входной BLOB.
 |===
 
@@ -86,7 +86,7 @@
 ^| Описание
 
 |BLOB
-|`BLOB NOT NULL`
+|BLOB NOT NULL
 |Проверяемый BLOB.
 |===
 
@@ -109,11 +109,11 @@
 ^| Описание
 
 |HANDLE
-|`INTEGER NOT NULL`
+|INTEGER NOT NULL
 |Дескриптор открытого BLOB.
 
 |LENGTH
-|`INTEGER`
+|INTEGER
 |Количество байт, которое необходимо прочитать.
 |===
 
@@ -136,15 +136,15 @@
 ^| Описание
 
 |HANDLE
-|`INTEGER NOT NULL`
+|INTEGER NOT NULL
 |Дескриптор открытого BLOB.
 
 |MODE
-|`INTEGER NOT NULL`
+|INTEGER NOT NULL
 |Режим поиска.
 
 |OFFSET
-|`INTEGER NOT NULL`
+|INTEGER NOT NULL
 |Смещение, байт.
 |===
 
@@ -165,7 +165,7 @@
 ^| Описание
 
 |BLOB
-|`BLOB NOT NULL`
+|BLOB NOT NULL
 |BLOB для отмены.
 |===
 
@@ -183,7 +183,7 @@
 ^| Описание
 
 |HANDLE
-|`INTEGER NOT NULL`
+|INTEGER NOT NULL
 |Дескриптор BLOB для закрытия.
 |===
 
@@ -344,23 +344,23 @@ set term ;!
 ^| Описание
 
 |DESCRIPTION
-|`VARCHAR(255) CHARACTER SET UTF8`
+|VARCHAR(255) CHARACTER SET UTF8
 |Пользовательское описание сеанса профилирования. По умолчанию `NULL`.
 
 |FLUSH_INTERVAL
-|`INTEGER`
+|INTEGER
 |Интервал автоматического сброса статистики в таблицы снимков. По умолчанию `NULL`. Измеряется в секундах.
 
 |ATTACHMENT_ID
-|`BIGINT`
+|BIGINT
 |Идентификатор соединения для которого запускается сеанс профилирования. По умолчанию `CURRENT_CONNECTION`.
 
 |PLUGIN_NAME
-|`VARCHAR(255) CHARACTER SET UTF8`
+|VARCHAR(255) CHARACTER SET UTF8
 |Наименование плагина профилирования. По умолчанию `NULL`, что обозначает что будет использоваться плагин профилирования указанный в параметре конфигурации `DefaultProfilerPlugin`.
 
 |PLUGIN_OPTIONS
-|`VARCHAR(255) CHARACTER SET UTF8`
+|VARCHAR(255) CHARACTER SET UTF8
 |Параметры специфичные для плагина профилирования. По умолчанию `NULL`.
 |===
 
@@ -393,7 +393,7 @@ set term ;!
 ^| Описание
 
 |ATTACHMENT_ID
-|`BIGINT`
+|BIGINT
 |Идентификатор соединения для которого отменяется сеанс профилирования. По умолчанию `CURRENT_CONNECTION`.
 |===
 
@@ -411,7 +411,7 @@ set term ;!
 ^| Описание
 
 |ATTACHMENT_ID
-|`BIGINT`
+|BIGINT
 |Идентификатор соединения для которого удаляются все сеансы профилирования. По умолчанию `CURRENT_CONNECTION`.
 |===
 
@@ -427,11 +427,11 @@ set term ;!
 ^| Описание
 
 |FLUSH
-|`BOOLEAN`
+|BOOLEAN
 |Сбрасывать ли текущую статистику профилирования в таблицы моментальных снимков.
 
 |ATTACHMENT_ID
-|`BIGINT`
+|BIGINT
 |Идентификатор соединения для которого завершается сеанс профилирования. По умолчанию `CURRENT_CONNECTION`.
 |===
 
@@ -451,7 +451,7 @@ set term ;!
 ^| Описание
 
 |ATTACHMENT_ID
-|`BIGINT`
+|BIGINT
 |Идентификатор соединения для которого обновляются таблицы моментальных снимков из сеансов профилирования. По умолчанию `CURRENT_CONNECTION`.
 |===
 
@@ -473,11 +473,11 @@ set term ;!
 ^| Описание
 
 |FLUSH
-|`BOOLEAN`
+|BOOLEAN
 |Сбрасывать ли текущую статистику профилирования в таблицы моментальных снимков.
 
 |ATTACHMENT_ID
-|`BIGINT`
+|BIGINT
 |Идентификатор соединения для которого приостанавливается сеанс профилирования. По умолчанию `CURRENT_CONNECTION`.
 |===
 
@@ -499,7 +499,7 @@ set term ;!
 ^| Описание
 
 |ATTACHMENT_ID
-|`BIGINT`
+|BIGINT
 |Идентификатор соединения для которого возобновляется сеанс профилирования. По умолчанию `CURRENT_CONNECTION`.
 |===
 
@@ -515,11 +515,11 @@ set term ;!
 ^| Описание
 
 |FLUSH_INTERVAL
-|`INTEGER`
+|INTEGER
 |Интервал автоматического сброса статистики. Задаётся в секундах.
 
 |ATTACHMENT_ID
-|`BIGINT`
+|BIGINT
 |Идентификатор соединения для которого обновляются таблицы моментальных снимков из сеансов профилирования. По умолчанию `CURRENT_CONNECTION`.
 |===
 
@@ -698,55 +698,59 @@ SELECT PSTAT.*
 ^| Описание
 
 |PLAN_LINE
-|`INTEGER`
+|INTEGER
 |Номер строки плана.
 
 |RECORD_SOURCE_ID
-|`BIGINT`
+|BIGINT
 |Идентификатор источника данных.
 
 |PARENT_RECORD_SOURCE_ID
-|`BIGINT`
+|BIGINT
 |Идентификатор родительского источника данных.
 
 |LEVEL
-|`INTEGER`
+|INTEGER
 |Уровень отступа для источника данных.
 Необходим при конструировании подробного плана в виде единой строки.
 
 |OBJECT_TYPE
-|`SMALLINT`
+|SMALLINT
 |Тип объекта метаданных:
 
 `0` -- таблица; +
 `5` -- хранимая процедура.
 
+|SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|
+
 |PACKAGE_NAME
-|`CHAR(63)`
+|CHAR(63) CHARACTER SET UTF8
 |Наименование пакета. Отображается если источником данных выступает хранимая процедура пакета.
 
 |OBJECT_NAME
-|`CHAR(63)`
+|CHAR(63) CHARACTER SET UTF8
 |Наименование объекта метаданных.
 
 |ALIAS
-|`CHAR(63)`
+|CHAR(63) CHARACTER SET UTF8
 |Псевдоним объекта метаданных.
 
 |CARDINALITY
-|`DOUBLE PRECISION`
+|DOUBLE PRECISION
 |Кардинальность (мощность) источника данных.
 
 |RECORD_LENGTH
-|`INTEGER`
+|INTEGER
 |Длина записи в байтах.
 
 |KEY_LENGTH
-|`INTEGER`
+|INTEGER
 |Длина ключа в байтах.
 
 |ACCESS_PATH
-|`BLOB SUB_TYPE TEXT`
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Описание метода доступа, используемое источником данных.
 |===
 
@@ -860,15 +864,15 @@ DATABASE_VERSION
 ^| Описание
 
 |RDB$TIME_ZONE_NAME
-|`CHAR(63)`
+|CHAR(63) CHARACTER SET UTF8
 |Наименование часового пояса
 
 |RDB$FROM_TIMESTAMP
-|`TIMESTAMP WITH TIME ZONE`
+|TIMESTAMP WITH TIME ZONE
 |Начало интервала дат
 
 |RDB$TO_TIMESTAMP
-|`TIMESTAMP WITH TIME ZONE`
+|TIMESTAMP WITH TIME ZONE
 |Окончание интервала дат
 |===
 
@@ -880,23 +884,23 @@ DATABASE_VERSION
 ^| Описание
 
 |RDB$START_TIMESTAMP
-|`TIMESTAMP WITH TIME ZONE`
+|TIMESTAMP WITH TIME ZONE
 |Дата начала действия правила
 
 |RDB$END_TIMESTAMP
-|`TIMESTAMP WITH TIME ZONE`
+|TIMESTAMP WITH TIME ZONE
 |Дата окончания действия правила
 
 |RDB$ZONE_OFFSET
-|`SMALLINT`
+|SMALLINT
 |Смещение времени в минутах для заданного часового пояса
 
 |RDB$DST_OFFSET
-|`SMALLINT`
+|SMALLINT
 |Летнее смещение времени в минутах для заданного часового пояса
 
 |RDB$EFFECTIVE_OFFSET
-|`SMALLINT`
+|SMALLINT
 |Эффективное смещение, вычисляется как `RDB$ZONE_OFFSET + RDB$DST_OFFSET`
 |===
 
