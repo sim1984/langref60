@@ -69,7 +69,7 @@
 |идентификатор курсора
 
 |NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |имя явно объявленного курсора
 
 |LINE_NUM
@@ -171,7 +171,7 @@
 |уровень отступа для источника данных. Необходим при конструировании подробного плана.
 
 |ACCESS_PATH
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |описание метода доступа для источника данных
 |===
 
@@ -316,11 +316,11 @@
 |идентификатор соединения для которого производится профилирование
 
 |USER_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |имя пользователя
 
 |DESCRIPTION
-|VARCHAR(255)
+|VARCHAR(255) CHARACTER SET UTF8
 |описание переданное в параметре `RDB$PROFILER.START_SESSION`
 
 |START_TIMESTAMP
@@ -359,19 +359,23 @@
 |родительский идентификатор запроса - относится к подпрограммам.
 
 |STATEMENT_TYPE
-|VARCHAR(20)
+|VARCHAR(20) CHARACTER SET UTF8
 |типа оператора BLOCK, FUNCTION, PROCEDURE или TRIGGER
 
+|SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы
+
 |PACKAGE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пакета
 
 |ROUTINE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя функции, процедуры или триггера
 
 |SQL_TEXT
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |SQL текст для типа BLOCK
 |===
 
@@ -398,15 +402,19 @@
 |идентификатор оператора
 
 |STATEMENT_TYPE
-|VARCHAR(20)
+|VARCHAR(20) CHARACTER SET UTF8
 |типа оператора BLOCK, FUNCTION, PROCEDURE или TRIGGER
 
+|SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы
+
 |PACKAGE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пакета
 
 |ROUTINE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя функции, процедуры или триггера
 
 |PARENT_STATEMENT_ID
@@ -414,15 +422,15 @@
 |идентификатор родительского оператора
 
 |PARENT_STATEMENT_TYPE
-|VARCHAR(20)
+|VARCHAR(20) CHARACTER SET UTF8
 |типа родительского оператора BLOCK, FUNCTION, PROCEDURE или TRIGGER
 
 |PARENT_ROUTINE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя родительской функции, процедуры или триггера
 
 |SQL_TEXT
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |SQL текст для операторов типа BLOCK
 
 |LINE_NUM
@@ -475,15 +483,19 @@
 |идентификатор оператора
 
 |STATEMENT_TYPE
-|VARCHAR(20)
+|VARCHAR(20) CHARACTER SET UTF8
 |типа оператора BLOCK, FUNCTION, PROCEDURE или TRIGGER
 
+|SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы
+
 |PACKAGE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пакета
 
 |ROUTINE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя функции, процедуры или триггера
 
 |PARENT_STATEMENT_ID
@@ -491,15 +503,15 @@
 |идентификатор родительского оператора
 
 |PARENT_STATEMENT_TYPE
-|VARCHAR(20)
+|VARCHAR(20) CHARACTER SET UTF8
 |типа родительского оператора BLOCK, FUNCTION, PROCEDURE или TRIGGER
 
 |PARENT_ROUTINE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя родительской функции, процедуры или триггера
 
 |SQL_TEXT
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |SQL текст для типа BLOCK
 
 |CURSOR_ID
@@ -507,7 +519,7 @@
 |идентификатор курсора
 
 |NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |имя явно объявленного курсора
 
 |CURSOR_LINE_NUM
@@ -531,7 +543,7 @@
 |уровень метода доступа. Необходим для расчёта отступов при конструировании плана.
 
 |ACCESS_PATH
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |описание метода доступа для источника данных
 
 |OPEN_COUNTER
@@ -596,15 +608,19 @@
 |идентификатор оператора
 
 |STATEMENT_TYPE
-|VARCHAR(20)
+|VARCHAR(20) CHARACTER SET UTF8
 |типа оператора BLOCK, FUNCTION, PROCEDURE или TRIGGER
 
+|SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы
+
 |PACKAGE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя пакета
 
 |ROUTINE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя функции, процедуры или триггера
 
 |PARENT_STATEMENT_ID
@@ -612,15 +628,15 @@
 |идентификатор родительского оператора
 
 |PARENT_STATEMENT_TYPE
-|VARCHAR(20)
+|VARCHAR(20) CHARACTER SET UTF8
 |типа родительского оператора BLOCK, FUNCTION, PROCEDURE или TRIGGER
 
 |PARENT_ROUTINE_NAME
-|CHAR(63)
+|CHAR(63) CHARACTER SET UTF8
 |Имя родительской функции, процедуры или триггера
 
 |SQL_TEXT
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |SQL текст для типа BLOCK
 
 |COUNTER
@@ -661,7 +677,7 @@
 ^| Описание
 
 |PLG$USER_NAME
-|VARCHAR(63)
+|VARCHAR(63) CHARACTER SET UTF8
 |Имя пользователя
 
 |PLG$VERIFIER
@@ -673,23 +689,23 @@
 |Соль
 
 |PLG$COMMENT
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Текстовый комментарий
 
 |PLG$FIRST
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Первое имя (имя)
 
 |PLG$MIDDLE
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Среднее имя (отчество)
 
 |PLG$LAST
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Последнее имя (фамилия)
 
 |PLG$ATTRIBUTES
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Пользовательские аттрибуты (теги)
 
 |PLG$ACTIVE
@@ -711,7 +727,7 @@
 ^| Описание
 
 |PLG$USER_NAME
-|VARCHAR(63)
+|VARCHAR(63) CHARACTER SET UTF8
 |Имя пользователя
 
 |PLG$VERIFIER
@@ -723,23 +739,23 @@
 |Соль
 
 |PLG$COMMENT
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Текстовый комментарий
 
 |PLG$FIRST
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Первое имя (имя)
 
 |PLG$MIDDLE
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Среднее имя (отчество)
 
 |PLG$LAST
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Последнее имя (фамилия)
 
 |PLG$ATTRIBUTES
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Пользовательские аттрибуты (теги)
 
 |PLG$ACTIVE
@@ -783,15 +799,15 @@ WHERE RDB$SYSTEM_PRIVILEGE(USER_MANAGEMENT) OR CURRENT_USER = PLG$SRP.PLG$USER_N
 ^| Описание
 
 |PLG$USER_NAME
-|VARCHAR(63)
+|VARCHAR(63) CHARACTER SET UTF8
 |Имя пользователя
 
 |PLG$GROUP_NAME
-|VARCHAR(63)
+|VARCHAR(63) CHARACTER SET UTF8
 |Имя группы
 
 |PLG$GROUP_NAME
-|VARCHAR(63)
+|VARCHAR(63) CHARACTER SET UTF8
 |Имя группы
 
 |PLG$UID
@@ -807,19 +823,19 @@ WHERE RDB$SYSTEM_PRIVILEGE(USER_MANAGEMENT) OR CURRENT_USER = PLG$SRP.PLG$USER_N
 |Хеш пароля
 
 |PLG$COMMENT
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Текстовый комментарий
 
 |PLG$FIRST_NAME
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Первое имя (имя)
 
 |PLG$MIDDLE_NAME
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Среднее имя (отчество)
 
 |PLG$LAST_NAME
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Последнее имя (фамилия)
 
 |===
@@ -838,15 +854,15 @@ WHERE RDB$SYSTEM_PRIVILEGE(USER_MANAGEMENT) OR CURRENT_USER = PLG$SRP.PLG$USER_N
 ^| Описание
 
 |PLG$USER_NAME
-|VARCHAR(63)
+|VARCHAR(63) CHARACTER SET UTF8
 |Имя пользователя
 
 |PLG$GROUP_NAME
-|VARCHAR(63)
+|VARCHAR(63) CHARACTER SET UTF8
 |Имя группы
 
 |PLG$GROUP_NAME
-|VARCHAR(63)
+|VARCHAR(63) CHARACTER SET UTF8
 |Имя группы
 
 |PLG$UID
@@ -862,19 +878,19 @@ WHERE RDB$SYSTEM_PRIVILEGE(USER_MANAGEMENT) OR CURRENT_USER = PLG$SRP.PLG$USER_N
 |Хеш пароля
 
 |PLG$COMMENT
-|BLOB SUB_TYPE TEXT
+|BLOB SUB_TYPE TEXT CHARACTER SET UTF8
 |Текстовый комментарий
 
 |PLG$FIRST_NAME
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Первое имя (имя)
 
 |PLG$MIDDLE_NAME
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Среднее имя (отчество)
 
 |PLG$LAST_NAME
-|VARCHAR(32)
+|VARCHAR(32) CHARACTER SET UTF8
 |Последнее имя (фамилия)
 
 |===
