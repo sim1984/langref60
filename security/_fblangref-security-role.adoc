@@ -22,7 +22,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE ROLE _rolename_
+CREATE ROLE [IF NOT EXISTS] _rolename_
 [SET SYSTEM PRIVILEGES TO <privileges_list>]
 
 <privileges_list> ::= <privilege> [, <privilege> [, <privilege> ...]]
@@ -51,6 +51,8 @@ CREATE ROLE _rolename_
 Желательно также чтобы имя роли было уникальным не только среди имён ролей, но и среди имён пользователей. Если вы создадите роль с тем же именем существующего пользователя, то такой пользователь не сможет подключиться к базе данных.
 ====
 
+Если используется предложение `IF NOT EXISTS`, то оператор `CREATE ROLE` попытается создать новую роль без выдачи ошибки, если она уже существует. DDL триггеры не будут запускаться, если роль уже существует.
+
 [[fblangref-security-roles-system]]
 === Роли с системными привилегиями
 
@@ -74,7 +76,7 @@ CREATE ROLE _rolename_
 Создание, изменение и удаление не системных записей в таблице `RDB$USER_TYPES`.
 
 `USE_NBACKUP_UTILITY`::
-Использование [app]``nbackup`` для создания резервных копий.
+Использование `nbackup` для создания резервных копий.
 
 `CHANGE_SHUTDOWN_MODE`::
 Закрытие базы данных (shutdown) и возвращение её в online.
@@ -167,6 +169,15 @@ CREATE ROLE _rolename_
 [source,sql]
 ----
 CREATE ROLE SELLERS;
+----
+====
+
+.Создание роли, если её не существует
+[example]
+====
+[source,sql]
+----
+CREATE ROLE IF NOT EXISTS SELLERS;
 ----
 ====
 
