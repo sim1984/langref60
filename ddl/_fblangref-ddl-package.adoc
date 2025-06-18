@@ -246,12 +246,12 @@ BEGIN
 END
 ----
 
-.Создание заголовка пакета в схеме APP
-[example]
-====
+То же самое, но процедуры и функции пакета будут выполняться с правами определяющего пользователя (владельца пакета).
+
 [source,sql]
 ----
-CREATE PACKAGE APP.APP_VAR
+CREATE PACKAGE APP_VAR
+SQL SECURITY DEFINER
 AS
 BEGIN
   FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC;
@@ -259,13 +259,14 @@ BEGIN
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE DEFAULT CURRENT_DATE);
 END
 ----
+====
 
-То же самое, но процедуры и функции пакета будут выполняться с правами определяющего пользователя (владельца пакета).
-
+.Создание заголовка пакета в схеме APP
+[example]
+====
 [source,sql]
 ----
-CREATE PACKAGE APP_VAR
-SQL SECURITY DEFINER
+CREATE PACKAGE APP.APP_VAR
 AS
 BEGIN
   FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC;
