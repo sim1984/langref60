@@ -19,7 +19,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-CREATE EXCEPTION [IF NOT EXISTS] [_schema_name_.] _exception_name_ '<message>'
+CREATE EXCEPTION [IF NOT EXISTS] \[__schema-name__.]_exception_name_ '<message>'
 
 <message> ::= <message-part> [<message-part> ...]
 
@@ -41,7 +41,7 @@ CREATE EXCEPTION [IF NOT EXISTS] [_schema_name_.] _exception_name_ '<message>'
 |Имя исключения.
 Максимальная длина 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |message
@@ -150,7 +150,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER EXCEPTION [_schema_name_.] _exception_name_ '<message>'
+ALTER EXCEPTION \[__schema-name__.]_exception_name_ '<message>'
 
 Подробнее см. в синтаксисе <<fblangref-ddl-exception-create-syntax,`CREATE EXCEPTION`>>
 ----
@@ -203,7 +203,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER EXCEPTION [_schema_name_.] _exception_name_ '<message>'
+CREATE OR ALTER EXCEPTION \[__schema-name__.]_exception_name_ '<message>'
 
 Подробнее см. в синтаксисе <<fblangref-ddl-exception-create-syntax,`CREATE EXCEPTION`>>
 ----
@@ -248,19 +248,8 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP EXCEPTION [IF EXISTS] [_schema_name_.] _exception_name_
+DROP EXCEPTION [IF EXISTS] \[__schema-name__.]_exception_name_
 ----
-
-[[fblangref-ddl-tbl-dropexcep]]
-.Параметры оператора `DROP EXCEPTION`
-[cols="<1,<3", options="header",stripes="none"]
-|===
-^| Параметр
-^| Описание
-
-|exception_name
-|Имя исключения.
-|===
 
 Оператор `DROP EXCEPTION` удаляет пользовательское исключение.
 
@@ -321,7 +310,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE EXCEPTION [_schema_name_.] _exception_name_ '<message>'
+RECREATE EXCEPTION \[__schema-name__.]_exception_name_ '<message>'
 
 Подробнее см. в синтаксисе <<fblangref-ddl-exception-create-syntax,`CREATE EXCEPTION`>>
 ----

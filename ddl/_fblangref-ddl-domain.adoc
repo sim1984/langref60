@@ -17,12 +17,12 @@
 DSQL, ESQL.
 
 .Синтаксис
-[listing,subs="+quotes,macros"]
+[listing,subs="+quotes,,attributes,macros"]
 ----
-CREATE DOMAIN [IF NOT EXISTS] [_schema_name_.] _domain_name_ [AS] <datatype>
+CREATE DOMAIN [IF NOT EXISTS] \[__schema-name__.]_domain_name_ [AS] <datatype>
   [DEFAULT {<literal> | NULL | <context_var>}]
   [NOT NULL] [CHECK (<dom_condition>)]
-  [COLLATE [_schema_name_.]_collation_name_];
+  [COLLATE [_schema-name_.{endsb}__collation__] ;
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype> | <array_datatype>
@@ -63,8 +63,8 @@ CREATE DOMAIN [IF NOT EXISTS] [_schema_name_.] _domain_name_ [AS] <datatype>
   | <context_var>
   | <expression>
   | NULL
-  | NEXT VALUE FOR [_schema_name_.]_genname_
-  | GEN_ID([_schema_name_.]_genname_, <val>)
+  | NEXT VALUE FOR \[__schema-name__.]_genname_
+  | GEN_ID(\[__schema-name__.]_genname_, <val>)
   | CAST(<val> AS <cast_type>)
   | (<select_one>)
   | _func_(<val> [, <val> ...])
@@ -72,8 +72,8 @@ CREATE DOMAIN [IF NOT EXISTS] [_schema_name_.] _domain_name_ [AS] <datatype>
 
 <cast_type> ::=
    <datatype>
-  | [TYPE OF] [_schema_name_.]_domain_
-  | TYPE OF COLUMN [_schema_name_.]_rel_._col_
+  | [TYPE OF] \[__schema-name__.]_domain_
+  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
 ----
 
 
@@ -88,7 +88,7 @@ CREATE DOMAIN [IF NOT EXISTS] [_schema_name_.] _domain_name_ [AS] <datatype>
 |Имя домена.
 Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы
 
 |datatype
@@ -282,7 +282,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER DOMAIN [_schema_name_.] _domain_name_
+ALTER DOMAIN \[__schema-name__.]_domain_name_
   [TO _new_name_]
   [TYPE <datatype>]
   [{SET DEFAULT {<literal> | NULL | <context_var>}} | DROP DEFAULT]
@@ -328,8 +328,8 @@ ALTER DOMAIN [_schema_name_.] _domain_name_
   | <context_var>
   | <expression>
   | NULL
-  | NEXT VALUE FOR [_schema_name_.]_genname_
-  | GEN_ID([_schema_name_.]_genname_, <val>)
+  | NEXT VALUE FOR \[__schema-name__.]_genname_
+  | GEN_ID(\[__schema-name__.]_genname_, <val>)
   | CAST(<val> AS <cast_type>)
   | (<select_one>)
   | _func_(<val> [, <val> ...])
@@ -337,8 +337,8 @@ ALTER DOMAIN [_schema_name_.] _domain_name_
 
 <cast_type> ::=
     <datatype>
-  | [TYPE OF] [_schema_name_.]_domain_
-  | TYPE OF COLUMN [_schema_name_.]_rel_._col_
+  | [TYPE OF] \[__schema-name__.]_domain_
+  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
 ----
 
 [[fblangref-ddl-tbl-alterdomn]]
@@ -351,7 +351,7 @@ ALTER DOMAIN [_schema_name_.] _domain_name_
 |domain_name
 |Имя домена.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |new_name
@@ -537,7 +537,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP DOMAIN [IF EXISTS] [_schema_name_.] _domain_name_
+DROP DOMAIN [IF EXISTS] \[__schema-name__.]_domain_name_
 ----
 
 
@@ -550,7 +550,7 @@ DROP DOMAIN [IF EXISTS] [_schema_name_.] _domain_name_
 |domain_name
 |Имя домена.
 
-|schema_name
+|schema-name
 |Имя схемы.
 |===
 

@@ -25,7 +25,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE {SEQUENCE | GENERATOR} [IF NOT EXISTS] [_schema_name_.] _seq_name_
+CREATE {SEQUENCE | GENERATOR} [IF NOT EXISTS] \[__schema-name__.]_seq_name_
 [START WITH _start_value_] [INCREMENT [BY] _increment_]
 ----
 
@@ -39,7 +39,7 @@ CREATE {SEQUENCE | GENERATOR} [IF NOT EXISTS] [_schema_name_.] _seq_name_
 |seq_name
 |Имя последовательности (генератора). Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |start_value
@@ -172,7 +172,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-ALTER {SEQUENCE | GENERATOR} [_schema_name_.] _seq_name_
+ALTER {SEQUENCE | GENERATOR} \[__schema-name__.]_seq_name_
 [RESTART [WITH _newvalue_]]
 [INCREMENT [BY] _increment_]
 ----
@@ -187,7 +187,7 @@ ALTER {SEQUENCE | GENERATOR} [_schema_name_.] _seq_name_
 |seq_name
 |Имя последовательности (генератора).
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |newvalue
@@ -293,7 +293,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE OR ALTER {SEQUENCE | GENERATOR} [_schema_name_.] _seq_name_
+CREATE OR ALTER {SEQUENCE | GENERATOR} \[__schema-name__.]_seq_name_
 [{START WITH _start_value_ | RESTART}]
 [INCREMENT [BY] _increment_]
 ----
@@ -308,7 +308,7 @@ CREATE OR ALTER {SEQUENCE | GENERATOR} [_schema_name_.] _seq_name_
 |seq_name
 |Имя последовательности (генератора). Может содержать до 63 символов.
 
-|schena_name
+|schema-name
 |Имя схемы.
 
 |start_value
@@ -366,7 +366,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP {SEQUENCE | GENERATOR} [IF EXISTS] [_schema_name_.] _seq_name_
+DROP {SEQUENCE | GENERATOR} [IF EXISTS] \[__schema-name__.]_seq_name_
 ----
 
 [[fblangref-ddl-tbl-dropseq]]
@@ -379,7 +379,7 @@ DROP {SEQUENCE | GENERATOR} [IF EXISTS] [_schema_name_.] _seq_name_
 |seq_name
 |Имя последовательности (генератора).
 
-|schema_name
+|schema-name
 |Имя схемы.
 |===
 
@@ -446,7 +446,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-RECREATE {SEQUENCE | GENERATOR} [_schema_name_.] _seq_name_
+RECREATE {SEQUENCE | GENERATOR} \[__schema-name__.]_seq_name_
   [START WITH _start_value_]
   [INCREMENT [BY] _increment_];
 ----
@@ -461,7 +461,7 @@ RECREATE {SEQUENCE | GENERATOR} [_schema_name_.] _seq_name_
 |seq_name
 |Имя последовательности (генератора). Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |start_value
@@ -511,7 +511,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-SET GENERATOR [_schema_name_.] _seq_name_ TO _new_val_
+SET GENERATOR \[__schema-name__.]_seq_name_ TO _new_val_
 ----
 
 [[fblangref-ddl-tbl-setgen]]
@@ -524,7 +524,7 @@ SET GENERATOR [_schema_name_.] _seq_name_ TO _new_val_
 |seq_name
 |Имя последовательности (генератора).
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |new_val

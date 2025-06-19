@@ -17,9 +17,9 @@ DSQL, ESQL
 
 [[fblangref-ddl-proc-create-syntax]]
 .Синтаксис
-[listing,subs="+quotes,macros"]
+[listing,subs="+quotes,macros,attributes"]
 ----
-CREATE PROCEDURE [IF NOT EXISTS] [_schema_name_.] _procname_ [( <in_params> )]
+CREATE PROCEDURE [IF NOT EXISTS] \[__schema-name__.]_procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine body>
 
@@ -33,12 +33,12 @@ CREATE PROCEDURE [IF NOT EXISTS] [_schema_name_.] _procname_ [( <in_params> )]
 
 <value> ::=  {_literal_ | NULL | _context_var_}
 
-<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema_name_.]_collation_]
+<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
 
 <type> ::=
     <datatype>
-  | [TYPE OF] [_schema_name_.] _domain_name_
-  | TYPE OF COLUMN [_schema_name_.] _rel_._col_
+  | [TYPE OF] \[__schema-name__.]_domain_
+  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -80,7 +80,7 @@ CREATE PROCEDURE [IF NOT EXISTS] [_schema_name_.] _procname_ [( <in_params> )]
 |procname
 |Имя хранимой процедуры. Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |inparam
@@ -369,7 +369,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER PROCEDURE [_schema_name_.] _procname_ [( <in_params> )]
+ALTER PROCEDURE \[__schema-name__.]_procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 
@@ -448,7 +448,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER PROCEDURE [_schema_name_.] _procname_ [( <in_params> )]
+CREATE OR ALTER PROCEDURE \[__schema-name__.]_procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 
@@ -505,7 +505,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP PROCEDURE [IF EXISTS] [_schema_name_.] _procname_
+DROP PROCEDURE [IF EXISTS] \[__schema-name__.]_procname_
 ----
 
 .Параметры оператора `DROP PROCEDURE`
@@ -517,7 +517,7 @@ DROP PROCEDURE [IF EXISTS] [_schema_name_.] _procname_
 |procname
 |Имя хранимой процедуры.
 
-|schema_name
+|schema-name
 |Имя схемы.
 |===
 
@@ -580,7 +580,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE PROCEDURE [_schema_name_.] _procname_ [( <in_params> )]
+RECREATE PROCEDURE \[__schema-name__.]_procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 

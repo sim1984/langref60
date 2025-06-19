@@ -18,11 +18,11 @@
 DSQL
 
 .Синтаксис
-[listing,subs="+quotes"]
+[listing,subs="+quotes,attributes"]
 ----
-CREATE COLLATION [IF NOT EXISTS] [_schema_name_.] _collname_
-FOR [_schema_name_.] _charset_
-[FROM [_schema_name_.] _basecoll_ | FROM EXTERNAL ('_extname_')]
+CREATE COLLATION [IF NOT EXISTS] \[__schema-name__.]_collname_
+FOR \[__schema-name__.]_charset_
+[FROM [_schema-name_.{endsb}__basecoll__ | FROM EXTERNAL ('_extname_')]
 [NO PAD | PAD SPACE]
 [CASE [IN]SENSITIVE]
 [ACCENT [IN]SENSITIVE]
@@ -40,7 +40,7 @@ FOR [_schema_name_.] _charset_
 ^| Параметр
 ^| Описание
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |collname
@@ -249,22 +249,8 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP COLLATION [IF EXISTS] [_schema_name_.] _collname_
+DROP COLLATION [IF EXISTS] \[__schema-name__.]_collname_
 ----
-
-[[fblangref-ddl-tbl-collatdrp]]
-.Параметры оператора `DROP COLLATION`
-[cols="<1,<3", options="header",stripes="none"]
-|===
-^| Параметр
-^| Описание
-
-|schema_name
-|Имя схемы.
-
-|collname
-|Имя сортировки.
-|===
 
 Оператор `DROP COLLATION` удаляет указанную сортировку. Сортировка должна присутствовать в базе данных, иначе будет выдана соответствующая ошибка. Если указано только имя сортировки, то его поиск происходит в текущей схеме.
 

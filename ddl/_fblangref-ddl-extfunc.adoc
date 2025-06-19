@@ -39,9 +39,9 @@ UDF принципиально небезопасны. Мы рекомендуе
 DSQL, ESQL
 
 .Синтаксис
-[listing,subs="+quotes,macros"]
+[listing,subs="+quotes,macros,attributes"]
 ----
-DECLARE EXTERNAL FUNCTION [IF NOT EXISTS] [_schema_name_.] _funcname_
+DECLARE EXTERNAL FUNCTION [IF NOT EXISTS] \[__schema-name__.]_funcname_
   [{ <arg_desc_list> | ( <arg_desc_list> ) }]
   RETURNS { <return_value> | ( <return_value> ) }
   ENTRY_POINT '_entry_point_' MODULE_NAME '_library_name_'
@@ -55,7 +55,7 @@ DECLARE EXTERNAL FUNCTION [IF NOT EXISTS] [_schema_name_.] _funcname_
 <udf_data_type> ::=
     <scalar_datatype>
   | BLOB
-  | CSTRING(_length_) [ CHARACTER SET [_schema_name_.] _charset_ ]
+  | CSTRING(_length_) [ CHARACTER SET [_schema-name_.{endsb}__charset__ ]
 
 <return_value> ::=
     <udf_data_type> { BY VALUE | BY DESCRIPTOR [FREE_IT] | FREE_IT }
@@ -75,7 +75,7 @@ DECLARE EXTERNAL FUNCTION [IF NOT EXISTS] [_schema_name_.] _funcname_
 |Имя внешней функции.
 Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |entry_point
@@ -223,7 +223,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-ALTER EXTERNAL FUNCTION [_schema_name_.] _funcname_
+ALTER EXTERNAL FUNCTION \[__schema-name__.]_funcname_
 [ENTRY_POINT '_new_entry_point_']
 [MODULE_NAME '_new_library_name_'];
 ----
@@ -237,7 +237,7 @@ ALTER EXTERNAL FUNCTION [_schema_name_.] _funcname_
 |funcname
 |Имя внешней функции.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |new_entry_point
@@ -304,7 +304,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP EXTERNAL FUNCTION [IF EXISTS] [_schema_name_.] _funcname_
+DROP EXTERNAL FUNCTION [IF EXISTS] \[__schema-name__.]_funcname_
 ----
 
 
@@ -317,7 +317,7 @@ DROP EXTERNAL FUNCTION [IF EXISTS] [_schema_name_.] _funcname_
 |funcname
 |Имя внешней функции.
 
-|schema_name
+|schema-name
 |Имя схемы.
 |===
 

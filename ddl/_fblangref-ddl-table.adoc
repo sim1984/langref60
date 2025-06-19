@@ -17,9 +17,9 @@ DSQL, ESQL
 
 [[fblangref-ddl-tbl-create-syntax]]
 .Синтаксис
-[listing,subs="+quotes,macros"]
+[listing,subs="+quotes,macros,attributes"]
 ----
-CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.] _tablename_
+CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] \[__schema-name__.]_tablename_
   [EXTERNAL [FILE] '_filespec_']
   (<col_def> [, <col_def> | <tconstraint> ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]
@@ -32,15 +32,15 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.] _tablename_
   | <identity_col_def>
 
 <regular_col_def> ::=
-  _colname_ { <datatype> | [_schema_name_.] _domain_name_ }
+  _colname_ { <datatype> | \[__schema-name__.]_domain_name_ }
   [DEFAULT {<literal> | NULL | <context_var>}]
   [NOT NULL]
   [<col_constraint>]
-  [COLLATE _collation_name_]
+  [COLLATE [_schema-name_.{endsb}__collation_name__]
 
 
 <computed_col_def> ::=
-  _colname_ [{ <datatype> | [_schema_name_.] _domain_name_ }]
+  _colname_ [{ <datatype> | [_schema-name_.{endsb}__domain_name__ }]
   {COMPUTED [BY] | GENERATED ALWAYS AS} (<expression>)
 
 <identity_col_def> ::=
@@ -68,7 +68,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.] _tablename_
 <col_constraint> ::= [CONSTRAINT _constr_name_]
 {   UNIQUE [<using_index>]
   | PRIMARY KEY [<using_index>]
-  | REFERENCES [_schema_name_.]_other_table_ [(_other_col_)]
+  | REFERENCES \[__schema-name__.]_other_table_ [(_other_col_)]
       [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [<using_index>]
@@ -79,7 +79,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.] _tablename_
 {   UNIQUE (<col_list>) [<using_index>]
   | PRIMARY KEY (<col_list>) [<using_index>]
   | FOREIGN KEY (<col_list>)
-    REFERENCES [_schema_name_.] _other_table_ [(<col_list>)]
+    REFERENCES \[__schema-name__.]_other_table_ [(<col_list>)]
       [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [<using_index>]
@@ -88,7 +88,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.] _tablename_
 
 <col_list> ::= _colname_ [, _colname_ ...]
 
-<using_index> ::= USING [ASC[ENDING] | DESC[ENDING]] INDEX _indexname_
+<using_index> ::= USING [ASC[ENDING] | DESC[ENDING]] INDEX \[__schema-name__.]_indexname_
 
 <check_condition> ::=
     <val> <operator> <val>
@@ -120,16 +120,16 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.] _tablename_
   | <context_var>
   | <expression>
   | NULL
-  | NEXT VALUE FOR [_schema_name_.] _genname_
-  | GEN_ID([_schema_name_.] _genname_, <val>)
+  | NEXT VALUE FOR \[__schema-name__.]_genname_
+  | GEN_ID(\[__schema-name__.]_genname_, <val>)
   | CAST(<val> AS <cast_type>)
   | (<select_one>)
-  | [_schema_name_.] _func_(<val> [, <val> ...])
+  | \[__schema-name__.]_func_(<val> [, <val> ...])
 
 <cast_type> ::=
    <datatype>
-  | [TYPE OF] [_schema_name_.] _domain_name_
-  | TYPE OF COLUMN [_schema_name_.] _rel_._colname_
+  | [TYPE OF] \[__schema-name__.]_domain_name_
+  | TYPE OF COLUMN \[__schema-name__.]_rel_._colname_
 ----
 
 
@@ -143,7 +143,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [_schema_name_.] _tablename_
 |tablename
 |Имя таблицы, может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |filespec
@@ -1112,7 +1112,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,attributes,macros"]
 ----
-ALTER TABLE [_schema_name_.] _tablename_
+ALTER TABLE \[__schema-name__.]_tablename_
   <operation> [, <operation>];
 
 <operation> ::=
@@ -1131,7 +1131,7 @@ ALTER TABLE [_schema_name_.] _tablename_
   | <identity_col_def>
 
 <regular_col_def> ::=
-  colname { <datatype> | [_schema_name_.] _domainname_ }
+  colname { <datatype> | \[__schema-name__.]_domainname_ }
   [DEFAULT {literal | NULL | <context_var>}]
   [NOT NULL]
   [<col_constraint>]
@@ -1154,7 +1154,7 @@ ALTER TABLE [_schema_name_.] _tablename_
   | <identity_col_mod>
 
 <regular_col_mod> ::=
-  |  TYPE { <datatype>  | [_schema_name_.] _domain_name_ }
+  |  TYPE { <datatype>  | \[__schema-name__.]_domain_name_ }
   |  SET DEFAULT {_literal_ | NULL | <context_var>}
   |  DROP DEFAULT
   |  SET NOT NULL
@@ -1185,7 +1185,7 @@ ALTER TABLE [_schema_name_.] _tablename_
   [CONSTRAINT _constr_name_]
   {   UNIQUE [<using_index>]
     | PRIMARY KEY [<using_index>]
-    | REFERENCES [_schema_name_.] _other_table_ [(_other_col_)]
+    | REFERENCES \[__schema-name__.]_other_table_ [(_other_col_)]
         [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [<using_index>]
@@ -1197,7 +1197,7 @@ ALTER TABLE [_schema_name_.] _tablename_
   {   UNIQUE (<col_list>) [<using_index>]
     | PRIMARY KEY (<col_list>) [<using_index>]
     | FOREIGN KEY (<col_list>)
-      REFERENCES [_schema_name_.] _other_table_ [(<col_list>)]
+      REFERENCES \[__schema-name__.]_other_table_ [(<col_list>)]
         [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [<using_index>]
@@ -1238,17 +1238,17 @@ ALTER TABLE [_schema_name_.] _tablename_
   | <context_var>
   | <expression>
   | NULL
-  | NEXT VALUE FOR [_schema_name_.] _genname_
-  | GEN_ID([_schema_name_.] _genname_, <val>)
+  | NEXT VALUE FOR \[__schema-name__.]_genname_
+  | GEN_ID(\[__schema-name__.]_genname_, <val>)
   | CAST(<val> AS <datatype>)
   | (<select_one>)
-  | [_schema_name_.] func(<val> [, <val> ...])
+  | \[__schema-name__.]_func_(<val> [, <val> ...])
 
 
 <cast_type> ::=
    <datatype>
-  | [TYPE OF] [_schema_name_.] _domain_name_
-  | TYPE OF COLUMN [_schema_name_.] _rel_._colname_
+  | [TYPE OF] \[__schema-name__.]_domain_name_
+  | TYPE OF COLUMN \[__schema-name__.]_rel_._colname_
 ----
 
 [[fblangref-ddl-tbl-altertbl]]
@@ -1261,7 +1261,7 @@ ALTER TABLE [_schema_name_.] _tablename_
 |tablename
 |Имя таблицы.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |operation
@@ -2046,7 +2046,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP TABLE [IF EXISTS] [_schema_name_.] _tablename_
+DROP TABLE [IF EXISTS] \[__schema-name__.]_tablename_
 ----
 
 .Параметры оператора `DROP TABLE`
@@ -2058,7 +2058,7 @@ DROP TABLE [IF EXISTS] [_schema_name_.] _tablename_
 |tablename
 |Имя таблицы.
 
-|schema_name
+|schema-name
 |Имя схемы.
 |===
 
@@ -2126,7 +2126,7 @@ DSQL.
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-RECREATE [GLOBAL TEMPORARY] TABLE [_schema_name_.] _tablename_
+RECREATE [GLOBAL TEMPORARY] TABLE \[__schema-name__.]_tablename_
   [EXTERNAL [FILE] '_filespec_']
   (<col_def> [, <col_def> | <tconstraint> ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]

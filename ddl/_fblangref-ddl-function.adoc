@@ -20,10 +20,10 @@ DSQL
 
 [[fblangref-ddl-func-create-syntax]]
 .Синтаксис
-[listing,subs="+quotes,macros"]
+[listing,subs="+quotes,macros,attributes"]
 ----
-CREATE FUNCTION [IF NOT EXISTS] [_schema_name_.] _funcname_ [( <in_params> )]
-  RETURNS <type> [NOT NULL] [COLLATE [_schema_name_.] _collation_]
+CREATE FUNCTION [IF NOT EXISTS] \[__schema-name__.]_funcname_ [( <in_params> )]
+  RETURNS <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
   [DETERMINISTIC]
   <routine-body>
 
@@ -33,12 +33,12 @@ CREATE FUNCTION [IF NOT EXISTS] [_schema_name_.] _funcname_ [( <in_params> )]
 
 <value> ::=  {<literal> | NULL | <context_var>}
 
-<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema_name_.] _collation_]
+<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
 
 <type> ::=
     <datatype>
-  | [TYPE OF] [_schema_name_.] _domain_
-  | TYPE OF COLUMN [_schema_name_.] _rel_._col_
+  | [TYPE OF] \[__schema-name__.]_domain_
+  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -80,7 +80,7 @@ CREATE FUNCTION [IF NOT EXISTS] [_schema_name_.] _funcname_ [( <in_params> )]
 |funcname
 |Имя хранимой функции. Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |inparam
@@ -490,10 +490,10 @@ END
 DSQL
 
 .Синтаксис
-[listing,subs="+quotes,macros"]
+[listing,subs="+quotes,macros,attributes"]
 ----
-ALTER FUNCTION [_schema_name_.] _funcname_ [( <in_params> )]
-RETURNS <type> [COLLATE [_schema_name_.] _collation_]
+ALTER FUNCTION \[__schema-name__.]_funcname_ [( <in_params> )]
+RETURNS <type> [COLLATE [_schema-name_.{endsb}__collation__]
 [DETERMINISTIC]
 <routine-body>
 
@@ -557,10 +557,10 @@ END
 DSQL
 
 .Синтаксис
-[listing,subs="+quotes,macros"]
+[listing,subs="+quotes,macros,attributes"]
 ----
-CREATE OR ALTER FUNCTION [_schema_name_.] _funcname_ [( <in_params> )]
-RETURNS <type> [COLLATE [_schema_name_.] _collation_]
+CREATE OR ALTER FUNCTION \[__schema-name__.]_funcname_ [( <in_params> )]
+RETURNS <type> [COLLATE [_schema-name_.{endsb}__collation__]
 [DETERMINISTIC]
 <routine-body>
 
@@ -610,7 +610,7 @@ DSQL
 
 [listing,subs="+quotes"]
 ----
-DROP FUNCTION [IF EXISTS] [_schema_name_.] _funcname_
+DROP FUNCTION [IF EXISTS] \[__schema-name__.]_funcname_
 ----
 
 
@@ -623,7 +623,7 @@ DROP FUNCTION [IF EXISTS] [_schema_name_.] _funcname_
 |funcname
 |Имя хранимой функции.
 
-|schema_name
+|schema-name
 |Имя схемы.
 |===
 
@@ -684,10 +684,10 @@ DROP FUNCTION IF EXISTS ADD_INT;
 DSQL
 
 .Синтаксис
-[listing,subs="+quotes,macros"]
+[listing,subs="+quotes,macros,attributes"]
 ----
-RECREATE FUNCTION [_schema_name_.] _funcname_ [( <in_params> )]
-RETURNS <type> [COLLATE _collation_]
+RECREATE FUNCTION \[__schema-name__.]_funcname_ [( <in_params> )]
+RETURNS <type> [COLLATE [_schema-name_.{endsb}__collation__]
 [DETERMINISTIC]
 <routine-body>
 

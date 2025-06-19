@@ -18,8 +18,8 @@ DSQL, ESQL.
 [listing,subs=+quotes]
 ----
 CREATE [UNIQUE] [ASC[ENDING] | DESC[ENDING]]
-INDEX [IF NOT EXISTS] [_schema_name_.] _indexname_ [{ACTIVE | INACTIVE}]
-ON [_schema_name_.] _tablename_
+INDEX [IF NOT EXISTS] \[__schema-name__.]_indexname_ [{ACTIVE | INACTIVE}]
+ON \[__schema-name__.]_tablename_
 {(<column_list>) | COMPUTED [BY] (<value_expression>)}
 [WHERE <search_condition>]
 
@@ -37,7 +37,7 @@ ON [_schema_name_.] _tablename_
 |Имя индекса.
 Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |tablename
@@ -365,7 +365,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-ALTER INDEX [_schema_name_.] _indexname_ {ACTIVE | INACTIVE};
+ALTER INDEX \[__schema-name__.]_indexname_ {ACTIVE | INACTIVE};
 ----
 
 [[fblangref-ddl-idx-alteridx]]
@@ -378,7 +378,7 @@ ALTER INDEX [_schema_name_.] _indexname_ {ACTIVE | INACTIVE};
 |indexname
 |Имя индекса.
 
-|schema_name
+|schema-name
 |Имя схемы.
 |===
 
@@ -473,7 +473,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP INDEX [IF EXISTS] [_schema_name_.] _indexname_
+DROP INDEX [IF EXISTS] \[__schema-name__.]_indexname_
 ----
 
 .Параметры оператора `DROP INDEX`
@@ -485,7 +485,7 @@ DROP INDEX [IF EXISTS] [_schema_name_.] _indexname_
 |indexname
 |Имя индекса.
 
-|schema_name
+|schema-name
 |Имя схемы.
 |===
 
@@ -552,7 +552,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-SET STATISTICS INDEX [_schema_name_.] _indexname_
+SET STATISTICS INDEX \[__schema-name__.]_indexname_
 ----
 
 .Параметры оператора `SET STATISTICS`
@@ -564,7 +564,7 @@ SET STATISTICS INDEX [_schema_name_.] _indexname_
 |indexname
 |Имя индекса.
 
-|schema_name
+|schema-name
 |Имя схемы, в которой находится индекс.
 |===
 

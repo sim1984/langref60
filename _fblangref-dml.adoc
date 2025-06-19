@@ -433,9 +433,10 @@ FROM <table-reference> [, <table-reference> ...]
   | <parenthesized-joined-table>
 
 <table-or-query-name> ::=
-    table-name
-  | query-name
-  | [package-name.]procedure-name [(<procedure-args>)]
+    \[__schema-name__.]_table-name_
+  | [_schema-name_.]\[__package-name__.]_procedure-name_ [(<procedure-args>)]
+  | _query-name_
+
 
 <procedure-args> ::= <value-expression [, <value-expression> ...]
 
@@ -453,6 +454,9 @@ FROM <table-reference> [, <table-reference> ...]
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы.
 
 |table-name
 |Имя таблицы или представления.
@@ -1022,23 +1026,24 @@ FROM <table-reference> [, <table-reference> ...]
 <table-reference> ::= <table-primary> | <joined-table>
 
 <table-primary> ::=
-    <table-or-query-name> [[AS] correlation-name]
+    <table-or-query-name> [[AS] _correlation-name_]
   | [LATERAL] <derived-table> [<correlation-or-recognition>]
   | <parenthesized-joined-table>
 
 <table-or-query-name> ::=
-    table-name
-  | query-name
-  | [package-name.]procedure-name [(<procedure-args>)]
+    \[__schema-name__.]_table-name_
+  | [_schema-name_.]\[__package-name__.]_procedure-name_ [(<procedure-args>)]
+  | _query-name_
+
 
 <procedure-args> ::= <value-expression [, <value-expression> ...]
 
 <derived-table> ::= (<query-expression>)
 
 <correlation-or-recognition> ::=
-  [AS] correlation-name [(<column-name-list>)]
+  [AS] _correlation-name_ [(<column-name-list>)]
 
-<column-name-list> ::= column-name [, column-name ...]
+<column-name-list> ::= _column-name_ [, _column-name_ ...]
 
 <parenthesized-joined-table> ::=
     (<parenthesized-joined-table>)
@@ -1069,6 +1074,9 @@ FROM <table-reference> [, <table-reference> ...]
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы.
 
 |table-name
 |Имя таблицы или представления.
@@ -3952,9 +3960,9 @@ FROM
   | <parenthesized-joined-table>
 
 <table-or-query-name> ::=
-    _table-name_
+    \[__schema-name__.]_table-name_
+  | [_schema-name_.]\[__package-name__.]_procedure-name_ [(<procedure-args>)]
   | _query-name_
-  | \[__package-name__.]_procedure-name_ [(<procedure-args>)]
 
 <procedure-args> ::= <value-expression> [, <value-expression> ...]
 
@@ -4059,7 +4067,7 @@ DSQL, ESQL, PSQL
 .Синтаксис
 [listing,subs="+quotes,attributes"]
 ----
-INSERT INTO _target_ [(<column_list>)]
+INSERT INTO \[__schema-name__.]_target_ [(<column_list>)]
   [OVERRIDE {SYSTEM | USER} VALUE]
   {DEFAULT VALUES | <value_source>}
   [RETURNING <returning_list> [INTO <variables>]]
@@ -4075,12 +4083,12 @@ INSERT INTO _target_ [(<column_list>)]
 <returning_list> ::= * | <output_column> [, <output_column]
 
 <output_column> ::=
-    _target_.*
-  | <return_expression> [COLLATE _collation_] [[AS] _alias_]
+    \[__schema-name__.]_target_.*
+  | <return_expression> [COLLATE [_schema-name_.{endsb}__collation__] [[AS] _alias_]
 
 <return_expression> ::=
     <value_expression>
-  | [_target_.{endsb}__col_name__
+  | [[_schema-name_.] _target_.{endsb}__col_name__
 
 <value_expression> ::=
     <literal>
@@ -4096,6 +4104,9 @@ INSERT INTO _target_ [(<column_list>)]
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы.
 
 |target
 |Имя таблицы или представления, в которую происходит вставка новой записи или записей.
@@ -4374,7 +4385,7 @@ DSQL, ESQL, PSQL
 .Синтаксис
 [listing,subs="+quotes,attributes"]
 ----
-UPDATE _target_ [[AS] _alias_]
+UPDATE \[__schema-name__.]_target_ [[AS] _alias_]
   SET _col_name_ = <upd_value> [, _col_name_ = <upd_value> ...]
   [WHERE {<search-conditions> | CURRENT OF _cursorname_}]
   [PLAN <plan_items>]
@@ -4388,12 +4399,13 @@ UPDATE _target_ [[AS] _alias_]
 <returning_list> ::= * | <output_column> [, <output_column]
 
 <output_column> ::=
-    _target_.* | NEW.* | OLD.*
-  | <return_expression> [COLLATE _collation_] [[AS] _ret_alias_]
+    \[__schema-name__.]_target_.*
+  | NEW.* | OLD.*
+  | <return_expression> [COLLATE [_schema-name_.{endsb}_collation_] [[AS] _ret_alias_]
 
 <return_expression> ::=
     <value_expression>
-  | [_target_.{endsb}__col_name__
+  | [[_schema-name_.{endsb}__target__.{endsb}__col_name__
   | NEW._col_name_
   | OLD._col_name_
 
@@ -4411,6 +4423,9 @@ UPDATE _target_ [[AS] _alias_]
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы.
 
 |target
 |Имя таблицы или представления, в которой происходит обновление записей.
@@ -4758,7 +4773,7 @@ DSQL, PSQL
 .Синтаксис
 [listing,subs="+quotes,attributes"]
 ----
-UPDATE OR INSERT INTO _target_ [(<column_list>)]
+UPDATE OR INSERT INTO \[__schema-name__.]_target_ [(<column_list>)]
   VALUES (<value_list>)
   [MATCHING (<column_list>)]
   [RETURNING <returning_list> [INTO <variables>]]
@@ -4772,12 +4787,13 @@ UPDATE OR INSERT INTO _target_ [(<column_list>)]
 <returning_list> ::= * | <output_column> [, <output_column]
 
 <output_column> ::=
-    _target_.* | NEW.* | OLD.*
-  | <return_expression> [COLLATE _collation_] [[AS] _alias_]
+    \[__schema-name__.]_target_.*
+  | NEW.* | OLD.*
+  | <return_expression> [COLLATE [_schema-name_.{endsb}__collation__] [[AS] _alias_]
 
 <return_expression> ::=
     <value_expression>
-  | [_target_.{endsb}__col_name__
+  | [[_schema-name_.{endsb}__target__.{endsb}__col_name__
   | NEW._col_name_
   | OLD._col_name_
 
@@ -4795,6 +4811,9 @@ UPDATE OR INSERT INTO _target_ [(<column_list>)]
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы.
 
 |target
 |Имя таблицы или представления, запись в которой будет обновлена или произойдет вставка новой записи.
@@ -4911,7 +4930,7 @@ DSQL, ESQL, PSQL
 [listing,subs="+quotes,attributes"]
 ----
 DELETE
-  FROM _target_ [[AS] _alias_]
+  FROM \[__schema-name__.]_target_ [[AS] _alias_]
   [WHERE {<search-conditions> | CURRENT OF _cursorname_}]
   [PLAN <plan_items>]
   [ORDER BY <sort_items>]
@@ -4922,12 +4941,12 @@ DELETE
 <returning_list> ::= * | <output_column> [, <output_column]
 
 <output_column> ::=
-    _target_.*
-  | <return_expression> [COLLATE _collation_] [[AS] _ret_alias_]
+    \[__schema-name__.]_target_.*
+  | <return_expression> [COLLATE [_schema-name_.{endsb}__collation__] [[AS] _ret_alias_]
 
 <return_expression> ::=
     <value_expression>
-  | [_target_.{endsb}__col_name__
+  | [[_schema-name_.{endsb}__target__.{endsb}__col_name__
 
 <value_expression> ::=
     <literal>
@@ -4944,6 +4963,9 @@ DELETE
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы.
 
 |target
 |Имя таблицы или представления, из которой удаляются записи.
@@ -5245,7 +5267,7 @@ DSQL, PSQL
 [listing,subs="+quotes,attributes"]
 ----
 MERGE
-  INTO _target_ [[AS] _target_alias_]
+  INTO \[__schema-name__.]_target_ [[AS] _target_alias_]
   USING <source> [[AS] _source_alias_]
   ON <join condition>
   <merge when> [<merge when> ...]
@@ -5253,7 +5275,7 @@ MERGE
   [<order by clause>]
   [<returning clause>]
 
-<source> ::= _tablename_ | (<select_stmt>)
+<source> ::= \[__schema-name__.]_tablename_ | (<select_stmt>)
 
 <merge when> ::=
     <merge when matched>
@@ -5287,12 +5309,13 @@ MERGE
 <returning_list> ::= * | <output_column> [, <output_column]
 
 <output_column> ::=
-    _target_.* | NEW.* | OLD.*
-  | <return_expression> [COLLATE _collation_] [[AS] _ret_alias_]
+    \[__schema-name__.]_target_.*
+  | NEW.* | OLD.*
+  | <return_expression> [COLLATE [_schema-name_.{endsb}__collation__] [[AS] _ret_alias_]
 
 <return_expression> ::=
     <value_expression>
-  | [_target_.{endsb}__col_name__
+  | [[_schema-name_.{endsb}__target__.{endsb}__col_name__
   | NEW._col_name_
   | OLD._col_name_
 
@@ -5311,6 +5334,9 @@ MERGE
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы.
 
 |target
 |Целевая таблица или обновляемое представление.
@@ -5577,7 +5603,7 @@ DSQL, ESQL, PSQL
 [listing,subs="+quotes,attributes"]
 ----
 <execute procedure> ::=
-    EXECUTE PROCEDURE [<schema_name> .] [<package name> .] <procedure name>
+    EXECUTE PROCEDURE [_schema-name_.]\[__package-name__.]_procedure-name_
     [{ (<arguments>) | <arguments> }]
    [RETURNING_VALUES { <outvar-list> | ( <outvar-list> ) }]
 
@@ -5612,13 +5638,13 @@ DSQL, ESQL, PSQL
 ^| Параметр
 ^| Описание
 
-|schema_name
+|schema-name
 |Имя схемы хранимой процедуры или пакета.
 
-|package name
+|package-name
 |Имя пакета.
 
-|procedure name
+|procedure-name
 |Имя хранимой процедуры.
 
 |argument name
@@ -5774,7 +5800,7 @@ DSQL, ESQL, PSQL
 [listing,subs="+quotes,macros"]
 ----
 <call statement> ::=
-    CALL [<schema_name> .] [<package name> .] <procedure name> (<arguments>)
+    CALL [_schema-name_.]\[__package-name__.]_procedure-name_ (<arguments>)
 
 <arguments> ::=
     <positional arguments> |
@@ -5801,13 +5827,13 @@ DSQL, ESQL, PSQL
 ^| Параметр
 ^| Описание
 
-|schema_name
+|schema-name
 |Имя схемы хранимой процедуры или пакета.
 
-|package name
+|package-name
 |Имя пакета.
 
-|procedure name
+|procedure-name
 |Имя хранимой процедуры.
 
 |argument name

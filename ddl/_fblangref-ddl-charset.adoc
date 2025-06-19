@@ -16,8 +16,8 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-ALTER CHARACTER SET [_schema_.] _charset_
-SET DEFAULT COLLATION [_schema_.] _collation_
+ALTER CHARACTER SET \[__schema-name__.]_charset_
+SET DEFAULT COLLATION \[__schema-name__.]_collation_
 ----
 
 [[fblangref-ddl-tbl-charsetalter]]
@@ -27,7 +27,7 @@ SET DEFAULT COLLATION [_schema_.] _collation_
 ^| Параметр
 ^| Описание
 
-|schema
+|schema-name
 |Имя схемы.
 
 |charset
