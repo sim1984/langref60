@@ -103,62 +103,71 @@ where rdb$db_key >= make_dbkey('SOMETABLE', 0, 0, 1)
 
 [source,sql]
 ----
-WITH VALID_PSQL (
-    PSQL_TYPE,
-    ROUTE_NAME,
-    VALID)
-AS (SELECT
-        'Procedure',
-        RDB$PROCEDURE_NAME,
-        RDB$VALID_BLR
+WITH
+  VALID_PSQL (PSQL_TYPE, SCHEMA_NAME, ROUTE_NAME, VALID) AS (
+    SELECT
+      'Procedure',
+      RDB$SCHEMA_NAME,
+      RDB$PROCEDURE_NAME,
+      RDB$VALID_BLR
     FROM
-        RDB$PROCEDURES
+      SYSTEM.RDB$PROCEDURES
     WHERE
-          RDB$PROCEDURES.RDB$PACKAGE_NAME IS NULL
+      RDB$PROCEDURES.RDB$PACKAGE_NAME IS NULL
     UNION ALL
     SELECT
-        'Function',
-        RDB$FUNCTION_NAME,
-        RDB$VALID_BLR
+      'Function',
+      RDB$SCHEMA_NAME,
+      RDB$FUNCTION_NAME,
+      RDB$VALID_BLR
     FROM
-        RDB$FUNCTIONS
+      SYSTEM.RDB$FUNCTIONS
     WHERE
-          RDB$FUNCTIONS.RDB$PACKAGE_NAME IS NULL
+       RDB$FUNCTIONS.RDB$PACKAGE_NAME IS NULL
     UNION ALL
     SELECT
-        'Package',
-        RDB$PACKAGE_NAME,
-        RDB$VALID_BODY_FLAG
+      'Package',
+      RDB$SCHEMA_NAME,
+      RDB$PACKAGE_NAME,
+      RDB$VALID_BODY_FLAG
     FROM
-        RDB$PACKAGES
+      SYSTEM.RDB$PACKAGES
     UNION ALL
     SELECT
-        'Trigger',
-        RDB$TRIGGER_NAME,
-        RDB$VALID_BLR
+      'Trigger',
+      RDB$SCHEMA_NAME,
+      RDB$TRIGGER_NAME,
+      RDB$VALID_BLR
     FROM
-        RDB$TRIGGERS
+      SYSTEM.RDB$TRIGGERS
     WHERE
-          RDB$TRIGGERS.RDB$SYSTEM_FLAG = 0)
+      RDB$TRIGGERS.RDB$SYSTEM_FLAG = 0
+  )
 SELECT
-    PSQL_TYPE,
-    ROUTE_NAME,
-    VALID
+  PSQL_TYPE,
+  SCHEMA_NAME,
+  ROUTE_NAME,
+  VALID
 FROM
-    VALID_PSQL
+  VALID_PSQL
 WHERE
-      EXISTS(SELECT
-                 *
-             FROM
-                 RDB$DEPENDENCIES
-             WHERE
-                   RDB$DEPENDENT_NAME = VALID_PSQL.ROUTE_NAME
-               AND RDB$DEPENDED_ON_NAME = 'MYDOMAIN');
+  EXISTS(
+    SELECT
+      *
+    FROM
+      SYSTEM.RDB$DEPENDENCIES
+    WHERE RDB$DEPENDENT_NAME = VALID_PSQL.ROUTE_NAME
+      AND RDB$DEPENDENT_SCHEMA_NAME = VALID_PSQL.SCHEMA_NAME
+      AND RDB$DEPENDED_ON_SCHEMA_NAME = 'PUBLIC'
+      AND RDB$DEPENDED_ON_NAME = 'MYDOMAIN'
+  )
+
 
 /*
   Замените MYDOMAIN фактическим именем проверяемого
-  домена. Используйте заглавные буквы, если
-  домен создавался нечувствительным к регистру — в
+  домена, а PUBLIC на схему этого домена.
+  Используйте заглавные буквы, если
+  домен создавался нечувствительным к регистру - в
   противном случае используйте точное написание
   имени домена с учётом регистра
 */
@@ -169,62 +178,69 @@ WHERE
 
 [source,sql]
 ----
-WITH VALID_PSQL (
-    PSQL_TYPE,
-    ROUTE_NAME,
-    VALID)
-AS (SELECT
-        'Procedure',
-        RDB$PROCEDURE_NAME,
-        RDB$VALID_BLR
+WITH
+  VALID_PSQL (PSQL_TYPE, SCHEMA_NAME, ROUTE_NAME, VALID) AS (
+    SELECT
+      'Procedure',
+      RDB$SCHEMA_NAME,
+      RDB$PROCEDURE_NAME,
+      RDB$VALID_BLR
     FROM
-        RDB$PROCEDURES
+      SYSTEM.RDB$PROCEDURES
     WHERE
-          RDB$PROCEDURES.RDB$PACKAGE_NAME IS NULL
+      RDB$PROCEDURES.RDB$PACKAGE_NAME IS NULL
     UNION ALL
     SELECT
-        'Function',
-        RDB$FUNCTION_NAME,
-        RDB$VALID_BLR
+      'Function',
+      RDB$SCHEMA_NAME,
+      RDB$FUNCTION_NAME,
+      RDB$VALID_BLR
     FROM
-        RDB$FUNCTIONS
+      SYSTEM.RDB$FUNCTIONS
     WHERE
-          RDB$FUNCTIONS.RDB$PACKAGE_NAME IS NULL
+       RDB$FUNCTIONS.RDB$PACKAGE_NAME IS NULL
     UNION ALL
     SELECT
-        'Package',
-        RDB$PACKAGE_NAME,
-        RDB$VALID_BODY_FLAG
+      'Package',
+      RDB$SCHEMA_NAME,
+      RDB$PACKAGE_NAME,
+      RDB$VALID_BODY_FLAG
     FROM
-        RDB$PACKAGES
+      SYSTEM.RDB$PACKAGES
     UNION ALL
     SELECT
-        'Trigger',
-        RDB$TRIGGER_NAME,
-        RDB$VALID_BLR
+      'Trigger',
+      RDB$SCHEMA_NAME,
+      RDB$TRIGGER_NAME,
+      RDB$VALID_BLR
     FROM
-        RDB$TRIGGERS
+      SYSTEM.RDB$TRIGGERS
     WHERE
-          RDB$TRIGGERS.RDB$SYSTEM_FLAG = 0)
+      RDB$TRIGGERS.RDB$SYSTEM_FLAG = 0
+  )
 SELECT
-    PSQL_TYPE,
-    ROUTE_NAME,
-    VALID
+  PSQL_TYPE,
+  SCHEMA_NAME,
+  ROUTE_NAME,
+  VALID
 FROM
-    VALID_PSQL
+  VALID_PSQL
 WHERE
-      EXISTS(SELECT
-                 *
-             FROM
-                 RDB$DEPENDENCIES D
-             WHERE
-                   D.RDB$DEPENDENT_NAME = VALID_PSQL.ROUTE_NAME
-               AND D.RDB$DEPENDED_ON_NAME = 'MYTABLE'
-               AND D.RDB$FIELD_NAME = 'MYCOLUMN');
+  EXISTS(
+    SELECT
+      *
+    FROM
+      RDB$DEPENDENCIES D
+    WHERE D.RDB$DEPENDENT_NAME = VALID_PSQL.ROUTE_NAME
+      AND RDB$DEPENDENT_SCHEMA_NAME = VALID_PSQL.SCHEMA_NAME
+      AND RDB$DEPENDED_ON_SCHEMA_NAME = 'PUBLIC'
+      AND D.RDB$DEPENDED_ON_NAME = 'MYTABLE'
+      AND D.RDB$FIELD_NAME = 'MYCOLUMN'
+  );
 
 /*
-  Замените MYTABLE и MYCOLUMN фактическими именами
-  проверяемой таблицы и её столбца.
+  Замените PUBLIC, MYTABLE и MYCOLUMN фактическими именами
+  схемы, проверяемой таблицы и её столбца.
   Используйте заглавные буквы, если таблица и её
   столбец создавались нечувствительными к регистру —
   в противном случае используйте точное написание
