@@ -2765,15 +2765,15 @@ CREATE DOMAIN BOOL3 AS SMALLINT
 [[fblangref-datatypes-domaincreate]]
 === Создание доменов
 
-Создание домена производится оператором CREATE DOMAIN.
+Создание домена производится оператором `CREATE DOMAIN`.
 
 .Краткий синтаксис:
-[listing,subs=+quotes]
+[listing,subs=+quotes,attributes]
 ----
-CREATE DOMAIN _name_ [AS] <type>
+CREATE DOMAIN \[__schema-name__.]_domain-name_ [AS] <type>
 [DEFAULT {<literal> | NULL | <context_var>}]
 [NOT NULL] [CHECK (<condition>)]
-[COLLATE _collation_];
+[COLLATE [_schema-name_.{endsb}__collation__]
 ----
 
 .См. также:
@@ -2797,7 +2797,7 @@ CREATE DOMAIN _name_ [AS] <type>
 .Краткий синтаксис:
 [listing,subs=+quotes]
 ----
-ALTER DOMAIN _name_
+ALTER DOMAIN \[__schema-name__.]_name_
   [{TO _new_name_}]
   [{SET DEFAULT {<literal> | NULL | <context_var>} |
     DROP DEFAULT}]
@@ -2829,12 +2829,12 @@ ALTER DOMAIN STORE_GRP SET DEFAULT -1;
 [[fblangref-datatypes-domaindrop]]
 === Удаление доменов
 
-Оператор DROP DOMAIN удаляет из базы данных домена при условии, что он не используется в каком либо из объектов базы данных.
+Оператор `DROP DOMAIN` удаляет из базы данных домена при условии, что он не используется в каком либо из объектов базы данных.
 
 .Синтаксис:
 [listing,subs=+quotes]
 ----
-DROP DOMAIN _name_;
+DROP DOMAIN \[__schema-name__.]_domain-name_;
 ----
 
 .Удаление домена
@@ -2864,13 +2864,13 @@ DROP DOMAIN Test_Domain;
 
 [[fblangref-datatypes-syntax-scalar-syntax]]
 .Синтаксис:
-[listing,subs=+quotes]
+[listing,subs="+quotes,attributes"]
 ----
 <domain_or_non_array_type> ::=
     <scalar_datatype>
   | <blob_datatype>
-  | [TYPE OF] _domain_
-  | TYPE OF COLUMN _rel_._col_
+  | [TYPE OF] \[__schema-name__.]_domain_
+  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
 
 <scalar_datatype> ::=
     {SMALLINT | INT[EGER] | BIGINT | INT128}
@@ -2882,10 +2882,11 @@ DROP DOMAIN Test_Domain;
   | {TIME | TIMESTAMP} [{WITH | WITHOUT} TIME ZONE]
   | {DECIMAL | NUMERIC} [(_precision_ [, _scale_])]
   | {VARCHAR | {CHAR | CHARACTER} VARYING} (_length_)
-    [CHARACTER SET _charset_]
-  | {CHAR | CHARACTER} [(_length_)] [CHARACTER SET _charset_]
+    [CHARACTER SET [_schema-name_.{endsb}__charset__]
+  | {CHAR | CHARACTER} [(_length_)] [CHARACTER SET [_schema-name_.{endsb}__charset__]
   | {NCHAR | NATIONAL {CHARACTER | CHAR}} VARYING (_length_)
   | {NCHAR | NATIONAL {CHARACTER | CHAR}} [(_length_)]
+  | {BINARY | VARBINARY} (_length_)
 ----
 
 [[fblangref-datatypes-tbl-scalar-syntax]]
@@ -2894,6 +2895,9 @@ DROP DOMAIN Test_Domain;
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы.
 
 |domain
 |Имя домена (только не домены типа массив).
@@ -2948,11 +2952,11 @@ DROP DOMAIN Test_Domain;
 
 [[fblangref-datatypes-syntax-blob-syntax]]
 .Синтаксис типа BLOB
-[listing,subs=+quotes]
+[listing,subs="+quotes,attributes"]
 ----
 <blob_datatype> ::=
     BLOB [SUB_TYPE {_subtype_num_ | _subtype_name_}]
-    [SEGMENT SIZE _seglen_] [CHARACTER SET _charset_]
+    [SEGMENT SIZE _seglen_] [CHARACTER SET [_schema-name_.{endsb}__charset__]
   | BLOB [(_seglen_ [, _subtype_num_])]
 ----
 
@@ -2963,6 +2967,9 @@ DROP DOMAIN Test_Domain;
 |===
 ^| Параметр
 ^^| Описание
+
+|schema-name
+|Имя схемы.
 
 |charset
 |Набор символов (игнорируется для всех подтипов кроме 1 (TEXT)).
@@ -2997,10 +3004,11 @@ DROP DOMAIN Test_Domain;
   | {TIME | TIMESTAMP} [{WITH | WITHOUT} TIME ZONE] <array_dim>
   | {DECIMAL | NUMERIC} [(_precision_ [, _scale_])]  <array_dim>
   | {VARCHAR | {CHAR | CHARACTER} VARYING} (_length_)  <array_dim>
-    [CHARACTER SET _charset_]
-  | {CHAR | CHARACTER} [(_length_)]  <array_dim> [CHARACTER SET _charset_]
+    [CHARACTER SET [_schema-name_.{endsb}__charset__]
+  | {CHAR | CHARACTER} [(_length_)]  <array_dim> [CHARACTER SET [_schema-name_.{endsb}__charset__]
   | {NCHAR | NATIONAL {CHARACTER | CHAR}} VARYING (_length_) <array_dim>
   | {NCHAR | NATIONAL {CHARACTER | CHAR}} [(_length_)] <array_dim>
+  | {BINARY | VARBINARY} (_length_) <array_dim>
 
 <array_dim> ::= '[' [_m_:{endsb}__n__ [,[_m_:{endsb}__n__ ...] ']'
 ----
@@ -3011,6 +3019,9 @@ DROP DOMAIN Test_Domain;
 |===
 ^| Параметр
 ^^| Описание
+
+|schema-name
+|Имя схемы.
 
 |binary-precision
 |Двоичная точность. От 1 до 53 бит.

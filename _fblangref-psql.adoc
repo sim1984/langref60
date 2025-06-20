@@ -350,7 +350,7 @@ EXECUTE BLOCK
 
 Пакет -- группа процедур и функций, которая представляет собой единый объект базы данных.
 
-Пакеты Firebird состоят из двух частей: заголовка (ключевое слово PACKAGE) и тела (ключевые слова PACKAGE BODY). Такое разделение очень сильно напоминает модули Delphi, заголовок соответствует интерфейсной части, а тело -- части реализации.
+Пакеты Firebird состоят из двух частей: заголовка (ключевое слово `PACKAGE`) и тела (ключевые слова `PACKAGE BODY`). Такое разделение очень сильно напоминает модули Delphi, заголовок соответствует интерфейсной части, а тело -- части реализации.
 
 [[fblangref-psql-package-benefits]]
 === Преимущества пакетов
@@ -517,13 +517,23 @@ DDL триггеры срабатывают на указанные событи
 
 
 
-.Переменные доступные в пространстве имён DDL_TRIGGER:* EVENT_TYPE -- тип события (CREATE, ALTER, DROP)
-* OBJECT_TYPE -- тип объекта (TABLE, VIEW и д.р.)
-* DDL_EVENT -- имя события (`<ddl event item>`),
-+
-где `<ddl event item>` = `EVENT_TYPE || ' ' || OBJECT_TYPE`
-* OBJECT_NAME -- имя объекта метаданных
-* SQL_TEXT -- текст SQL запроса
+.Переменные доступные в пространстве имён DDL_TRIGGER:
+
+`EVENT_TYPE`:: тип события (`CREATE`, `ALTER`, `DROP`).
+
+`OBJECT_TYPE`:: тип объекта (`TABLE`, `VIEW` и др.).
+
+`DDL_EVENT`:: (`<ddl event item>`), где `<ddl_event_item>` это `EVENT_TYPE || ' ' || OBJECT_TYPE`
+
+`OBJECT_NAME`:: имя объекта метаданных.
+
+`OLD_OBJECT_NAME`:: имя объекта метаданных до переименования.
+
+`NEW_OBJECT_NAME`:: имя объекта метаданных после переименования.
+
+`SCHEMA_NAME`:: имя схемы, которому принадлежит объект метаданных.
+
+`SQL_TEXT`:: текст SQL запроса.
 
 
 [[fblangref-psql-triggers-create]]
@@ -640,16 +650,16 @@ END
 PSQL
 
 .Синтаксис
-[listing,subs="+quotes,macros"]
+[listing,subs="+quotes,macros,attributes"]
 ----
 DECLARE [VARIABLE] _varname_
-  <type> [NOT NULL] [COLLATE _collation_]
+  <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
   [{= | DEFAULT} <initvalue>] }
 
 <type> ::=
     <non_array_datatype>
-  | [TYPE OF] _domain_
-  | TYPE OF COLUMN _rel_._col_
+  | [TYPE OF] \[__schema-name__.]_domain_
+  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
 
 <non_array_datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -680,11 +690,14 @@ DECLARE [VARIABLE] _varname_
 |non_array_datatype
 |Тип данных SQL кроме массивов.
 
+|schema-name
+|Имя схемы.
+
 |collation
 |Порядок сортировки.
 
 |domain
-|Домен.
+|Имя домена.
 
 |rel
 |Имя таблицы или представления.
@@ -1049,15 +1062,15 @@ END!
 PSQL
 
 .Синтаксис
-[listing,subs="+quotes,macros"]
+[listing,subs="+quotes,macros,attributes"]
 ----
 <subfunc-declaration> ::=
   DECLARE FUNCTION _subfuncname_ [(<input-parameters>)]
-  RETURNS <type> [COLLATE _collation_] [DETERMINISTIC];
+  RETURNS <type> [_schema-name_.{endsb}__collation__] [DETERMINISTIC];
 
 <subfunc-implementation> ::=
   DECLARE FUNCTION _subfuncname_ [(<input-parameters>)]
-  RETURNS <type> [COLLATE _collation_] [DETERMINISTIC]
+  RETURNS <type> [_schema-name_.{endsb}__collation__] [DETERMINISTIC]
   <psql-routine-body>
 
 <input-parameters> ::= <inparam> [, <inparam> ...]
@@ -1083,6 +1096,9 @@ PSQL
 
 |type
 |Тип выходного результата.
+
+|schema-name
+|Имя схемы.
 
 |collation
 |Порядок сортировки.
@@ -2493,16 +2509,17 @@ RETURNS (
   FIELD CHAR(32))
 AS
 BEGIN
-  FOR SELECT RDB$RELATION_NAME
-      FROM RDB$RELATIONS
-      ORDER BY 1
-      INTO :RELATION
+  FOR
+    SELECT RDB$RELATION_NAME
+    FROM SYSTEM.RDB$RELATIONS
+    ORDER BY 1
+    INTO :RELATION
   DO
   BEGIN
     FOR SELECT
           RDB$FIELD_POSITION + 1,
           RDB$FIELD_NAME
-        FROM RDB$RELATION_FIELDS
+        FROM SYSTEM.RDB$RELATION_FIELDS
         WHERE
           RDB$RELATION_NAME = :RELATION
         ORDER BY RDB$FIELD_POSITION
@@ -2562,7 +2579,7 @@ BEGIN
       SELECT
           rdb$relation_name AS name
       FROM
-          rdb$relations AS CURSOR c
+          system.rdb$relations AS CURSOR c
   DO
   BEGIN
     o = c.name;
@@ -2587,7 +2604,7 @@ BEGIN
       SELECT
           rdb$relation_name
       FROM
-          rdb$relations
+          system.rdb$relations
       WHERE
           rdb$relation_name = 'RDB$RELATIONS' AS CURSOR c
   DO
@@ -2599,7 +2616,7 @@ BEGIN
             -- без префикса как псевдоним таблицы rdb$relations
             c.rdb$relation_name x2
         FROM
-            rdb$relations c
+            system.rdb$relations c
         WHERE
             rdb$relation_name = 'RDB$DATABASE' AS CURSOR d
     DO
@@ -2745,7 +2762,8 @@ RETURNS (
 AS
   DECLARE C CURSOR FOR (
     SELECT RDB$RELATION_NAME
-    FROM RDB$RELATIONS);
+    FROM SYSTEM.RDB$RELATIONS
+  );
 BEGIN
   OPEN C;
   WHILE (1 = 1) DO
@@ -2774,16 +2792,16 @@ RETURNS (
   SCRIPT BLOB SUB_TYPE TEXT)
 AS
   DECLARE VARIABLE FIELDS VARCHAR(8191);
-  DECLARE VARIABLE FIELD_NAME TYPE OF RDB$FIELD_NAME;
-  DECLARE VARIABLE RELATION RDB$RELATION_NAME;
-  DECLARE VARIABLE SOURCE TYPE OF COLUMN RDB$RELATIONS.RDB$VIEW_SOURCE;
+  DECLARE VARIABLE FIELD_NAME TYPE OF SYSTEM.RDB$FIELD_NAME;
+  DECLARE VARIABLE RELATION SYSTEM.RDB$RELATION_NAME;
+  DECLARE VARIABLE SOURCE TYPE OF COLUMN SYSTEM.RDB$RELATIONS.RDB$VIEW_SOURCE;
   -- именованный курсор
   DECLARE VARIABLE CUR_R CURSOR FOR (
     SELECT
       RDB$RELATION_NAME,
       RDB$VIEW_SOURCE
     FROM
-      RDB$RELATIONS
+      SYSTEM.RDB$RELATIONS
     WHERE
       RDB$VIEW_SOURCE IS NOT NULL);
   -- Именованный курсор
@@ -2791,7 +2809,7 @@ AS
     SELECT
       RDB$FIELD_NAME
     FROM
-      RDB$RELATION_FIELDS
+      SYSTEM.RDB$RELATION_FIELDS
     WHERE
       -- Важно! Переменная должна быть объявлена ранее
       RDB$RELATION_NAME = :RELATION);
@@ -2932,7 +2950,7 @@ RETURNS (
   RNAME CHAR(63)
 )
 AS
-  DECLARE C CURSOR FOR (SELECT RDB$RELATION_NAME FROM RDB$RELATIONS);
+  DECLARE C CURSOR FOR (SELECT RDB$RELATION_NAME FROM SYSTEM.RDB$RELATIONS);
 BEGIN
   OPEN C;
   WHILE (1 = 1) DO
@@ -2959,28 +2977,30 @@ RETURNS (
     SCRIPT BLOB SUB_TYPE TEXT)
 AS
 DECLARE VARIABLE FIELDS VARCHAR(8191);
-DECLARE VARIABLE FIELD_NAME TYPE OF RDB$FIELD_NAME;
-DECLARE VARIABLE RELATION RDB$RELATION_NAME;
-DECLARE VARIABLE SRC   TYPE OF COLUMN RDB$RELATIONS.RDB$VIEW_SOURCE;
+DECLARE VARIABLE FIELD_NAME TYPE OF SYSTEM.RDB$FIELD_NAME;
+DECLARE VARIABLE RELATION SYSTEM.RDB$RELATION_NAME;
+DECLARE VARIABLE SRC   TYPE OF COLUMN SYSTEM.RDB$RELATIONS.RDB$VIEW_SOURCE;
 -- Объявление именованного курсора
 DECLARE VARIABLE CUR_R      CURSOR FOR (
     SELECT
         RDB$RELATION_NAME,
         RDB$VIEW_SOURCE
     FROM
-        RDB$RELATIONS
+        SYSTEM.RDB$RELATIONS
     WHERE
-        RDB$VIEW_SOURCE IS NOT NULL);
+        RDB$VIEW_SOURCE IS NOT NULL
+  );
 -- Объявление именованного курсора, в котором
 -- используется локальная переменная
 DECLARE CUR_F      CURSOR FOR (
     SELECT
         RDB$FIELD_NAME
     FROM
-        RDB$RELATION_FIELDS
+        SYSTEM.RDB$RELATION_FIELDS
     WHERE
         -- Важно переменная должна быть объявлена ранее
-        RDB$RELATION_NAME = :RELATION);
+        RDB$RELATION_NAME = :RELATION
+);
 BEGIN
   OPEN CUR_R;
   WHILE (1 = 1) DO
@@ -3036,7 +3056,7 @@ AS
     SELECT
       ROW_NUMBER() OVER(ORDER BY RDB$RELATION_NAME) AS N,
       RDB$RELATION_NAME
-    FROM RDB$RELATIONS
+    FROM SYSTEM.RDB$RELATIONS
     ORDER BY RDB$RELATION_NAME);
 BEGIN
   OPEN C;
@@ -3172,7 +3192,7 @@ AS
 BEGIN
   -- Все попытки соединения с БД сохраняем в журнал
   IN AUTONOMOUS TRANSACTION DO
-    INSERT INTO LOG(MSG)
+    INSERT INTO APP_LOG.LOG(MSG)
     VALUES ('USER ' || CURRENT_USER || ' CONNECTS.');
   IF (CURRENT_USER IN (SELECT
                            USERNAME
@@ -3184,7 +3204,7 @@ BEGIN
     -- и отправляем сообщение о событии
     IN AUTONOMOUS TRANSACTION DO
     BEGIN
-      INSERT INTO LOG(MSG)
+      INSERT INTO APP_LOG.LOG(MSG)
       VALUES ('USER ' || CURRENT_USER || ' REFUSED.');
       POST_EVENT 'CONNECTION ATTEMPT' || ' BY BLOCKED USER!';
     END
@@ -3325,10 +3345,10 @@ RETURN _value_;
 PSQL
 
 .Синтаксис
-[listing,subs=+quotes]
+[listing,subs="+quotes,attributes"]
 ----
 EXCEPTION [
-    _exception_name_
+    [_schema-name_.{endsb}__exception_name__
     [ _custom_message_ | USING (<value_list>)]
   ]
 
@@ -3341,6 +3361,9 @@ EXCEPTION [
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы.
 
 |exception_name
 |Имя исключения.
@@ -3440,7 +3463,7 @@ BEGIN
 
   /* Этот заказ уже отправлен на поставку. */
   IF (ord_stat = 'shipped') THEN
-    EXCEPTION order_already_shipped;
+    EXCEPTION app.order_already_shipped;
   /* Другие операторы */
 END
 ----
@@ -3474,7 +3497,7 @@ BEGIN
 
   /* Этот заказ уже отправлен на поставку. */
   IF (ord_stat = 'shipped') THEN
-    EXCEPTION order_already_shipped 'Order status is "' || ord_stat || '"';
+    EXCEPTION app.order_already_shipped 'Order status is "' || ord_stat || '"';
   /* Другие операторы */
 END
 ----
@@ -3513,13 +3536,13 @@ END^
 PSQL
 
 .Синтаксис
-[listing,subs=+quotes]
+[listing,subs="+quotes"]
 ----
 WHEN {<error> [, <error> ...] | ANY}
 DO <compound_statement>
 
 <error> ::= {
-    EXCEPTION _exception_name_
+    EXCEPTION \[__schema-name__.]_exception_name_
   | SQLCODE _number_
   | GDSCODE _errcode_
   | SQLSTATE '_sqlstate_code_'
@@ -3532,6 +3555,9 @@ DO <compound_statement>
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы для исключения.
 
 |exception_name
 |Имя исключения.

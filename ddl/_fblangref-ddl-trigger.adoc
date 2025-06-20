@@ -24,7 +24,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE TRIGGER [IF NOT EXISTS] [_schema_name_.] _trigname_ {
+CREATE TRIGGER [IF NOT EXISTS] \[__schema-name__.]_trigname_ {
     <relation_trigger_legacy>
   | <relation_trigger_sql2003>
   | <database_trigger>
@@ -119,7 +119,7 @@ CREATE TRIGGER [IF NOT EXISTS] [_schema_name_.] _trigname_ {
 |Имя триггера.
 Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |relation_trigger_legacy
@@ -980,7 +980,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER TRIGGER [_schema_name_.] _trigname_
+ALTER TRIGGER \[__schema-name__.]_trigname_
 [ACTIVE | INACTIVE]
 [{BEFORE | AFTER} <mutation_list>]
 [POSITION number]
@@ -1156,7 +1156,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER TRIGGER [_schema_name_.] _trigname_ {
+CREATE OR ALTER TRIGGER \[__schema-name__.]_trigname_ {
     <relation_trigger_legacy>
   | <relation_trigger_sql2003>
   | <database_trigger>
@@ -1206,7 +1206,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP TRIGGER [IF EXISTS] [_schema_name_.] _trigname_
+DROP TRIGGER [IF EXISTS] \[__schema-name__.]_trigname_
 ----
 
 .Параметры оператора `DROP TRIGGER`
@@ -1218,7 +1218,7 @@ DROP TRIGGER [IF EXISTS] [_schema_name_.] _trigname_
 |trigname
 |Имя триггера.
 
-|schema_name
+|schema-name
 |Имя схемы.
 |===
 
@@ -1290,7 +1290,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE TRIGGER [_schema_name_.] _trigname_ {
+RECREATE TRIGGER \[__schema-name__.]_trigname_ {
     <relation_trigger_legacy>
   | <relation_trigger_sql2003>
   | <database_trigger>

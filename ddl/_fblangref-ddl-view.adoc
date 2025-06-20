@@ -20,7 +20,7 @@ DSQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE VIEW [IF NOT EXISTS] [_schema_name_.] _viewname_ [<full_column_list>]
+CREATE VIEW [IF NOT EXISTS] \[__schema-name__.]_viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -38,7 +38,7 @@ AS <select_statement>
 |Имя представления.
 Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |select_statement
@@ -324,7 +324,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-ALTER VIEW [_schema_name_.] _viewname_ [<full_column_list>]
+ALTER VIEW \[__schema-name__.]_viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -341,7 +341,7 @@ AS <select_statement>
 |viewname
 |Имя существующего представления.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |select_statement
@@ -417,7 +417,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-CREATE OR ALTER VIEW [_schema_name_.] _viewname_ [<full_column_list>]
+CREATE OR ALTER VIEW \[__schema-name__.]_viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -435,7 +435,7 @@ AS <select_statement>
 |Имя представления.
 Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |select_statement
@@ -490,7 +490,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP VIEW [IF EXISTS] [_schema_name_.] _viewname_
+DROP VIEW [IF EXISTS] \[__schema-name__.]_viewname_
 ----
 
 [[fblangref-ddl-view-dropview-tbl]]
@@ -503,7 +503,7 @@ DROP VIEW [IF EXISTS] [_schema_name_.] _viewname_
 |viewname
 |Имя представления.
 
-|schema_name
+|schema-name
 |Имя схемы.
 |===
 
@@ -565,7 +565,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-RECREATE VIEW [_schema_name_.] _viewname_ [<full_column_list>]
+RECREATE VIEW \[__schema-name__.]_viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -583,7 +583,7 @@ AS <select_statement>
 |Имя представления.
 Может содержать до 63 символов.
 
-|schema_name
+|schema-name
 |Имя схемы.
 
 |select_statement
