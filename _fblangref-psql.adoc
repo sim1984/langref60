@@ -211,6 +211,17 @@ SET TERM ;^
 ====
 ****
 
+===== Разрешение имён в теле модуля
+
+Неквалифицированные имена объектов метаданных внутри тела модула относительно схем разрешаются с помощью пути поиска (`SEARCH_PATH`). За исключением `EXECUTE BLOCK` модули создаются DDL операторами, для которых действуют следующее правило. После того как модуль (функция, триггер, пакет, процедура) привязан к схеме во время подготовки оператора, путь поиска неявно и временно изменяется. Эта корректировка устанавливает путь поиска на схему пакета. Кроме того, если если схема `SYSTEM` уже присутствовала в пути поиска, то она добавляется как последняя схема.
+
+Для оператора `EXECUTE BLOCK` действует текущий путь поиска, который установлен при соединении или изменён оператором `SET SEARCH_PATH TO`.
+
+[TIP]
+====
+До Firebird 6.0 системные объекты всегда были доступны без квалификации. С появлением схем, доступность системных объектов без квалификации их схемой зависят от текущего пути поиска. В путь поиска по умолчанию обычно входит схема `SYSTEM`, но его могут изменить. Если вы хотите более стабильного поведения вашего приложения и PSQL модулей рекомендуется обращаться к системным объектом через полностью квалифицированное имя, то есть как `SYSTEM._name_`.
+====
+
 [[fblangref-psql-elements-body-external]]
 ===== Тело внешнего модуля
 
@@ -761,12 +772,24 @@ AS
   DECLARE VARIABLE K INT DEFAULT 0;
   -- Объявление переменной типа INT со значением по умолчанию 1
   DECLARE VARIABLE L INT = 1;
-  -- Объявление переменной на основе домена COUNTRYNAME
+  -- Объявление переменной на основе домена COUNTRYNAME.
+  -- Имя домена ищется в пути поиска (схема процедуры, SYSTEM)
   DECLARE FARM_COUNTRY COUNTRYNAME;
   -- Объявление переменной с типом равным типу домена COUNTRYNAME
+  -- Имя домена ищется в пути поиска (схема процедуры, SYSTEM)
   DECLARE FROM_COUNTRY TYPE OF COUNTRYNAME;
-  -- Объявление переменной с типом столбца CAPITAL таблицы COUNTRY
+  -- Объявление переменной на основе домена COUNTRYNAME
+  -- из схемы MANAGEMENT
+  DECLARE FACTORY_COUNTRY MANAGEMENT.COUNTRYNAME;
+  -- Объявление переменной с типом равным типу домена COUNTRYNAME
+  -- из схемы MANAGEMENT
+  DECLARE TO_COUNTRY TYPE OF MANAGEMENT.COUNTRYNAME;
+  -- Объявление переменной с типом столбца CAPITAL таблицы COUNTRY.
+  -- Имя таблицы ищется в пути поиска (схема процедуры, SYSTEM)
   DECLARE CAPITAL TYPE OF COLUMN COUNTRY.CAPITAL;
+  -- Объявление переменной с типом столбца CAPITAL таблицы COUNTRY
+  -- схемы MANAGEMENT
+  DECLARE CAPITAL2 TYPE OF COLUMN MANAGEMENT.COUNTRY.CAPITAL;
 BEGIN
   /* Операторы PSQL */
 END
@@ -881,7 +904,7 @@ AS
     SELECT
       ROW_NUMBER() OVER(ORDER BY RDB$RELATION_NAME) AS N,
       RDB$RELATION_NAME
-    FROM RDB$RELATIONS
+    FROM SYSTEM.RDB$RELATIONS
     ORDER BY RDB$RELATION_NAME);
 BEGIN
   /* Операторы PSQL */
@@ -975,7 +998,7 @@ AS
       SELECT
         rdb$relation_name
       FROM
-        rdb$relations
+        system.rdb$relations
       WHERE
         rdb$view_blr IS NULL
       INTO table_name
@@ -991,7 +1014,7 @@ AS
       SELECT
         rdb$relation_name
       FROM
-        rdb$relations
+        system.rdb$relations
       WHERE
         rdb$view_blr IS NOT NULL
       INTO view_name
@@ -2914,7 +2937,7 @@ FETCH [<fetch_scroll> FROM] _cursor_name_
 
 `LAST`:: перемещает указатель курсора на последнюю запись.
 
-`ABSOLTE __n__`:: перемещает указатель курсора на указанную запись;
+`ABSOLUTE __n__`:: перемещает указатель курсора на указанную запись;
 +
 _n_ -- целочисленное выражение, где `1` обозначает первую строку. Для отрицательных значений абсолютная позиция берется с конца набора результатов, поэтому `-1` указывает последнюю строку, `-2` - предпоследнюю строку и т. д. Нулевое значение (`0`) будет располагаться перед первой строкой.
 
