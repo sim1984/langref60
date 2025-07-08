@@ -17,7 +17,7 @@
 DSQL, ESQL.
 
 .Синтаксис
-[listing,subs="+quotes,,attributes,macros"]
+[listing,subs="+quotes,attributes,macros"]
 ----
 CREATE DOMAIN [IF NOT EXISTS] \[__schema-name__.]_domain_name_ [AS] <datatype>
   [DEFAULT {<literal> | NULL | <context_var>}]

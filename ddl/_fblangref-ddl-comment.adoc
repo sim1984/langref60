@@ -1,4 +1,3 @@
-
 [[fblangref-ddl-comment]]
 = COMMENTS
 
