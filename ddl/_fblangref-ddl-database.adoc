@@ -467,7 +467,6 @@ END BACKUP;
 (((ALTER DATABASE, SET DEFAULT CHARACTER SET)))
 Предложение `SET DEFAULT CHARACTER SET` изменяет набор символов по умолчанию для базы данных. Это изменение не затрагивает существующие данные. Новый набор символов по умолчанию будет использоваться только в последующих DDL командах, кроме того для них будет использоваться сортировка по умолчанию для нового набора символов.
 
-
 .Изменение набора символов по умолчанию для базы данных
 [example]
 ====
@@ -489,7 +488,6 @@ ALTER DATABASE SET DEFAULT CHARACTER SET WIN1251;
 [example]
 ====
 После выполнения данного оператора PSQL модули по умолчанию будут выполняться с опцией `SQL SECURITY DEFINER`
-
 
 [source,sql]
 ----
@@ -517,14 +515,12 @@ ALTER DATABASE SET DEFAULT SQL SECURITY DEFINER;
 
 Кроме того, одноразовое переопределение доступно также через сервисы API, с использованием тега `isc_spb_prp_nolinger`, например (в такой строке):
 
-
 [source]
 ----
 fbsvcmgr host:service_mgr user sysdba password xxx
 action_properties dbname employee prp_nolinger
 ----
 ====
-
 
 .Установка задержки в 30 секунд
 [example]
@@ -588,8 +584,8 @@ ALTER DATABASE ENCRYPT WITH DbCrypt;
 ====
 
 .Дешифрование базы данных
-====
 [example]
+====
 [source,sql]
 ----
 ALTER DATABASE DECRYPT;
@@ -680,7 +676,6 @@ ALTER DATABASE EXCLUDE TABLE t1, t2 FROM PUBLICATION
 * <<fblangref-security-administrators,Администраторы>>;
 * Владелец базы данных;
 * Пользователи с привилегией `ALTER DATABASE`.
-
 
 .См. также:
 <<fblangref-ddl-database-create,CREATE DATABASE>>, <<fblangref-ddl-database-drop,DROP DATABASE>>.
