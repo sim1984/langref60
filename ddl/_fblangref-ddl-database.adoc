@@ -38,7 +38,6 @@ CREATE DATABASE <filespec>
 
 <server_spec> ::=
     _host_[/ {_port_ | _service_}]:
-  | {backslash}{backslash}__host__\
   | <protocol>://[_host_[:{_port_ | _service_}]/]
 
 <protocol> ::= inet | inet4 | inet6 | xnet
@@ -151,13 +150,6 @@ _alias_ = _filepath_
 [listing,subs=+quotes]
 ----
 _host_[/{_port_ | _service_}]:{_filepath_ | _db_alias_}
-----
-
-Если вы при создании базы данных используете протокол под названием именованные каналы (Name Pipes), то спецификация первичного файла должна выглядеть следующим образом.
-
-[listing,subs="+quotes,attributes"]
-----
-{backslash}{backslash}__host__\{_filepath_ | _db_alias_}
 ----
 
 Существует также унифицированный URL-подобный синтаксис спецификации удалённого сервера. В этом синтаксисе первым параметром указывается наименование протокола, далее указывается имя сервера или IP адрес, номер порта и путь к первичному файлу базы данных или псевдоним. В качестве протокола можно указать следующие значения:
