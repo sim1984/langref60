@@ -1392,6 +1392,10 @@ ALTER TABLE \[__schema-name__.]_tablename_
 ----
 ALTER TABLE COUNTRY
 ADD CAPITAL VARCHAR(25);
+
+-- тоже самое, но с использованием COLUMN
+ALTER TABLE COUNTRY
+ADD COLUMN CAPITAL VARCHAR(25);
 ----
 ====
 
@@ -1513,10 +1517,10 @@ REFERENCES COUNTRY (COUNTRY);
 ====
 
 [[fblangref-ddl-table-alter-drop]]
-=== Предложение `DROP`
+=== Предложение `DROP [COLUMN]`
 
 (((ALTER TABLE, DROP)))
-Предложение `DROP` удаляет указанный столбец таблицы. Столбец таблицы не может быть удалён, если от него существуют зависимости. Другими словами для успешного удаления столбца на него должны отсутствовать ссылки.
+Предложение `DROP [COLUMN]` удаляет указанный столбец таблицы. Столбец таблицы не может быть удалён, если от него существуют зависимости. Другими словами для успешного удаления столбца на него должны отсутствовать ссылки.
 
 Вы можете использовать необязательное слово `COLUMN` при удалении столбца для улучшения читаемости.
 
@@ -1536,6 +1540,10 @@ REFERENCES COUNTRY (COUNTRY);
 ====
 [source,sql]
 ----
+ALTER TABLE COUNTRY
+DROP CURRENCY;
+
+-- тоже самое, но с использованием COLUMN
 ALTER TABLE COUNTRY
 DROP COLUMN CURRENCY;
 ----
