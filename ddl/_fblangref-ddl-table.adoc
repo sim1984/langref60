@@ -1116,9 +1116,9 @@ ALTER TABLE \[__schema-name__.]_tablename_
   <operation> [, <operation>];
 
 <operation> ::=
-    ADD [IF NOT EXISTS] <col_def>
+    ADD [COLUMN] [IF NOT EXISTS] <col_def>
   | ADD <tconsrtaint>
-  | DROP [IF EXISTS] _colname_
+  | DROP [COLUMN] [IF EXISTS] _colname_
   | DROP CONSTRAINT [IF EXISTS] _constr_name_
   | DROP SQL SECURITY
   | ALTER [COLUMN] colname <col_mod>
@@ -1377,6 +1377,8 @@ ALTER TABLE \[__schema-name__.]_tablename_
 (((ALTER TABLE, ADD)))
 Предложение `ADD` позволяет добавить новый столбец или новое ограничение таблицы. Синтаксис определения столбца и синтаксис описания ограничения таблицы полностью совпадают с синтаксисом, описанным в операторе <<fblangref-ddl-table-create,CREATE TABLE>>.
 
+Вы можете использовать необязательное слово `COLUMN` при добавлении нового столбца для улучшения читаемости.
+
 Если используется предложение `IF NOT EXISTS`, то оператор `CREATE TABLE _tablename_ ADD` попытается добавить новый столбец или ограничение без выдачи ошибки, если они уже существует. DDL триггеры не будут запускаться только если все `IF NOT EXISTS` будут истины, то есть если все добавляемые ограничения или столбцы уже существуют.
 
 .Воздействие на счётчик форматов:
@@ -1410,11 +1412,11 @@ ADD IF NOT EXISTS CAPITAL VARCHAR(25);
 ----
 -- домен D_INT должен быть в схеме таблицы OBJECT или схеме SYSTEM
 ALTER TABLE OBJECTS
-ADD QUANTITY D_INT;
+ADD COLUMN QUANTITY D_INT;
 
 -- домен D_INT из схемы APP
 ALTER TABLE OBJECTS
-ADD QUANTITY APP.D_INT;
+ADD COLUMN QUANTITY APP.D_INT;
 
 -- домен D_INT ищется в схемах APP, SYSTEM
 -- поскольку мы задали для таблицы явную схему
@@ -1516,6 +1518,8 @@ REFERENCES COUNTRY (COUNTRY);
 (((ALTER TABLE, DROP)))
 Предложение `DROP` удаляет указанный столбец таблицы. Столбец таблицы не может быть удалён, если от него существуют зависимости. Другими словами для успешного удаления столбца на него должны отсутствовать ссылки.
 
+Вы можете использовать необязательное слово `COLUMN` при удалении столбца для улучшения читаемости.
+
 Ссылки на столбец могут содержаться:
 
 * в ограничениях столбцов или таблицы;
@@ -1533,7 +1537,7 @@ REFERENCES COUNTRY (COUNTRY);
 [source,sql]
 ----
 ALTER TABLE COUNTRY
-DROP CURRENCY;
+DROP COLUMN CURRENCY;
 ----
 ====
 
