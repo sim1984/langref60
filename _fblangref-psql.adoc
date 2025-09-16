@@ -664,13 +664,13 @@ PSQL
 [listing,subs="+quotes,macros,attributes"]
 ----
 DECLARE [VARIABLE] _varname_
-  <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
+  <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
   [{= | DEFAULT} <initvalue>] }
 
 <type> ::=
     <non_array_datatype>
-  | [TYPE OF] \[__schema-name__.]_domain_
-  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
+  | [TYPE OF] [ _dom-schema_ <period> ] _domain_
+  | TYPE OF COLUMN [ _rel-schema_ <period> ] _rel_._col_
 
 <non_array_datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -701,14 +701,20 @@ DECLARE [VARIABLE] _varname_
 |non_array_datatype
 |Тип данных SQL кроме массивов.
 
-|schema-name
-|Имя схемы.
+|coll-schema
+|Имя схемы сортировки (сравнения). Если не указано, то сортировка будет найдена в пути поиска.
 
 |collation
-|Порядок сортировки.
+|Имя сортировки (сравнения).
+
+|coll-schema
+|Имя схемы домена. Если не указано, то домен будет найден в пути поиска.
 
 |domain
 |Имя домена.
+
+|rel-schema
+|Имя схемы таблицы или представления. Если не указано, то таблица или представление будут найдены в пути поиска.
 
 |rel
 |Имя таблицы или представления.
@@ -3371,7 +3377,7 @@ PSQL
 [listing,subs="+quotes,attributes"]
 ----
 EXCEPTION [
-    [_schema-name_.{endsb}__exception_name__
+    [ _exc-schema_ <period> ] _exception_name_
     [ _custom_message_ | USING (<value_list>)]
   ]
 
@@ -3385,8 +3391,8 @@ EXCEPTION [
 ^| Параметр
 ^| Описание
 
-|schema-name
-|Имя схемы.
+|exc-schema
+|Имя схемы исключения. Если не указано, то исключение будет найдено в пути поиска.
 
 |exception_name
 |Имя исключения.
