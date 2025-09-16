@@ -41,7 +41,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-DECLARE EXTERNAL FUNCTION [IF NOT EXISTS] \[__schema-name__.]_funcname_
+DECLARE EXTERNAL FUNCTION [IF NOT EXISTS] [ _func-schema_ <period> ] _funcname_
   [{ <arg_desc_list> | ( <arg_desc_list> ) }]
   RETURNS { <return_value> | ( <return_value> ) }
   ENTRY_POINT '_entry_point_' MODULE_NAME '_library_name_'
@@ -55,7 +55,7 @@ DECLARE EXTERNAL FUNCTION [IF NOT EXISTS] \[__schema-name__.]_funcname_
 <udf_data_type> ::=
     <scalar_datatype>
   | BLOB
-  | CSTRING(_length_) [ CHARACTER SET [_schema-name_.{endsb}__charset__ ]
+  | CSTRING(_length_) [ CHARACTER SET [ SYSTEM <period> ]_charset_ ]
 
 <return_value> ::=
     <udf_data_type> { BY VALUE | BY DESCRIPTOR [FREE_IT] | FREE_IT }
@@ -71,12 +71,11 @@ DECLARE EXTERNAL FUNCTION [IF NOT EXISTS] \[__schema-name__.]_funcname_
 ^| Параметр
 ^| Описание
 
-|funcname
-|Имя внешней функции.
-Может содержать до 63 символов.
+|func-schema
+|Имя схемы внешней функции. Если не указано, то функция создаётся в текущей схеме.
 
-|schema-name
-|Имя схемы.
+|funcname
+|Имя внешней функции. Может содержать до 63 символов.
 
 |entry_point
 |Имя экспортируемой функции (точка входа).
@@ -223,7 +222,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-ALTER EXTERNAL FUNCTION \[__schema-name__.]_funcname_
+ALTER EXTERNAL FUNCTION [ _func-schema_ <period> ] _funcname_
 [ENTRY_POINT '_new_entry_point_']
 [MODULE_NAME '_new_library_name_'];
 ----
@@ -234,11 +233,11 @@ ALTER EXTERNAL FUNCTION \[__schema-name__.]_funcname_
 ^| Параметр
 ^| Описание
 
+|func-schema
+|Имя схемы внешней функции. Если не указано, то функция будет найдена в пути поиска.
+
 |funcname
 |Имя внешней функции.
-
-|schema-name
-|Имя схемы.
 
 |new_entry_point
 |Новое имя экспортируемой функции (точки входа).
@@ -304,7 +303,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP EXTERNAL FUNCTION [IF EXISTS] \[__schema-name__.]_funcname_
+DROP EXTERNAL FUNCTION [IF EXISTS] [ _func-schema_ <period> ] _funcname_
 ----
 
 
@@ -314,11 +313,12 @@ DROP EXTERNAL FUNCTION [IF EXISTS] \[__schema-name__.]_funcname_
 ^| Параметр
 ^| Описание
 
+|func-schema
+|Имя схемы внешней функции. Если не указано, то функция будет найдена в пути поиска.
+
 |funcname
 |Имя внешней функции.
 
-|schema-name
-|Имя схемы.
 |===
 
 Оператор `DROP EXTERNAL FUNCTION` удаляет объявление функции определённой пользователем из базы данных.

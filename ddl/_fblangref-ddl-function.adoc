@@ -22,8 +22,8 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-CREATE FUNCTION [IF NOT EXISTS] \[__schema-name__.]_funcname_ [( <in_params> )]
-  RETURNS <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
+CREATE FUNCTION [IF NOT EXISTS] [ _func-schema_ <period> ] _funcname_ [( <in_params> )]
+  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
   [DETERMINISTIC]
   <routine-body>
 
@@ -33,12 +33,12 @@ CREATE FUNCTION [IF NOT EXISTS] \[__schema-name__.]_funcname_ [( <in_params> )]
 
 <value> ::=  {<literal> | NULL | <context_var>}
 
-<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
+<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
 
 <type> ::=
     <datatype>
-  | [TYPE OF] \[__schema-name__.]_domain_
-  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
+  | [TYPE OF] [ _dom-schema_ <period> ] _domain_
+  | TYPE OF COLUMN [ _rel-schema_ <period> ] _rel_._col_
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -77,11 +77,11 @@ CREATE FUNCTION [IF NOT EXISTS] \[__schema-name__.]_funcname_ [( <in_params> )]
 ^| Параметр
 ^| Описание
 
+|func-schema
+|Имя схемы функции. Если не указано, то функция создаётся в текущей схеме.
+
 |funcname
 |Имя хранимой функции. Может содержать до 63 символов.
-
-|schema-name
-|Имя схемы.
 
 |inparam
 |Описание входного параметра.
@@ -114,11 +114,20 @@ CREATE FUNCTION [IF NOT EXISTS] \[__schema-name__.]_funcname_ [( <in_params> )]
 |datatype
 |Тип данных SQL.
 
+|coll-schema
+|Имя схемы сортировки (сравнения). Если не указано, то сортировка будет найдена в пути поиска.
+
 |collation
-|Порядок сортировки.
+|Имя сортировки (сравнения).
+
+|dom-schema
+|Имя схемы домена. Если не указано, то домен будет найден в пути поиска.
 
 |domain_name
 |Имя домена.
+
+|rel-schema
+|Имя схемы таблицы или представления. Если не указано, то таблица или представление будут найдены в пути поиска.
 
 |rel
 |Имя таблицы или представления.
@@ -492,8 +501,8 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-ALTER FUNCTION \[__schema-name__.]_funcname_ [( <in_params> )]
-RETURNS <type> [COLLATE [_schema-name_.{endsb}__collation__]
+ALTER FUNCTION [ _func-schema_ <period> ] _funcname_ [( <in_params> )]
+RETURNS <type> [COLLATE [ _coll-schema_ <period> ] _collation_]
 [DETERMINISTIC]
 <routine-body>
 
@@ -559,8 +568,8 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-CREATE OR ALTER FUNCTION \[__schema-name__.]_funcname_ [( <in_params> )]
-RETURNS <type> [COLLATE [_schema-name_.{endsb}__collation__]
+CREATE OR ALTER FUNCTION [ _func-schema_ <period> ] _funcname_ [( <in_params> )]
+RETURNS <type> [COLLATE [ _coll-schema_ <period> ] _collation_]
 [DETERMINISTIC]
 <routine-body>
 
@@ -610,7 +619,7 @@ DSQL
 
 [listing,subs="+quotes"]
 ----
-DROP FUNCTION [IF EXISTS] \[__schema-name__.]_funcname_
+DROP FUNCTION [IF EXISTS] [ _func-schema_ <period> ] _funcname_
 ----
 
 
@@ -620,11 +629,12 @@ DROP FUNCTION [IF EXISTS] \[__schema-name__.]_funcname_
 ^| Параметр
 ^| Описание
 
+|func-schema
+|Имя схемы функции. Если не указано, то функция будет найдена в пути поиска.
+
 |funcname
 |Имя хранимой функции.
 
-|schema-name
-|Имя схемы.
 |===
 
 Оператор `DROP FUNCTION` удаляет существующую хранимую функцию.
@@ -686,8 +696,8 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-RECREATE FUNCTION \[__schema-name__.]_funcname_ [( <in_params> )]
-RETURNS <type> [COLLATE [_schema-name_.{endsb}__collation__]
+RECREATE FUNCTION [ _func-schema_ <period> ] _funcname_ [( <in_params> )]
+RETURNS <type> [COLLATE [ _coll-schema_ <period> ] _collation_]
 [DETERMINISTIC]
 <routine-body>
 

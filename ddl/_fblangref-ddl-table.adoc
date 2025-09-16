@@ -19,7 +19,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] \[__schema-name__.]_tablename_
+CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] [ _tbl-schema_ <period> ] _tablename_
   [EXTERNAL [FILE] '_filespec_']
   (<col_def> [, <col_def> | <tconstraint> ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]
@@ -32,15 +32,15 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] \[__schema-name__.]_tablename_
   | <identity_col_def>
 
 <regular_col_def> ::=
-  _colname_ { <datatype> | \[__schema-name__.]_domain_name_ }
+  _colname_ { <datatype> | [ _dom-schema_ <period> ] _domain_name_ }
   [DEFAULT {<literal> | NULL | <context_var>}]
   [NOT NULL]
   [<col_constraint>]
-  [COLLATE [_schema-name_.{endsb}__collation_name__]
+  [COLLATE [ _coll-schema_ <period> ] _collation_name_]
 
 
 <computed_col_def> ::=
-  _colname_ [{ <datatype> | [_schema-name_.{endsb}__domain_name__ }]
+  _colname_ [{ <datatype> | [ _dom-schema_ <period> ] _domain_name_ }]
   {COMPUTED [BY] | GENERATED ALWAYS AS} (<expression>)
 
 <identity_col_def> ::=
@@ -68,7 +68,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] \[__schema-name__.]_tablename_
 <col_constraint> ::= [CONSTRAINT _constr_name_]
 {   UNIQUE [<using_index>]
   | PRIMARY KEY [<using_index>]
-  | REFERENCES \[__schema-name__.]_other_table_ [(_other_col_)]
+  | REFERENCES [ _other-schema_ <period> ] _other_table_ [(_other_col_)]
       [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [<using_index>]
@@ -79,7 +79,7 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] \[__schema-name__.]_tablename_
 {   UNIQUE (<col_list>) [<using_index>]
   | PRIMARY KEY (<col_list>) [<using_index>]
   | FOREIGN KEY (<col_list>)
-    REFERENCES \[__schema-name__.]_other_table_ [(<col_list>)]
+    REFERENCES [ _other-schema_ <period> ] _other_table_ [(<col_list>)]
       [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [<using_index>]
@@ -88,48 +88,8 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] \[__schema-name__.]_tablename_
 
 <col_list> ::= _colname_ [, _colname_ ...]
 
-<using_index> ::= USING [ASC[ENDING] | DESC[ENDING]] INDEX \[__schema-name__.]_indexname_
+<using_index> ::= USING [ASC[ENDING] | DESC[ENDING]] INDEX [ _tbl-schema_ <period> ] _indexname_
 
-<check_condition> ::=
-    <val> <operator> <val>
-  | <val> [NOT] BETWEEN <val> AND <val>
-  | <val> [NOT] IN (<val> [, <val> ...] | <select_list>)
-  | <val> IS [NOT] NULL
-  | <val> IS [NOT] DISTINCT <val>
-  | <val> IS [NOT] {TRUE | FALSE | UNKNOWN}
-  | <val> [NOT] CONTAINING <val>
-  | <val> [NOT] STARTING [WITH] <val>
-  | <val> [NOT] LIKE <val> [ESCAPE <val>]
-  | <val> [NOT] SIMILAR TO <val> [ESCAPE <val>]
-  | <val> <operator> {ALL | SOME | ANY} (<select_list>)
-  | [NOT] EXISTS (<select_expr>)
-  | [NOT] SINGULAR (<select_expr>)
-  | (<check_condition>)
-  | NOT <check_condition>
-  | <check_condition> OR <check_condition>
-  | <check_condition> AND <check_condition>
-
-
-<operator> ::=
-    <> | != | ^= | ~= | = | < | > | <= | >=
-  | !< | ^< | ~< | !> | ^> | ~>
-
-<val> ::=
-    _colname_ ['['<array_idx> [, <array_idx> ...]']']
-  | <literal>
-  | <context_var>
-  | <expression>
-  | NULL
-  | NEXT VALUE FOR \[__schema-name__.]_genname_
-  | GEN_ID(\[__schema-name__.]_genname_, <val>)
-  | CAST(<val> AS <cast_type>)
-  | (<select_one>)
-  | \[__schema-name__.]_func_(<val> [, <val> ...])
-
-<cast_type> ::=
-   <datatype>
-  | [TYPE OF] \[__schema-name__.]_domain_name_
-  | TYPE OF COLUMN \[__schema-name__.]_rel_._colname_
 ----
 
 
@@ -140,11 +100,11 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] \[__schema-name__.]_tablename_
 ^|Параметр
 ^|Описание
 
+|tbl-schema
+|Имя схемы таблицы. Если не указано, то таблица создаётся в текущей схеме.
+
 |tablename
 |Имя таблицы, может содержать до 63 символов.
-
-|schema-name
-|Имя схемы.
 
 |filespec
 |Спецификация файла (только для внешних таблиц).
@@ -154,6 +114,9 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] \[__schema-name__.]_tablename_
 
 |datatype
 |Тип данных SQL.
+
+|dom-schema
+|Имя схемы домена. Если не указано, то домен будет найден в пути поиска.
 
 |domain_name
 |Имя домена.
@@ -172,6 +135,9 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] \[__schema-name__.]_tablename_
 
 |constr_name
 |Имя ограничения, может содержать до 63 символов.
+
+|other-schema
+|Имя схемы таблицы, на которую ссылается внешний ключ. Если не указано, то таблица будет найдена в пути поиска.
 
 |other_table
 |Имя таблицы, на которую ссылается внешний ключ.
@@ -192,27 +158,13 @@ CREATE [GLOBAL TEMPORARY] TABLE [IF NOT EXISTS] \[__schema-name__.]_tablename_
 |Условие проверки ограничения.
 Выполняется, если оценивается как `TRUE` или NULL/UNKNOWN.
 
+|coll-schema
+|Имя схемы сортировки (сравнения). Если не указано, то сортировка будет найдена в пути поиска.
+
 |collation_name
-|Порядок сортировки.
+|Имя сортировки (сравнения).
 Необходимо указывать если вы хотите чтобы порядок сортировки для столбца отличался от порядка сортировки для набора символов по умолчанию этого столбца.
 
-|select_one
-|Оператор `SELECT` выбирающий один столбец и возвращающий только одну строку.
-
-|select_list
-|Оператор `SELECT` выбирающий один столбец и возвращающий ноль и более строк.
-
-|select_expr
-|Оператор `SELECT` выбирающий несколько столбцов и возвращающий ноль и более строк.
-
-|experssion
-|Выражение.
-
-|genname
-|Имя последовательности (генератора).
-
-|func
-|Скалярная функция.
 |===
 
 Оператор `CREATE TABLE` создаёт новую таблицу. Если перед именем таблицы указана схема, то таблица будет создана в указанной схеме, в противном случае таблица будет создана в текущей схеме (первая валидная схема в пути поиска). Имя таблицы должно быть уникальным среди имён всех таблиц, представлений (VIEWs) и хранимых процедур внутри заданной (текущей) схемы.
@@ -892,7 +844,7 @@ SQL SECURITY DEFINER;
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE GLOBAL TEMPORARY TABLE [IF NOT EXISTS] [_schema_name_.] _tablename_
+CREATE GLOBAL TEMPORARY TABLE [IF NOT EXISTS] [ _tbl-schema_ <period> ] _tablename_
   (<column_def> [, {<column_def> | <table_constraint>} ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]
   [SQL SECURITY {DEFINER | INVOKER}]
@@ -991,22 +943,18 @@ CREATE GLOBAL TEMPORARY TABLE APP.MYTXGTT (
 === Внешние таблицы
 
 (((CREATE TABLE, EXTERNAL FILE)))
-Необязательное предложение `EXTERNAL [FILE]` указывает, что таблица хранится вне базы данных во внешнем текстовом файле.
-Столбцы таблицы, хранящейся во внешнем файле, могут быть любого типа за исключением BLOB и массивов с любым типом данных.
+Необязательное предложение `EXTERNAL [FILE]` указывает, что таблица хранится вне базы данных во внешнем текстовом файле. Столбцы таблицы, хранящейся во внешнем файле, могут быть любого типа за исключением BLOB и массивов с любым типом данных.
 
-Над таблицей, хранящейся во внешнем файле, допустимы только операции добавления новых строк (`INSERT`) и выборки (`SELECT`) данных.
-Операции же изменения существующих данных (`UPDATE`) или удаления строк такой таблицы (`DELETE`) не могут быть выполнены.
+Над таблицей, хранящейся во внешнем файле, допустимы только операции добавления новых строк (`INSERT`) и выборки (`SELECT`) данных. Операции же изменения существующих данных (`UPDATE`) или удаления строк такой таблицы (`DELETE`) не могут быть выполнены.
 
 Внешняя таблица не может содержать ограничений первичного, внешнего и уникального ключа.
 Для полей такой таблицы невозможно создать индексы.
 
-Файл с внешней таблицей должен располагаться на устройстве хранения, физически расположенном на сервере, на котором расположена СУБД.
-Если параметр [parameter]``ExternalFileAccess`` в файле конфигурации [path]_firebird.conf_ содержит `Restrict`, то файл внешней таблицы должен находится в одном из каталогов, указанных в качестве аргумента `Restrict`.
-Если при обращении к таблице Firebird не находит файла, то он создаёт его при первом обращении.
+Файл с внешней таблицей должен располагаться на устройстве хранения, физически расположенном на сервере, на котором расположена СУБД. Если параметр `ExternalFileAccess` в файле конфигурации `firebird.conf` содержит `Restrict`, то файл внешней таблицы должен находится в одном из каталогов, указанных в качестве аргумента `Restrict`. Если при обращении к таблице Firebird не находит файла, то он создаёт его при первом обращении.
 
 [IMPORTANT]
 ====
-Возможность использования для таблиц внешних файлов зависит от установки значения параметра [parameter]``ExternalFileAccess`` в файле конфигурации [path]_firebird.conf_:
+Возможность использования для таблиц внешних файлов зависит от установки значения параметра `ExternalFileAccess` в файле конфигурации `firebird.conf`:
 
 * Если он установлен в значение `None`, то запрещён любой доступ к внешнему файлу.
 * Значение `Restrict` рекомендуется для ограничения доступа к внешним файлам только каталогами, созданными специально для этой цели администратором сервера. Например:
@@ -1020,35 +968,21 @@ CREATE GLOBAL TEMPORARY TABLE APP.MYTXGTT (
 [[fblangref-ddl-table-ext-format]]
 ==== Формат внешних файлов
 
-Внешняя таблица имеет формат "`строк`" с фиксированной длинной.
-Нет никаких разделителей полей: границы полей и строк определяются максимальными размерами в байтах в определении каждого поля.
-Это необходимо помнить и при определении структуры внешней таблицы, и при проектировании входного файла для внешней таблицы, в которую должны импортироваться данные из другого приложения.
-Например, широко распространённый формат "`.csv`", не может быть использован в качестве входного файла, и не может быть получен непосредственно как внешний файл.
+Внешняя таблица имеет формат "`строк`" с фиксированной длинной. Нет никаких разделителей полей: границы полей и строк определяются максимальными размерами в байтах в определении каждого поля. Это необходимо помнить и при определении структуры внешней таблицы, и при проектировании входного файла для внешней таблицы, в которую должны импортироваться данные из другого приложения. Например, широко распространённый формат "`.csv`", не может быть использован в качестве входного файла, и не может быть получен непосредственно как внешний файл.
 
-Самым полезным типом данных для столбцов внешних таблиц является тип CHAR с фиксированной длинной, длинна должна подходить под данные с которыми необходимо работать.
-Числовые типы и даты легко преобразуются в них, строки получаются как есть, в то время как, если данные не читаются другой базой данных Firebird, то родные типы могут быть нераспознаваемыми дня внешних приложений и являться для них "`абракадаброй`".
+Самым полезным типом данных для столбцов внешних таблиц является тип CHAR с фиксированной длинной, длинна должна подходить под данные с которыми необходимо работать. Числовые типы и даты легко преобразуются в них, строки получаются как есть, в то время как, если данные не читаются другой базой данных Firebird, то родные типы могут быть нераспознаваемыми дня внешних приложений и являться для них "`абракадаброй`".
 
-Конечно, существуют способы манипулирования типами данных так, чтобы создавать выходные файлы из Firebird, которые могут быть непосредственно прочитаны как входные файлы в других приложениях, используя хранимые процедуры с использованием внешних таблиц или без них.
-Описания этих методов выходит за рамки данного руководства.
-Здесь мы приведём лишь некоторые рекомендации и советы для создания и работы с простыми текстовыми файлами, поскольку внешняя таблица часто используется как простой способ для создания или чтения транзакционно-независимого журнала.
-Эти файлы могут быть прочитаны в оффлайн режиме текстовым редактором или приложением аудита.
+Конечно, существуют способы манипулирования типами данных так, чтобы создавать выходные файлы из Firebird, которые могут быть непосредственно прочитаны как входные файлы в других приложениях, используя хранимые процедуры с использованием внешних таблиц или без них. Описания этих методов выходит за рамки данного руководства. Здесь мы приведём лишь некоторые рекомендации и советы для создания и работы с простыми текстовыми файлами, поскольку внешняя таблица часто используется как простой способ для создания или чтения транзакционно-независимого журнала. Эти файлы могут быть прочитаны в оффлайн режиме текстовым редактором или приложением аудита.
 
 [[fblangref-ddl-table-ext-format-delimiter]]
 ===== Разделитель строк
 
-Как правило, внешние файлы более удобны если строки разделены разделителем, в виде последовательности "новой строки", которая может быть распознана приложением на предназначенной платформе.
-Для Windows -- это двухбайтная 'CRLF' последовательность, возврат каретки (ASCII код 13) и перевод строки (ASCII код 10).
-Для POSIX -- LF обычно самодостаточен, в некоторых MacOS X приложениях она может быть LFCR.
-Существуют различные способы для автоматического заполнения столбца разделителя.
-В нашем примере это сделано с помощью `BEFORE INSERT` триггера и встроенной функции `ASCII_CHAR`.
+Как правило, внешние файлы более удобны если строки разделены разделителем, в виде последовательности "новой строки", которая может быть распознана приложением на предназначенной платформе. Для Windows -- это двухбайтная 'CRLF' последовательность, возврат каретки (ASCII код 13) и перевод строки (ASCII код 10). Для POSIX -- LF обычно самодостаточен, в некоторых MacOS X приложениях она может быть LFCR. Существуют различные способы для автоматического заполнения столбца разделителя. В нашем примере это сделано с помощью `BEFORE INSERT` триггера и встроенной функции `ASCII_CHAR`.
 
 [[fblangref-ddl-table-create-external-examples]]
 ==== Примеры использования внешних таблиц
 
-В нашем примере мы будем определять внешнюю таблицу журнала, которая может быть использована в обработчике исключений внутри хранимой процедуры или триггера.
-Внешняя таблица выбрана потому, что сообщения из любых обрабатываемых исключений будут сохранены в журнале, даже если транзакция, в которой был запущен процесс, будет откачена из-за другого необработанного исключения.
-В целях демонстрации наша таблица содержит всего два столбца: метку времени и текстовое сообщение.
-Третий столбец хранит разделитель строки:
+В нашем примере мы будем определять внешнюю таблицу журнала, которая может быть использована в обработчике исключений внутри хранимой процедуры или триггера. Внешняя таблица выбрана потому, что сообщения из любых обрабатываемых исключений будут сохранены в журнале, даже если транзакция, в которой был запущен процесс, будет откачена из-за другого необработанного исключения. В целях демонстрации наша таблица содержит всего два столбца: метку времени и текстовое сообщение. Третий столбец хранит разделитель строки:
 
 [source,sql]
 ----
@@ -1112,7 +1046,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,attributes,macros"]
 ----
-ALTER TABLE \[__schema-name__.]_tablename_
+ALTER TABLE [ _tbl-schema_ <period> ] _tablename_
   <operation> [, <operation>];
 
 <operation> ::=
@@ -1131,11 +1065,11 @@ ALTER TABLE \[__schema-name__.]_tablename_
   | <identity_col_def>
 
 <regular_col_def> ::=
-  colname { <datatype> | \[__schema-name__.]_domainname_ }
+  colname { <datatype> | [ _dom-schema_ <period> ] _domainname_ }
   [DEFAULT {literal | NULL | <context_var>}]
   [NOT NULL]
   [<col_constraint>]
-  [COLLATE _collation_name_]
+  [COLLATE [ _coll-schema_ <period> ] _collation_name_]
 
 
 <computed_col_def>  ::=
@@ -1154,7 +1088,7 @@ ALTER TABLE \[__schema-name__.]_tablename_
   | <identity_col_mod>
 
 <regular_col_mod> ::=
-  |  TYPE { <datatype>  | \[__schema-name__.]_domain_name_ }
+  |  TYPE { <datatype>  | [ _dom-schema_ <period> ] _domain_name_ }
   |  SET DEFAULT {_literal_ | NULL | <context_var>}
   |  DROP DEFAULT
   |  SET NOT NULL
@@ -1185,7 +1119,7 @@ ALTER TABLE \[__schema-name__.]_tablename_
   [CONSTRAINT _constr_name_]
   {   UNIQUE [<using_index>]
     | PRIMARY KEY [<using_index>]
-    | REFERENCES \[__schema-name__.]_other_table_ [(_other_col_)]
+    | REFERENCES [ _other-schema_ <period> ] _other_table_ [(_other_col_)]
         [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [<using_index>]
@@ -1197,7 +1131,7 @@ ALTER TABLE \[__schema-name__.]_tablename_
   {   UNIQUE (<col_list>) [<using_index>]
     | PRIMARY KEY (<col_list>) [<using_index>]
     | FOREIGN KEY (<col_list>)
-      REFERENCES \[__schema-name__.]_other_table_ [(<col_list>)]
+      REFERENCES [ _other-schema_ <period> ] _other_table_ [(<col_list>)]
         [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
         [<using_index>]
@@ -1206,49 +1140,8 @@ ALTER TABLE \[__schema-name__.]_tablename_
 
 <col_list> ::= _colname_ [, _colname_ ...]
 
-<using_index> ::= USING [ASC[ENDING] | DESC[ENDING]] INDEX indexname
+<using_index> ::= USING [ASC[ENDING] | DESC[ENDING]] INDEX [ _tbl-schema_ <period> ] _indexname_
 
-<check_condition> ::=
-    <val> <operator> <val>
-  | <val> [NOT] BETWEEN <val> AND <val>
-  | <val> [NOT] IN (<val> [, <val> ...] | <select_list>)
-  | <val> IS [NOT] NULL
-  | <val> IS [NOT] DISTINCT <val>
-  | <val> IS [NOT] {TRUE | FALSE | UNKNOWN}
-  | <val> [NOT] CONTAINING <val>
-  | <val> [NOT] STARTING [WITH] <val>
-  | <val> [NOT] LIKE <val> [ESCAPE <val>]
-  | <val> [NOT] SIMILAR TO <val> [ESCAPE <val>]
-  | <val> <operator> {ALL | SOME | ANY} (<select_list>)
-  | [NOT] EXISTS (<select_expr>)
-  | [NOT] SINGULAR (<select_expr>)
-  | (<check_condition>)
-  | NOT <check_condition>
-  | <check_condition> OR <check_condition>
-  | <check_condition> AND <check_condition>
-
-
-<operator> ::=
-    <> | != | ^= | ~= | = | < | > | <= | >=
-  | !< | ^< | ~< | !> | ^> | ~>
-
-<val> ::=
-    _colname_ [[<array_idx> [, <array_idx> ...]]]
-  | _literal_
-  | <context_var>
-  | <expression>
-  | NULL
-  | NEXT VALUE FOR \[__schema-name__.]_genname_
-  | GEN_ID(\[__schema-name__.]_genname_, <val>)
-  | CAST(<val> AS <datatype>)
-  | (<select_one>)
-  | \[__schema-name__.]_func_(<val> [, <val> ...])
-
-
-<cast_type> ::=
-   <datatype>
-  | [TYPE OF] \[__schema-name__.]_domain_name_
-  | TYPE OF COLUMN \[__schema-name__.]_rel_._colname_
 ----
 
 [[fblangref-ddl-tbl-altertbl]]
@@ -1258,11 +1151,11 @@ ALTER TABLE \[__schema-name__.]_tablename_
 ^|Параметр
 ^|Описание
 
+|tbl-schema
+|Имя схемы таблицы. Если не указано, то таблица будет найдена в пути поиска.
+
 |tablename
 |Имя таблицы.
-
-|schema-name
-|Имя схемы.
 
 |operation
 |Одна из допустимых операций по изменению структуры таблицы.
@@ -1288,6 +1181,9 @@ ALTER TABLE \[__schema-name__.]_tablename_
 |datatype
 |Тип данных SQL.
 
+|dom-schema
+|Имя схемы домена. Если не указано, то домен будет найден в пути поиска.
+
 |domain_name
 |Имя домена.
 
@@ -1306,6 +1202,9 @@ ALTER TABLE \[__schema-name__.]_tablename_
 
 |constr_name
 |Имя ограничения, может содержать до 63 символов.
+
+|other-schema
+|Имя схемы таблицы, на которую ссылается внешний ключ. Если не указано, то таблица будет найдена в пути поиска.
 
 |other_table
 |Имя таблицы, на которую ссылается внешний ключ.
@@ -1326,27 +1225,13 @@ ALTER TABLE \[__schema-name__.]_tablename_
 |Условие проверки ограничения.
 Выполняется, если оценивается как `TRUE` или NULL/UNKNOWN.
 
+|coll-schema
+|Имя схемы сортировки (сравнения). Если не указано, то сортировка будет найдена в пути поиска.
+
 |collation_name
 |Имя порядка сортировки.
 Необходимо указывать если вы хотите чтобы порядок сортировки для столбца отличался от порядка сортировки для набора символов по умолчанию этого столбца.
 
-|select_one
-|Оператор `SELECT` выбирающий один столбец и возвращающий только одну строку.
-
-|select_list
-|Оператор `SELECT` выбирающий один столбец и возвращающий ноль и более строк.
-
-|select_expr
-|Оператор `SELECT` выбирающий несколько столбцов и возвращающий ноль и более строк.
-
-|experssion
-|Выражение.
-
-|genname
-|Имя последовательности (генератора).
-
-|func
-|Скалярная функция.
 |===
 
 Оператор `ALTER TABLE` изменяет структуру существующей таблицы.
@@ -1371,19 +1256,20 @@ ALTER TABLE \[__schema-name__.]_tablename_
 .Сброс счётчика форматов
 Для сброса счётчика форматов необходимо сделать резервное копирование и восстановление базы данных (утилитой `gbak`).
 
-[[fblangref-ddl-table-alter-add]]
-=== Предложение `ADD`
+[[fblangref-ddl-table-alter-add-column]]
+=== Предложение `ADD COLUMN`
 
-(((ALTER TABLE, ADD)))
-Предложение `ADD` позволяет добавить новый столбец или новое ограничение таблицы. Синтаксис определения столбца и синтаксис описания ограничения таблицы полностью совпадают с синтаксисом, описанным в операторе <<fblangref-ddl-table-create,CREATE TABLE>>.
+(((ALTER TABLE, ADD COLUMN)))
+Предложение `ADD [COLUMN]` позволяет добавить новый столбец. Синтаксис определения столбца таблицы полностью совпадают с синтаксисом, описанным в операторе <<fblangref-ddl-table-create,CREATE TABLE>>.
 
-Вы можете использовать необязательное слово `COLUMN` при добавлении нового столбца для улучшения читаемости.
+Необязательное слово `COLUMN` может быть использовано для улучшения читаемости.
 
-Если используется предложение `IF NOT EXISTS`, то оператор `CREATE TABLE _tablename_ ADD` попытается добавить новый столбец или ограничение без выдачи ошибки, если они уже существует. DDL триггеры не будут запускаться только если все `IF NOT EXISTS` будут истины, то есть если все добавляемые ограничения или столбцы уже существуют.
+Если используется предложение `IF NOT EXISTS`, то оператор `ALTER TABLE _tablename_ ADD [COLUMN]` попытается добавить новый столбец без выдачи ошибки, если он уже существует.
+
+DDL триггеры не будут запускаться только если все `IF [NOT] EXISTS` будут истины, то есть если все добавляемые ограничения или столбцы уже существуют или удаляемые ограничения или столбцы не существуют.
 
 .Воздействие на счётчик форматов:
 * При каждом добавлении нового столбца номер формата увеличивается на единицу.
-* Добавление нового ограничения таблицы не влечёт за собой увеличение номера формата.
 
 .Добавление столбца в таблицу
 [example]
@@ -1455,8 +1341,19 @@ ALTER TABLE COUNTRY
 ----
 ====
 
+[[fblangref-ddl-table-alter-add-constraint]]
+=== Предложение `ADD CONSTRAINT`
 (((ALTER TABLE, ADD CONSTRAINT)))
-Для добавления ограничений уровня таблицы необходимо использовать предложение `ADD [CONSTRAINT]`.
+Предложение `ADD [CONSTRAINT]` позволяет добавить новое ограничение таблицы. Синтаксис описания ограничения таблицы полностью совпадают с синтаксисом, описанным в операторе <<fblangref-ddl-table-create,CREATE TABLE>>.
+
+Необязательное слово `CONSTRAINT` используется для добавления именованного ограничения.
+
+Если используется предложение `IF NOT EXISTS`, то оператор `ALTER TABLE _tablename_ ADD CONSTRAINT` попытается добавить новое ограничение без выдачи ошибки, если оно уже существует.
+
+DDL триггеры не будут запускаться только если все `IF [NOT] EXISTS` будут истины, то есть если все добавляемые ограничения или столбцы уже существуют или удаляемые ограничения или столбцы не существуют.
+
+.Воздействие на счётчик форматов:
+* Добавление нового ограничения таблицы не влечёт за собой увеличение номера формата.
 
 .Добавление проверочного ограничения
 [example]
@@ -1517,7 +1414,7 @@ REFERENCES COUNTRY (COUNTRY);
 ====
 
 [[fblangref-ddl-table-alter-drop]]
-=== Предложение `DROP [COLUMN]`
+=== Предложение `DROP COLUMN`
 
 (((ALTER TABLE, DROP)))
 Предложение `DROP [COLUMN]` удаляет указанный столбец таблицы. Столбец таблицы не может быть удалён, если от него существуют зависимости. Другими словами для успешного удаления столбца на него должны отсутствовать ссылки.
@@ -1531,9 +1428,12 @@ REFERENCES COUNTRY (COUNTRY);
 * в хранимых процедурах и триггерах;
 * в представлениях.
 
-Если используется предложение `IF EXISTS`, то оператор `ALTER TABLE _tablename_ DROP` попытается удалить столбец таблицы без выдачи ошибки, если его не существует. DDL триггеры не будут запускаться только если все `IF EXISTS` будут истины, то есть если все удаляемые ограничения или столбцы не существуют.
+Если используется предложение `IF EXISTS`, то оператор `ALTER TABLE _tablename_ DROP` попытается удалить столбец таблицы без выдачи ошибки, если его не существует.
 
-При каждом удалении столбца номер формата увеличивается на единицу.
+DDL триггеры не будут запускаться только если все `IF [NOT] EXISTS` будут истины, то есть если все добавляемые ограничения или столбцы уже существуют или удаляемые ограничения или столбцы не существуют.
+
+.Воздействие на счётчик форматов:
+* При каждом удалении столбца номер формата увеличивается на единицу.
 
 .Удаление столбца таблицы
 [example]
@@ -1565,9 +1465,12 @@ DROP IF EXISTS CURRENCY;
 (((ALTER TABLE, DROP CONSTRAINT)))
 Предложение `DROP CONSTRAINT` удаляет указанное ограничение столбца или таблицы. Ограничение первичного ключа или уникального ключа не могут быть удалены, если они используются в ограничении внешнего ключа другой таблицы. В этом случае необходимо удалить ограничение `FOREIGN KEY` до удаления `PRIMARY KEY` или `UNIQUE` ключа, на которые оно ссылается.
 
-Если используется предложение `IF EXISTS`, то оператор `ALTER TABLE _tablename_ DROP` попытается удалить ограничение таблицы без выдачи ошибки, если его не существует. DDL триггеры не будут запускаться только если все `IF EXISTS` будут истины, то есть если все удаляемые ограничения или столбцы не существуют.
+Если используется предложение `IF EXISTS`, то оператор `ALTER TABLE _tablename_ DROP` попытается удалить ограничение таблицы без выдачи ошибки, если его не существует.
 
-Удаление ограничения столбца или ограничения таблицы не влечёт за собой увеличение номера формата.
+DDL триггеры не будут запускаться только если все `IF [NOT] EXISTS` будут истины, то есть если все добавляемые ограничения или столбцы уже существуют или удаляемые ограничения или столбцы не существуют.
+
+.Воздействие на счётчик форматов:
+* Удаление ограничения столбца или ограничения таблицы не влечёт за собой увеличение номера формата.
 
 .Удаление ограничения таблицы
 [example]
@@ -1596,9 +1499,9 @@ DROP CONSTRAINT IF EXISTS CHK_SALARY;
 Предложение `DROP SQL SECURITY` удаляет привилегии выполнения для таблицы. После удаления привилегий выполнения вычисляемые столбцы таблицы будут вычисляться с привилегиями вызывающего пользователя. Триггеры также будут выполняться с привилегиями вызывающего пользователя, если их привилегии выполнения не переопределены в триггере явно.
 
 [[fblangref-ddl-table-alter-alter-column]]
-=== Предложение `ALTER [COLUMN]`
+=== Предложение `ALTER COLUMN`
 
-(((ALTER TABLE, ALTER [COLUMN])))
+(((ALTER TABLE, ALTER COLUMN)))
 Предложение `ALTER [COLUMN]` позволяет изменить следующие характеристики существующих столбцов:
 
 * изменение имени (не изменяет номер формата);
@@ -1614,7 +1517,7 @@ DROP CONSTRAINT IF EXISTS CHK_SALARY;
 [[fblangref-ddl-table-alter-alter-column-to]]
 ==== Переименование столбца
 
-(((ALTER TABLE, ALTER [COLUMN], TO)))
+(((ALTER TABLE, ALTER COLUMN, TO)))
 Ключевое слово `TO` переименовывает существующий столбец. Новое имя столбца не должно присутствовать в таблице.
 
 Невозможно изменение имени столбца, если этот столбец включён в какое-либо ограничение -- первичный или уникальный ключ, внешний ключ, ограничение столбца или проверочное ограничение таблицы `CHECK`. Имя столбца также нельзя изменить, если этот столбец таблицы используется в каком-либо триггере, в хранимой процедуре или представлении.
@@ -1642,7 +1545,7 @@ ALTER COLUMN MODELNAME TO NAME;
 [[fblangref-ddl-table-alter-alter-column-type]]
 ==== Изменение типа столбца
 
-(((ALTER TABLE, ALTER [COLUMN], TYPE)))
+(((ALTER TABLE, ALTER COLUMN, TYPE)))
 Ключевое слово `TYPE` изменяет тип существующего столбца на другой допустимый тип. Не допустимы любые изменения типа, которые могут привести к потере данных. Например, количество символов в новом типе для столбца не может быть меньше, чем было установлено ранее.
 
 Если столбец был объявлен как массив, то изменить ни его тип, ни размерность нельзя.
@@ -1684,7 +1587,7 @@ ALTER COLUMN NAME TYPE VARCHAR(28) CHARACTER SET UTF8 COLLATE UNICODE_CI;
 [[fblangref-ddl-table-alter-alter-column-position]]
 ==== Изменение позиции столбца
 
-(((ALTER TABLE, ALTER [COLUMN], POSITION)))
+(((ALTER TABLE, ALTER COLUMN, POSITION)))
 Ключевое слово `POSITION` изменяет позицию существующего столбца. Позиции столбцов нумеруются с единицы.
 
 * Если будет задан номер позиции меньше 1, то будет выдано соответствующее сообщение об ошибке.
@@ -1714,7 +1617,7 @@ ALTER COLUMN ITEMID POSITION 5;
 [[fblangref-ddl-table-alter-alter-column-default]]
 ==== Установка и удаление значения по умолчанию
 
-(((ALTER TABLE, ALTER [COLUMN], DROP DEFAULT)))
+(((ALTER TABLE, ALTER COLUMN, DROP DEFAULT)))
 Предложение `DROP DEFAULT` удаляет значение по умолчанию для столбца таблицы.
 
 * Если столбец основан на домене со значением по умолчанию -- доменное значение перекроет это удаление.
@@ -1741,7 +1644,7 @@ ALTER COLUMN MODEL DROP DEFAULT;
 ----
 ====
 
-(((ALTER TABLE, ALTER [COLUMN], SET DEFAULT)))
+(((ALTER TABLE, ALTER COLUMN, SET DEFAULT)))
 Предложение `SET DEFAULT` устанавливает значение по умолчанию для столбца таблицы. Если столбец уже имел значение по умолчанию, то оно будет заменено новым. Значение по умолчанию для столбца всегда перекрывает доменное значение по умолчанию.
 
 .Установка значения по умолчанию для столбца первой найденной таблицы с именем STOCK в одной из схем в пути поиска
@@ -1767,7 +1670,7 @@ ALTER COLUMN MODEL SET DEFAULT 1;
 [[fblangref-ddl-table-alter-alter-column-nullable]]
 ==== Установка и удаление ограничения NOT NULL
 
-(((ALTER TABLE, ALTER [COLUMN], SET NOT NULL)))
+(((ALTER TABLE, ALTER COLUMN, SET NOT NULL)))
 Предложение `SET NOT NULL` добавляет ограничение `NOT NULL` для столбца таблицы.
 
 [NOTE]
@@ -1797,7 +1700,7 @@ ALTER COLUMN PROPID SET NOT NULL;
 ----
 ====
 
-(((ALTER TABLE, ALTER [COLUMN], DROP NOT NULL)))
+(((ALTER TABLE, ALTER COLUMN, DROP NOT NULL)))
 Предложение `DROP NOT NULL` удаляет ограничение `NOT NULL` для столбца таблицы. Если столбец основан на домене с ограничением `NOT NULL`, то ограничение домена перекроет это удаление.
 
 .Удаление ограничения `NOT NULL` для столбца первой найденной таблицы с именем STOCK в одной из схем в пути поиска
@@ -1823,7 +1726,7 @@ ALTER COLUMN ITEMID DROP NOT NULL;
 [[fblangref-ddl-table-alter-alter-column-identity]]
 ==== Изменение столбцов идентификации
 
-(((ALTER TABLE, ALTER [COLUMN], SET GENERATED)))
+(((ALTER TABLE, ALTER COLUMN, SET GENERATED)))
 Для столбцов идентификации позволено изменять способ генерации, начальное значение и значение приращения.
 
 Предложение `SET GENERATED` позволяет изменить способ генерации столбца идентификации.
@@ -1854,7 +1757,7 @@ ALTER ID SET GENERATED ALWAYS;
 ----
 ====
 
-(((ALTER TABLE, ALTER [COLUMN], RESTART))) (((ALTER TABLE, ALTER [COLUMN], RESTART WITH)))
+(((ALTER TABLE, ALTER COLUMN, RESTART))) (((ALTER TABLE, ALTER COLUMN, RESTART WITH)))
 Если указано только предложение `RESTART`, то происходит сброс значения генератора в ноль. Необязательное предложение `WITH` позволяет указать для нового значения внутреннего генератора отличное от нуля значение.
 
 .Изменение текущего значения генератора для столбца идентификации первой найденной таблицы с именем OBJECTS в одной из схем в пути поиска
@@ -1877,7 +1780,7 @@ ALTER ID RESTART WITH 100;
 ----
 ====
 
-(((ALTER TABLE, ALTER [COLUMN], SET INCREMENT)))
+(((ALTER TABLE, ALTER COLUMN, SET INCREMENT)))
 Предложение `SET INCREMENT [BY]` позволяет изменить значение приращения столбца идентификации. Значение приращения должно быть отлично от 0.
 
 .Изменение приращения столбца идентификации первой найденной таблицы с именем OBJECTS в одной из схем в пути поиска
@@ -1922,7 +1825,7 @@ ALTER ID SET GENERATED ALWAYS RESTART SET INCREMENT BY 2;
 ----
 ====
 
-(((ALTER TABLE, ALTER [COLUMN], DROP IDENTITY)))
+(((ALTER TABLE, ALTER COLUMN, DROP IDENTITY)))
 Предложение `DROP IDENTITY` удаляет связанный со столбцом идентификации системную последовательность и преобразует его в обычный столбец.
 
 .Превращение столбца идентификации в обычный столбец первой найденной таблицы с именем OBJECTS в одной из схем в пути поиска
@@ -1948,7 +1851,7 @@ ALTER ID DROP IDENTITY;
 [[fblangref-ddl-table-alter-alter-column-computed]]
 ==== Изменение вычисляемых столбцов
 
-(((ALTER TABLE, ALTER [COLUMN], GENERATED ALWAYS AS))) (((ALTER TABLE, ALTER [COLUMN], COMPUTED BY)))
+(((ALTER TABLE, ALTER COLUMN, GENERATED ALWAYS AS))) (((ALTER TABLE, ALTER COLUMN, COMPUTED BY)))
 Для вычисляемых столбцов (`GENERATED ALWAYS AS` или `COMPUTED BY`) позволяется изменить тип и выражение вычисляемого столбца. Невозможно изменить обычный столбец на вычисляемый и наоборот.
 
 .Изменение вычисляемых столбцов первой найденной таблицы с именем SALARY_HISTORY в одной из схем в пути поиска
@@ -2058,7 +1961,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP TABLE [IF EXISTS] \[__schema-name__.]_tablename_
+DROP TABLE [IF EXISTS] [ _tbl-schema_ <period> ] _tablename_
 ----
 
 .Параметры оператора `DROP TABLE`
@@ -2067,11 +1970,12 @@ DROP TABLE [IF EXISTS] \[__schema-name__.]_tablename_
 ^|Параметр
 ^|Описание
 
+|tbl-schema
+|Имя схемы таблицы. Если не указано, то таблица будет найдена в пути поиска.
+
 |tablename
 |Имя таблицы.
 
-|schema-name
-|Имя схемы.
 |===
 
 Оператор `DROP TABLE` удаляет существующую таблицу.
@@ -2138,7 +2042,7 @@ DSQL.
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-RECREATE [GLOBAL TEMPORARY] TABLE \[__schema-name__.]_tablename_
+RECREATE [GLOBAL TEMPORARY] TABLE [ _tbl-schema_ <period> ] _tablename_
   [EXTERNAL [FILE] '_filespec_']
   (<col_def> [, <col_def> | <tconstraint> ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]

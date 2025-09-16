@@ -24,7 +24,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE TRIGGER [IF NOT EXISTS] \[__schema-name__.]_trigname_ {
+CREATE TRIGGER [IF NOT EXISTS] [ _trig-schema_ <period> ] _trigname_ {
     <relation_trigger_legacy>
   | <relation_trigger_sql2003>
   | <database_trigger>
@@ -32,7 +32,7 @@ CREATE TRIGGER [IF NOT EXISTS] \[__schema-name__.]_trigname_ {
 <routine body>
 
 <relation_trigger_legacy> ::=
-  FOR [_schema_name_.]{_tablename_ | _viewname_}
+  FOR [ _rel-schema_ <period> ] {_tablename_ | _viewname_}
   [ACTIVE | INACTIVE]
   {BEFORE | AFTER} <mutation_list>
   [POSITION _number_]
@@ -40,7 +40,7 @@ CREATE TRIGGER [IF NOT EXISTS] \[__schema-name__.]_trigname_ {
 <relation_trigger_sql2003> ::=
   [ACTIVE | INACTIVE]
   {BEFORE | AFTER} <mutation_list>
-  ON [_schema_name_.]{_tablename_ | _viewname_}
+  ON [ _rel-schema_ <period> ] {_tablename_ | _viewname_}
   [POSITION _number_]
 
 <database_trigger> ::=
@@ -115,12 +115,12 @@ CREATE TRIGGER [IF NOT EXISTS] \[__schema-name__.]_trigname_ {
 ^| Параметр
 ^| Описание
 
-|trigname
-|Имя триггера.
-Может содержать до 63 символов.
+|trig-schema
+|Имя схемы триггера. Если не указано, то триггер создаётся в текущей схеме.
+Для DML триггеров, если схема определена, то она должна совпадать со схемой таблицы или представления.
 
-|schema-name
-|Имя схемы.
+|trigname
+|Имя триггера. Может содержать до 63 символов.
 
 |relation_trigger_legacy
 |Объявление табличного триггера (унаследованное).
@@ -133,6 +133,9 @@ CREATE TRIGGER [IF NOT EXISTS] \[__schema-name__.]_trigname_ {
 
 |ddl_trigger
 |Объявление DDL триггера.
+
+|rel-schema
+|Имя схемы таблицы или представления.  Если не указано, то таблица или представление будут найдены в пути поиска.
 
 |tablename
 |Имя таблицы.
@@ -980,7 +983,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER TRIGGER \[__schema-name__.]_trigname_
+ALTER TRIGGER [ _trig-schema_ <period> ] _trigname_
 [ACTIVE | INACTIVE]
 [{BEFORE | AFTER} <mutation_list>]
 [POSITION number]
@@ -1156,7 +1159,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER TRIGGER \[__schema-name__.]_trigname_ {
+CREATE OR ALTER TRIGGER [ _trig-schema_ <period> ] _trigname_ {
     <relation_trigger_legacy>
   | <relation_trigger_sql2003>
   | <database_trigger>
@@ -1206,7 +1209,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP TRIGGER [IF EXISTS] \[__schema-name__.]_trigname_
+DROP TRIGGER [IF EXISTS] [ _trig-schema_ <period> ] _trigname_
 ----
 
 .Параметры оператора `DROP TRIGGER`
@@ -1215,11 +1218,12 @@ DROP TRIGGER [IF EXISTS] \[__schema-name__.]_trigname_
 ^| Параметр
 ^| Описание
 
+|trig-schema
+|Имя схемы триггера. Если не указано, то триггер будет найден в пути поиска.
+
 |trigname
 |Имя триггера.
 
-|schema-name
-|Имя схемы.
 |===
 
 Оператор `DROP TRIGGER` удаляет существующий триггер.
@@ -1290,7 +1294,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE TRIGGER \[__schema-name__.]_trigname_ {
+RECREATE TRIGGER [ _trig-schema_ <period> ] _trigname_ {
     <relation_trigger_legacy>
   | <relation_trigger_sql2003>
   | <database_trigger>

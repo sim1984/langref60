@@ -19,34 +19,32 @@ DSQL, ESQL
 COMMENT ON <object> IS {'_sometext_' | NULL}
 <object> ::=
     DATABASE
-  | <basic-type> \[__schema-name__.]_objectname_
+  | <schema-bound-type> [ _object-schema_ <period> ] _objectname_
   | <schema-lees-type> _objectname_
   | USER _username_ [USING PLUGIN _plugin_name_]
-  | COLUMN \[__schema-name__.]_relationname_._fieldname_
+  | COLUMN [ _rel-schema_ <period> ] _relationname_ <period> _fieldname_
   | [PROCEDURE | FUNCTION] PARAMETER
-    [_schema-name_.]\[__package_name__.]_routinename_._paramname_
+    [<routine-location>] _routinename_ <period> _paramname_
   | {PROCEDURE | [EXTERNAL] FUNCTION}
-    [_schema-name_.]\[__package_name__.]_routinename_
-  | [GLOBAL] MAPPING _mappingname_
+    [<routine-location>] _routinename_
 
-<basic-type> ::=
-    CHARACTER SET
-  | COLLATION
-  | DOMAIN
-  | EXCEPTION
-  | GENERATOR
-  | INDEX
-  | PACKAGE
-  | SEQUENCE
-  | SCHEMA
-  | TABLE
-  | TRIGGER
-  | VIEW
+<schema-bound-type> ::=
+    CHARACTER SET | COLLATION | DOMAIN
+  | EXCEPTION | GENERATOR | INDEX
+  | PACKAGE | SEQUENCE | TRIGGER
+  | TABLE | VIEW
 
 <schema-lees-type> ::=
     SCHEMA
   | FILTER
   | ROLE
+  | [GLOBAL] MAPPING
+
+<routine-location> ::=
+    _routine-schema_
+  | [ _routine-schema_ <period> ] _package-name_
+  | _package-name_%PACKAGE
+  | _routine-schema_%SCHEMA
 
 ----
 
@@ -60,23 +58,29 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
 |sometext
 |Текст комментария.
 
-|basic-type
+|schema-bound-type
 |Тип объекта метаданных, который расположен внутри схемы.
 
 |schema-lees-type
 |Тип объекта метаданных, который не имеет схемы.
 
-|schema-name
+|object-schema
 |Имя схемы объекта метаданных.
 
 |objectname
 |Имя объекта метаданных.
+
+|rel-schema
+|Имя схемы таблицы или представления.
 
 |relationname
 |Имя таблицы или представления.
 
 |filedname
 |Имя поля таблицы или представления.
+
+|routine-schema
+|Имя схемы процедуры, функции или пакета.
 
 |routinename
 |Имя хранимой процедуры или функции.
@@ -93,8 +97,6 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
 |plugin_name
 |Имя плагина управления пользователями.
 
-|mappingname
-|Имя отображения.
 |===
 
 Оператор `COMMENT ON` добавляет комментарии для объектов базы данных (метаданных). Комментарии при этом сохраняются в текстовые поля `RDB$DESCRIPTION` типа `BLOB` соответствующей системной таблицы (из этих полей клиентское приложение может просмотреть комментарии).

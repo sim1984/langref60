@@ -25,7 +25,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE {SEQUENCE | GENERATOR} [IF NOT EXISTS] \[__schema-name__.]_seq_name_
+CREATE {SEQUENCE | GENERATOR} [IF NOT EXISTS] [ _seq-schema_ <period> ] _seq_name_
 [START WITH _start_value_] [INCREMENT [BY] _increment_]
 ----
 
@@ -36,11 +36,11 @@ CREATE {SEQUENCE | GENERATOR} [IF NOT EXISTS] \[__schema-name__.]_seq_name_
 ^| Параметр
 ^| Описание
 
+|seq-schema
+|Имя схемы последовательности. Если не указано, то последовательность создаётся в текущей схеме.
+
 |seq_name
 |Имя последовательности (генератора). Может содержать до 63 символов.
-
-|schema-name
-|Имя схемы.
 
 |start_value
 |Начальное значение последовательности (генератора).
@@ -172,7 +172,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-ALTER {SEQUENCE | GENERATOR} \[__schema-name__.]_seq_name_
+ALTER {SEQUENCE | GENERATOR} [ _seq-schema_ <period> ] _seq_name_
 [RESTART [WITH _newvalue_]]
 [INCREMENT [BY] _increment_]
 ----
@@ -184,11 +184,11 @@ ALTER {SEQUENCE | GENERATOR} \[__schema-name__.]_seq_name_
 ^| Параметр
 ^| Описание
 
+|seq-schema
+|Имя схемы последовательности. Если не указано, то последовательность (генератор) будет найдена в пути поиска.
+
 |seq_name
 |Имя последовательности (генератора).
-
-|schema-name
-|Имя схемы.
 
 |newvalue
 |Новое значение последовательности (генератора). 64 битное целое в диапазоне от -2^63^ до 2^63^ - 1
@@ -293,7 +293,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE OR ALTER {SEQUENCE | GENERATOR} \[__schema-name__.]_seq_name_
+CREATE OR ALTER {SEQUENCE | GENERATOR} [ _seq-schema_ <period> ] _seq_name_
 [{START WITH _start_value_ | RESTART}]
 [INCREMENT [BY] _increment_]
 ----
@@ -305,11 +305,11 @@ CREATE OR ALTER {SEQUENCE | GENERATOR} \[__schema-name__.]_seq_name_
 ^| Параметр
 ^| Описание
 
+|seq-schema
+|Имя схемы последовательности. Если не задано, то последовательность ищется в текущей схеме.
+
 |seq_name
 |Имя последовательности (генератора). Может содержать до 63 символов.
-
-|schema-name
-|Имя схемы.
 
 |start_value
 |Начальное значение последовательности (генератора).
@@ -366,7 +366,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP {SEQUENCE | GENERATOR} [IF EXISTS] \[__schema-name__.]_seq_name_
+DROP {SEQUENCE | GENERATOR} [IF EXISTS] [ _seq-schema_ <period> ] _seq_name_
 ----
 
 [[fblangref-ddl-tbl-dropseq]]
@@ -376,11 +376,12 @@ DROP {SEQUENCE | GENERATOR} [IF EXISTS] \[__schema-name__.]_seq_name_
 ^| Параметр
 ^| Описание
 
+|seq-schema
+|Имя схемы последовательности. Если не указано, то последовательность (генератор) будет найдена в пути поиска.
+
 |seq_name
 |Имя последовательности (генератора).
 
-|schema-name
-|Имя схемы.
 |===
 
 Оператор `DROP SEQUENCE` удаляет существующую последовательность (генератор). Слова `SEQUENCE` и `GENERATOR` являются синонимами. Вы можете использовать любое из них, но рекомендуется использовать `SEQUENCE`.
@@ -446,7 +447,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-RECREATE {SEQUENCE | GENERATOR} \[__schema-name__.]_seq_name_
+RECREATE {SEQUENCE | GENERATOR} [ _seq-schema_ <period> ] _seq_name_
   [START WITH _start_value_]
   [INCREMENT [BY] _increment_];
 ----
@@ -458,11 +459,11 @@ RECREATE {SEQUENCE | GENERATOR} \[__schema-name__.]_seq_name_
 ^| Параметр
 ^| Описание
 
+|seq-schema
+|Имя схемы последовательности. Если не задано, то последовательность ищется в текущей схеме.
+
 |seq_name
 |Имя последовательности (генератора). Может содержать до 63 символов.
-
-|schema-name
-|Имя схемы.
 
 |start_value
 |Начальное значение последовательности (генератора).
@@ -511,7 +512,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-SET GENERATOR \[__schema-name__.]_seq_name_ TO _new_val_
+SET GENERATOR [ _seq-schema_ <period> ] _seq_name_ TO _new_val_
 ----
 
 [[fblangref-ddl-tbl-setgen]]
@@ -521,11 +522,11 @@ SET GENERATOR \[__schema-name__.]_seq_name_ TO _new_val_
 ^| Параметр
 ^| Описание
 
+|seq-schema
+|Имя схемы последовательности. Если не указано, то последовательность (генератор) будет найдена в пути поиска.
+
 |seq_name
 |Имя последовательности (генератора).
-
-|schema-name
-|Имя схемы.
 
 |new_val
 |Новое значение последовательности (генератора). 64 битное целое в диапазоне от -2^63^ .. 2^63^ - 1

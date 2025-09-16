@@ -247,9 +247,9 @@ END
 [[fblangref-datatypes-integer-hex]]
 === Шестнадцатеричный формат для целых чисел
 
-Константы целочисленных типов можно указать в шестнадцатеричном формате.
+Литералы целочисленных типов можно указать в шестнадцатеричном формате.
 
-.Константы целочисленных типов в шестнадцатеричном формате
+.Литералы целочисленных типов в шестнадцатеричном формате
 [cols="<1,<1", options="header",stripes="none"]
 |===
 ^| Количество шестнадцатеричных цифр
@@ -267,7 +267,7 @@ END
 
 Запись `SMALLINT` в шестнадцатеричном представлении не поддерживается в явном виде, но Firebird будет прозрачно преобразовывать шестнадцатеричное число в `SMALLINT`, если это необходимо, при условии что оно попадает в допустимый диапазон положительных и отрицательных значений для `SMALLINT`.
 
-Использование и диапазоны значений чисел шестнадцатеричной нотации более подробно описаны в ходе обсуждения числовых констант в главе под названием "`Общие элементы языка`".
+Использование и диапазоны значений чисел шестнадцатеричной нотации более подробно описаны в ходе обсуждения числовых литералов в главе под названием "`Общие элементы языка`".
 
 .Использование целых чисел заданных шестнадцатеричном виде
 [example]
@@ -2916,8 +2916,8 @@ DROP DOMAIN Test_Domain;
 <domain_or_non_array_type> ::=
     <scalar_datatype>
   | <blob_datatype>
-  | [TYPE OF] \[__schema-name__.]_domain_
-  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
+  | [TYPE OF] [ _schema-name_ <period> ] _domain_
+  | TYPE OF COLUMN [ _schema-name_ <period> ] _rel_._col_
 
 <scalar_datatype> ::=
     {SMALLINT | INT[EGER] | BIGINT | INT128}
@@ -2929,8 +2929,8 @@ DROP DOMAIN Test_Domain;
   | {TIME | TIMESTAMP} [{WITH | WITHOUT} TIME ZONE]
   | {DECIMAL | NUMERIC} [(_precision_ [, _scale_])]
   | {VARCHAR | {CHAR | CHARACTER} VARYING} (_length_)
-    [CHARACTER SET [_schema-name_.{endsb}__charset__]
-  | {CHAR | CHARACTER} [(_length_)] [CHARACTER SET [_schema-name_.{endsb}__charset__]
+    [CHARACTER SET [ SYSTEM <period> ] _charset_ ]
+  | {CHAR | CHARACTER} [(_length_)] [CHARACTER SET [ SYSTEM <period> ] _charset_ ]
   | {NCHAR | NATIONAL {CHARACTER | CHAR}} VARYING (_length_)
   | {NCHAR | NATIONAL {CHARACTER | CHAR}} [(_length_)]
   | {BINARY | VARBINARY} (_length_)
@@ -2988,7 +2988,7 @@ DROP DOMAIN Test_Domain;
 [[fblangref-ddl-func-paramscoltype]]
 ==== Использование TYPE OF COLUMN в объявлениях
 
-Входные и выходные параметры или локальные переменные также могут быть объявлены с использованием типа данных столбцов в существующих таблицах и представлениях. Для этого используется предложение `TYPE OF COLUMN`, в котором в качестве аргумента указывается `_rel_._col_`.
+Входные и выходные параметры или локальные переменные также могут быть объявлены с использованием типа данных столбцов в существующих таблицах и представлениях. Для этого используется предложение `TYPE OF COLUMN`, в котором в качестве аргумента указывается `[ _schema-name_ <period>]  _rel_._col_`.
 
 Когда используется `TYPE OF COLUMN`, параметр или переменная наследует только тип данных и -- для строковых типов -- набор символов и последовательность сортировки. Ограничения и значение столбца по умолчанию игнорируются.
 
@@ -3003,7 +3003,7 @@ DROP DOMAIN Test_Domain;
 ----
 <blob_datatype> ::=
     BLOB [SUB_TYPE {_subtype_num_ | _subtype_name_}]
-    [SEGMENT SIZE _seglen_] [CHARACTER SET [_schema-name_.{endsb}__charset__]
+    [SEGMENT SIZE _seglen_] [CHARACTER SET [ SYSTEM <period> ] _charset_ ]
   | BLOB [(_seglen_ [, _subtype_num_])]
 ----
 
@@ -3015,9 +3015,6 @@ DROP DOMAIN Test_Domain;
 ^| Параметр
 ^^| Описание
 
-|schema-name
-|Имя схемы.
-
 |charset
 |Набор символов (игнорируется для всех подтипов кроме 1 (TEXT)).
 
@@ -3028,8 +3025,7 @@ DROP DOMAIN Test_Domain;
 |Мнемоническое имя подтипа BLOB; это может быть TEXT, BINARY или одно из (других) стандартных или настраиваемых имен, определенных в `RDB$TYPES` для `RDB$FIELD_NAME = 'RDB$FIELD_SUB_TYPE'`.
 
 |`seglen`
-|Размер сегмента не может быть больше 65535, по умолчанию -- 80, если не указан.
-Размер сегмента может быть может быть переопределён клиентом и в большинстве случаев не учитывается.
+|Размер сегмента не может быть больше 65535, по умолчанию -- 80, если не указан. Размер сегмента может быть может быть переопределён клиентом и в большинстве случаев не учитывается.
 |===
 
 [[fblangref-datatypes-syntax-array]]
@@ -3051,8 +3047,8 @@ DROP DOMAIN Test_Domain;
   | {TIME | TIMESTAMP} [{WITH | WITHOUT} TIME ZONE] <array_dim>
   | {DECIMAL | NUMERIC} [(_precision_ [, _scale_])]  <array_dim>
   | {VARCHAR | {CHAR | CHARACTER} VARYING} (_length_)  <array_dim>
-    [CHARACTER SET [_schema-name_.{endsb}__charset__]
-  | {CHAR | CHARACTER} [(_length_)]  <array_dim> [CHARACTER SET [_schema-name_.{endsb}__charset__]
+    [CHARACTER SET [ SYSTEM <period> ] _charset_ ]
+  | {CHAR | CHARACTER} [(_length_)]  <array_dim> [CHARACTER SET [ SYSTEM <period> ] _charset_ ]
   | {NCHAR | NATIONAL {CHARACTER | CHAR}} VARYING (_length_) <array_dim>
   | {NCHAR | NATIONAL {CHARACTER | CHAR}} [(_length_)] <array_dim>
   | {BINARY | VARBINARY} (_length_) <array_dim>
@@ -3066,9 +3062,6 @@ DROP DOMAIN Test_Domain;
 |===
 ^| Параметр
 ^^| Описание
-
-|schema-name
-|Имя схемы.
 
 |binary-precision
 |Двоичная точность. От 1 до 53 бит.

@@ -23,7 +23,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-CREATE PACKAGE [IF NOT EXISTS] \[__schema-name__.]_package_name_
+CREATE PACKAGE [IF NOT EXISTS] [ _pkg-schema_ <period> ] _package_name_
 [<rights clause>]
 AS
 BEGIN
@@ -39,7 +39,7 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
+  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
   [DETERMINISTIC]
 
 <procedure_decl> ::=
@@ -56,12 +56,12 @@ END
 
 <outparam>  ::=  <param_decl>
 
-<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
+<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
 
 <type> ::=
     <datatype>
-  | [TYPE OF] \[__schema-name__.]_domain_name_
-  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
+  | [TYPE OF] [ _dom-schema_ <period> ] _domain_name_
+  | TYPE OF COLUMN [ _rel-schema_ <period> ] _rel_._col_
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -78,12 +78,11 @@ END
 ^| Параметр
 ^| Описание
 
-|package_name
-|Имя пакета.
-Может содержать до 63 символов.
+|pkg-schema
+|Имя схемы пакета. Если не указано, то пакет создаётся в текущей схеме.
 
-|schema-name
-|Имя схемы.
+|package_name
+|Имя пакета. Может содержать до 63 символов.
 
 |function_decl
 |Объявление функции.
@@ -92,12 +91,10 @@ END
 |Объявление процедуры.
 
 |proc_name
-|Имя процедуры.
-Может содержать до 63 символов.
+|Имя процедуры. Может содержать до 63 символов.
 
 |func_name
-|Имя функции.
-Может содержать до 63 символов.
+|Имя функции. Может содержать до 63 символов.
 
 |inparam
 |Описание входного параметра.
@@ -112,18 +109,26 @@ END
 |Любая контекстная переменная, тип которой совместим с типом параметра.
 
 |paramname
-|Имя входного или выходного параметра процедуры/функции.
-Может содержать до 63 символов.
+|Имя входного или выходного параметра процедуры/функции. Может содержать до 63 символов.
 Имя параметра должно быть уникальным среди входных и выходных параметров процедуры/функции, а также её локальных переменных.
 
 |datatype
 |Тип данных SQL.
 
+|coll-schema
+|Имя схемы сортировки (сравнения). Если не указано, то сортировка будет найдена в пути поиска.
+
 |collation
-|Порядок сортировки.
+|Имя сортировки (сравнения).
+
+|dom-schema
+|Имя схемы домена. Если не указано, то домен будет найден в пути поиска.
 
 |domain_name
 |Имя домена.
+
+|rel-schema
+|Имя схемы таблицы или представления. Если не указано, то таблица или представление будут найдены в пути поиска.
 
 |rel
 |Имя таблицы или представления.
@@ -294,7 +299,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-ALTER PACKAGE \[__schema-name__.]_package_name_
+ALTER PACKAGE [ _pkg-schema_ <period> ] _package_name_
 [<rights clause>]
 AS
 BEGIN
@@ -307,7 +312,7 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
+  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
   [DETERMINISTIC]
 
 <procedure_decl> ::=
@@ -368,7 +373,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-CREATE OR ALTER PACKAGE \[__schema-name__.]_package_name_
+CREATE OR ALTER PACKAGE [ _pkg-schema_ <period> ] _package_name_
 [<rights clause>]
 AS
 BEGIN
@@ -381,7 +386,7 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
+  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
   [DETERMINISTIC]
 
 <procedure_decl> ::=
@@ -431,7 +436,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP PACKAGE [IF EXISTS] \[__schema-name__.]_package_name_
+DROP PACKAGE [IF EXISTS] [ _pkg-schema_ <period> ] _package_name_
 ----
 
 .Параметры оператора `DROP PACKAGE`
@@ -440,11 +445,12 @@ DROP PACKAGE [IF EXISTS] \[__schema-name__.]_package_name_
 ^| Параметр
 ^| Описание
 
+|pkg-schema
+|Имя схемы пакета. Если не указано, то пакет будет найден в пути поиска.
+
 |package_name
 |Имя пакета.
 
-|schema-name
-|Имя схемы, в которой находится пакет.
 |===
 
 Оператор `DROP PACKAGE` удаляет существующий заголовок пакета. Перед удалением заголовка пакета (`DROP PACKAGE`), необходимо выполнить удаление тела пакета (`DROP PACKAGE BODY`), иначе будет выдана ошибка. Если от заголовка пакета существуют зависимости, то при попытке удаления такого заголовка будет выдана соответствующая ошибка.
@@ -503,7 +509,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-RECREATE PACKAGE \[__schema-name__.]_package_name_
+RECREATE PACKAGE [ _pkg-schema_ <period> ] _package_name_
 [<rights clause>]
 AS
 BEGIN
@@ -516,7 +522,7 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
+  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
   [DETERMINISTIC]
 
 <procedure_decl> ::=

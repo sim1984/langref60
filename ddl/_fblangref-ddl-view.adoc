@@ -20,7 +20,7 @@ DSQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-CREATE VIEW [IF NOT EXISTS] \[__schema-name__.]_viewname_ [<full_column_list>]
+CREATE VIEW [IF NOT EXISTS] [ _vw-schema_ <period> ] _viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -34,12 +34,11 @@ AS <select_statement>
 ^| Параметр
 ^| Описание
 
-|viewname
-|Имя представления.
-Может содержать до 63 символов.
+|vw-schema
+|Имя схемы представления. Если не указано, то представление создаётся в текущей схеме.
 
-|schema-name
-|Имя схемы.
+|viewname
+|Имя представления. Может содержать до 63 символов.
 
 |select_statement
 |Оператор SELECT.
@@ -324,7 +323,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-ALTER VIEW \[__schema-name__.]_viewname_ [<full_column_list>]
+ALTER VIEW [ _vw-schema_ <period> ] _viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -338,11 +337,11 @@ AS <select_statement>
 ^| Параметр
 ^| Описание
 
+|vw-schema
+|Имя схемы представления. Если не указано, то представление будет найдено в пути поиска.
+
 |viewname
 |Имя существующего представления.
-
-|schema-name
-|Имя схемы.
 
 |select_statement
 |Оператор `SELECT`.
@@ -417,7 +416,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-CREATE OR ALTER VIEW \[__schema-name__.]_viewname_ [<full_column_list>]
+CREATE OR ALTER VIEW [ _vw-schema_ <period> ] _viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -431,12 +430,11 @@ AS <select_statement>
 ^| Параметр
 ^| Описание
 
-|viewname
-|Имя представления.
-Может содержать до 63 символов.
+|vw-schema
+|Имя схемы представления. Если не указано, то поиск представление будет производится в текущей схеме.
 
-|schema-name
-|Имя схемы.
+|viewname
+|Имя представления. Может содержать до 63 символов.
 
 |select_statement
 |Оператор `SELECT`.
@@ -490,7 +488,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP VIEW [IF EXISTS] \[__schema-name__.]_viewname_
+DROP VIEW [IF EXISTS] [ _vw-schema_ <period> ] _viewname_
 ----
 
 [[fblangref-ddl-view-dropview-tbl]]
@@ -500,11 +498,12 @@ DROP VIEW [IF EXISTS] \[__schema-name__.]_viewname_
 ^| Параметр
 ^| Описание
 
+|vw-schema
+|Имя схемы представления. Если не указано, то представление будет найдено в пути поиска.
+
 |viewname
 |Имя представления.
 
-|schema-name
-|Имя схемы.
 |===
 
 Оператор `DROP VIEW` удаляет существующее представление.
@@ -565,7 +564,7 @@ DSQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-RECREATE VIEW \[__schema-name__.]_viewname_ [<full_column_list>]
+RECREATE VIEW [ _vw-schema_ <period> ] _viewname_ [<full_column_list>]
 AS <select_statement>
 [WITH CHECK OPTION];
 
@@ -579,12 +578,11 @@ AS <select_statement>
 ^| Параметр
 ^| Описание
 
-|viewname
-|Имя представления.
-Может содержать до 63 символов.
+|vw-schema
+|Имя схемы представления. Если не указано, то поиск представление будет производится в текущей схеме.
 
-|schema-name
-|Имя схемы.
+|viewname
+|Имя представления. Может содержать до 63 символов.
 
 |select_statement
 |Оператор `SELECT`.

@@ -5034,7 +5034,7 @@ DSQL, PSQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-GEN_ID (_generator-name_, _step_)
+GEN_ID (\[__schema-name__.]_generator-name_, _step_)
 ----
 
 [[fblangref-funcs-tbl-gen-id]]
@@ -5043,6 +5043,10 @@ GEN_ID (_generator-name_, _step_)
 |===
 ^| Параметр
 ^| Описание
+
+|schema-name
+|Имя схемы генератора (последовательности).
+Если схема не задана, то ищется первый генератор с заданным именем в пути поиска.
 
 |generator-name
 |Имя генератора (последовательности).
@@ -5076,6 +5080,15 @@ GEN_ID (_generator-name_, _step_)
 [source,sql]
 ----
 NEW.ID = GEN_ID (GEN_TABLE_ID, 1);
+----
+====
+
+.Использование функции `GEN_ID` с генератором в схеме WAREHOUSE
+[example]
+====
+[source,sql]
+----
+NEW.ID = GEN_ID (WAREHOUSE.GEN_TABLE_ID, 1);
 ----
 ====
 

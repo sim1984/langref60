@@ -433,10 +433,21 @@ FROM <table-reference> [, <table-reference> ...]
   | <parenthesized-joined-table>
 
 <table-or-query-name> ::=
-    \[__schema-name__.]_table-name_
-  | [_schema-name_.]\[__package-name__.]_procedure-name_ [(<procedure-args>)]
+    <table-name>
+  | [ <routine-location> <period> ] _procedure-name_ [(<procedure-args>)]
   | _query-name_
 
+
+<table-name> ::= [ _schema-name_ <period> ] _table-name_
+
+<selectable-procedure> ::=
+  [ <routine-location> <period> ] _procedure-name_ [(<procedure-args>)]
+
+<routine-location> ::=
+    _schema-name_
+  | [ _schema-name_ <period> ] _package-name_
+  | _package-name_%PACKAGE
+  | _schema-name_%SCHEMA
 
 <procedure-args> ::= <value-expression [, <value-expression> ...]
 
@@ -754,7 +765,7 @@ FROM (SELECT *
 ====
 * Производные таблицы могут быть вложенными;
 * Производные таблицы могут быть объединениями и использоваться в объединениях. Они могут содержать агрегатные функции, подзапросы и соединения, и сами по себе могут быть использованы в агрегатных функциях, подзапросах и соединениях. Они также могут быть хранимыми процедурами или запросами из них. Они могут иметь предложения `WHERE`, `ORDER BY` и `GROUP BY`, указания `FIRST`, `SKIP` или `ROWS` и т.д.;
-* Каждый столбец в производной таблице должен иметь имя. Если этого нет по своей природе (например, потому что это -- константа), то надо в обычном порядке присвоить псевдоним или добавить список псевдонимов столбцов в спецификации производной таблицы;
+* Каждый столбец в производной таблице должен иметь имя. Если этого нет по своей природе (например, потому что это -- литерал), то надо в обычном порядке присвоить псевдоним или добавить список псевдонимов столбцов в спецификации производной таблицы;
 * Список псевдонимов столбцов опциональный, но если он присутствует, то должен быть полным (т.е. он должен содержать псевдоним для каждого столбца производной таблицы);
 * Оптимизатор может обрабатывать производные таблицы очень эффективно. Однако если производная таблица включена во внутреннее соединение и содержит подзапрос, то никакой порядок соединения не может быть использован оптимизатором;
 * Ключевое слово `LATERAL` позволяет производной таблице ссылаться на поля из ранее перечисленных таблиц в текущем `<table reference list>`.
@@ -2010,7 +2021,7 @@ GROUP BY <grouping-item> [, <grouping-item> ...]
 
 * Столбцы исходной таблицы, которые не включены в список выборки `SELECT`, или неагрегатные выражения, основанные на таких столбцах. Добавление таких столбцов может дополнительно разбить группы. Но так как эти столбцы не в списке выборки `SELECT`, вы не можете сказать, какому значению столбца соответствует значение агрегированной строки. Таким образом, если вы заинтересованы в этой информации, вы так же должны включить этот столбец или выражение в список выборки `SELECT`, что возвращает вас к правилу "каждый не агрегированный столбце в списке выборки `SELECT` должен быть включён в список группировки `GROUP BY`";
 
-* Выражения, которые не зависят от данных из основного набора, т.е. константы, контекстные переменные, некоррелированные подзапросы, возвращающие единственное значение и т.д. Это упоминается только для полноты картины, т.к. добавление этих элементов является абсолютно бессмысленным, поскольку они не повлияют на группировку вообще. "Безвредные, но бесполезные" элементы так же могут фигурировать в списке выбора `SELECT` без их копирования в список группировки `GROUP BY`.
+* Выражения, которые не зависят от данных из основного набора, т.е. литералы, контекстные переменные, некоррелированные подзапросы, возвращающие единственное значение и т.д. Это упоминается только для полноты картины, т.к. добавление этих элементов является абсолютно бессмысленным, поскольку они не повлияют на группировку вообще. "Безвредные, но бесполезные" элементы так же могут фигурировать в списке выбора `SELECT` без их копирования в список группировки `GROUP BY`.
 
 
 [float]
@@ -2188,7 +2199,7 @@ GROUP BY class, sex, boarding_type
 * Любой агрегированный столбец в списке выбора `SELECT`. Это наиболее широко используемый случай;
 * Любое агрегированное выражение, которое не находится в списке выбора `SELECT`, но разрешено в контексте запроса. Иногда это полезно;
 * Любой столбец в списке `GROUP BY`. Однако более эффективно фильтровать не агрегированные данные на более ранней стадии в предложении `WHERE`;
-* Любое выражение, значение которого не зависит от содержимого набора данных (например, константа или контекстная переменная). Это допустимо, но совершенно бессмысленно, потому что такое условие, не имеющее никакого отношения к самому набору данных, либо подавит весь набор, либо оставит его не тронутым.
+* Любое выражение, значение которого не зависит от содержимого набора данных (например, литерал или контекстная переменная). Это допустимо, но совершенно бессмысленно, потому что такое условие, не имеющее никакого отношения к самому набору данных, либо подавит весь набор, либо оставит его не тронутым.
 
 Предложение `HAVING` не может содержать:
 
@@ -3972,9 +3983,21 @@ FROM
   | <parenthesized-joined-table>
 
 <table-or-query-name> ::=
-    \[__schema-name__.]_table-name_
-  | [_schema-name_.]\[__package-name__.]_procedure-name_ [(<procedure-args>)]
+    <table-name>
+  | [ <routine-location> <period> ] _procedure-name_ [(<procedure-args>)]
   | _query-name_
+
+
+<table-name> ::= [ _schema-name_ <period> ] _table-name_
+
+<selectable-procedure> ::=
+  [ <routine-location> <period> ] _procedure-name_ [(<procedure-args>)]
+
+<routine-location> ::=
+    _schema-name_
+  | [ _schema-name_ <period> ] _package-name_
+  | _package-name_%PACKAGE
+  | _schema-name_%SCHEMA
 
 <procedure-args> ::= <value-expression> [, <value-expression> ...]
 
@@ -4079,7 +4102,7 @@ DSQL, ESQL, PSQL
 .Синтаксис
 [listing,subs="+quotes,attributes"]
 ----
-INSERT INTO \[__schema-name__.]_target_
+INSERT INTO [ _schema-name_ <period> ] _target_
   {DEFAULT VALUES | [(<column_list>)] [<override_opt>] <value_source>}
   [RETURNING <returning_list> [INTO <variables>]]
 
@@ -4093,15 +4116,17 @@ INSERT INTO \[__schema-name__.]_target_
 
 <ins_value> :: = <value_expression> | DEFAULT
 
-<returning_list> ::= * | <output_column> [, <output_column>]
+<returning_list> ::= * | <output_column> [, <output_column> ...]
 
 <output_column> ::=
-    \[__schema-name__.]_target_.*
-  | <return_expression> [COLLATE [_schema-name_.{endsb}__collation__] [[AS] _alias_]
+    [ _schema-name_ <period> ] _target_.*
+  | <return_expression> [COLLATE <collation-name>] [[AS] _alias_]
+
+<collation-name> ::= [ _schema-name_ <period> ] _collation_
 
 <return_expression> ::=
     <value_expression>
-  | [[_schema-name_.] _target_.{endsb}__col_name__
+  | [ [ _schema-name_ <period> ] _target_ <period> ] _col_name_
 
 <value_expression> ::=
     <literal>
@@ -4170,7 +4195,7 @@ INSERT INTO \[__schema-name__.]_target_
 
 [NOTE]
 ====
-<<fblangref-commons-introducer-syntax,Вводный синтаксис>> даёт возможность определить набор символов для значений строковых констант (литералов). Вводный синтаксис работает только с литералами строк: он не может быть применён к строковым переменным, параметрам, ссылкам на столбцы или значения, выражениям.
+<<fblangref-commons-introducer-syntax,Вводный синтаксис>> даёт возможность определить набор символов для значений строковых литералов. Вводный синтаксис работает только с литералами строк: он не может быть применён к строковым переменным, параметрам, ссылкам на столбцы или значения, выражениям.
 ====
 
 .Использование `INSERT` с предложением `VALUES`
@@ -4408,7 +4433,7 @@ DSQL, ESQL, PSQL
 .Синтаксис
 [listing,subs="+quotes,attributes"]
 ----
-UPDATE \[__schema-name__.]_target_ [[AS] _alias_]
+UPDATE [ _schema-name_ <period> ] _target_ [[AS] _alias_]
   SET _col_name_ = <upd_value> [, _col_name_ = <upd_value> ...]
   [WHERE {<search-conditions> | CURRENT OF _cursorname_}]
   [PLAN <plan_items>]
@@ -4422,13 +4447,15 @@ UPDATE \[__schema-name__.]_target_ [[AS] _alias_]
 <returning_list> ::= * | <output_column> [, <output_column>]
 
 <output_column> ::=
-    \[__schema-name__.]_target_.*
+    [ _schema-name_ <period> ] _target_.*
   | NEW.* | OLD.*
-  | <return_expression> [COLLATE [_schema-name_.{endsb}_collation_] [[AS] _ret_alias_]
+  | <return_expression> [COLLATE <collation-name>] [[AS] _ret_alias_]
+
+<collation-name> ::= [ _schema-name_ <period> ] _collation_
 
 <return_expression> ::=
     <value_expression>
-  | [[_schema-name_.{endsb}__target__.{endsb}__col_name__
+  | [ [ _schema-name_ <period> ] _target_ <period> ] _col_name_
   | NEW._col_name_
   | OLD._col_name_
 
@@ -4799,7 +4826,7 @@ DSQL, PSQL
 [listing,subs="+quotes,attributes"]
 ----
 UPDATE OR INSERT INTO
-  \[__schema-name__.]_target_ [(<column_list>)]
+  [ _schema-name_ <period> ] _target_ [(<column_list>)]
   [<override_opt>]
   VALUES (<value_list>)
   [MATCHING (<column_list>)]
@@ -4816,13 +4843,15 @@ UPDATE OR INSERT INTO
 <returning_list> ::= * | <output_column> [, <output_column>]
 
 <output_column> ::=
-    \[__schema-name__.]_target_.*
+    [ _schema-name_ <period> ] _target_.*
   | NEW.* | OLD.*
-  | <return_expression> [COLLATE [_schema-name_.{endsb}__collation__] [[AS] _alias_]
+  | <return_expression> [COLLATE <collation-name>] [[AS] _alias_]
+
+<collation-name> ::= [ _schema-name_ <period> ] _collation_
 
 <return_expression> ::=
     <value_expression>
-  | [[_schema-name_.{endsb}__target__.{endsb}__col_name__
+  | [ [ _schema-name_ <period> ] _target_ <period> ] _col_name_
   | NEW._col_name_
   | OLD._col_name_
 
@@ -4960,7 +4989,7 @@ DSQL, ESQL, PSQL
 [listing,subs="+quotes,attributes"]
 ----
 DELETE
-  FROM \[__schema-name__.]_target_ [[AS] _alias_]
+  FROM [ _schema-name_ <period> ] _target_ [[AS] _alias_]
   [WHERE {<search-conditions> | CURRENT OF _cursorname_}]
   [PLAN <plan_items>]
   [ORDER BY <sort_items>]
@@ -4971,12 +5000,14 @@ DELETE
 <returning_list> ::= * | <output_column> [, <output_column>]
 
 <output_column> ::=
-    \[__schema-name__.]_target_.*
-  | <return_expression> [COLLATE [_schema-name_.{endsb}__collation__] [[AS] _ret_alias_]
+    [ _schema-name_ <period> ] _target_.*
+  | <return_expression> [COLLATE <collation-name>] [[AS] _ret_alias_]
+
+<collation-name> ::= [ _schema-name_ <period> ] _collation_
 
 <return_expression> ::=
     <value_expression>
-  | [[_schema-name_.{endsb}__target__.{endsb}__col_name__
+  | [ [ _schema-name_ <period> ] _target_ <period> ] _col_name_
 
 <value_expression> ::=
     <literal>
@@ -5305,15 +5336,13 @@ DSQL, PSQL
 [listing,subs="+quotes,attributes"]
 ----
 MERGE
-  INTO \[__schema-name__.]_target_ [[AS] _target_alias_]
-  USING <source> [[AS] _source_alias_]
+  INTO [ _schema-name_ <period> ] _target_ [[AS] _target_alias_]
+  USING <table-reference>
   ON <join condition>
   <merge when> [<merge when> ...]
   [<plan clause>]
   [<order by clause>]
   [<returning clause>]
-
-<source> ::= \[__schema-name__.]_tablename_ | (<select_stmt>)
 
 <merge when> ::=
     <merge when matched>
@@ -5333,6 +5362,13 @@ MERGE
   WHEN NOT MATCHED BY SOURCE [ AND <condition> ] THEN
     { UPDATE SET <assignment list> | DELETE }
 
+<table-reference> ::= <table-primary> | <joined-table>
+
+<table-primary> ::=
+    <table-or-query-name> [[AS] correlation-name]
+  | [LATERAL] <derived-table> [<correlation-or-recognition>]
+  | <parenthesized-joined-table>
+
 <assignment_list> ::=
   _col_name_ = <m_value> [, _colname_ = <m_value> ...]
 
@@ -5349,13 +5385,15 @@ MERGE
 <returning_list> ::= * | <output_column> [, <output_column>]
 
 <output_column> ::=
-    \[__schema-name__.]_target_.*
+    [ _schema-name_ <period> ] _target_.*
   | NEW.* | OLD.*
-  | <return_expression> [COLLATE [_schema-name_.{endsb}__collation__] [[AS] _ret_alias_]
+  | <return_expression> [COLLATE <collation-name>] [[AS] _ret_alias_]
+
+<collation-name> ::= [ _schema-name_ <period> ] _collation_
 
 <return_expression> ::=
     <value_expression>
-  | [[_schema-name_.{endsb}__target__.{endsb}__col_name__
+  | [ [ _schema-name_ <period> ] _target_ <period> ] _col_name_
   | NEW._col_name_
   | OLD._col_name_
 
@@ -5381,15 +5419,8 @@ MERGE
 |target
 |Целевая таблица или обновляемое представление.
 
-|source
-|Источник данных.
-Может быть таблицей, представлением, хранимой процедурой или производной таблицей.
-
 |target_alias
 |Псевдоним целевой таблицы или представления.
-
-|source_alias
-|Псевдоним источника.
 
 |join condition
 |Условие соединения целевой таблицы и источника.
@@ -5644,9 +5675,15 @@ DSQL, ESQL, PSQL
 [listing,subs="+quotes,attributes"]
 ----
 <execute procedure> ::=
-    EXECUTE PROCEDURE [_schema-name_.]\[__package-name__.]_procedure-name_
+    EXECUTE PROCEDURE [<routine-location> <period> ] _procedure-name_
     [{ (<arguments>) | <arguments> }]
    [RETURNING_VALUES { <outvar-list> | ( <outvar-list> ) }]
+
+<routine-location> ::=
+    _schema-name_
+  | [ _schema-name_ <period> ] _package-name_
+  | _package-name_%PACKAGE
+  | _schema-name_%SCHEMA
 
 <arguments> ::=
     <positional arguments> |
@@ -5841,7 +5878,13 @@ DSQL, ESQL, PSQL
 [listing,subs="+quotes,macros"]
 ----
 <call statement> ::=
-    CALL [_schema-name_.]\[__package-name__.]_procedure-name_ (<arguments>)
+    CALL [<routine-location> <period> ] _procedure-name_ (<arguments>)
+
+<routine-location> ::=
+    _schema-name_
+  | [ _schema-name_ <period> ] _package-name_
+  | _package-name_%PACKAGE
+  | _schema-name_%SCHEMA
 
 <arguments> ::=
     <positional arguments> |
@@ -5995,12 +6038,14 @@ EXECUTE BLOCK [(<inparams>)]
 
 <outparams> ::= <param_decl> [, <outparams>]
 
-<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE _collation_]
+<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE <collation-name>]
+
+<collation-name> ::= [ _schema-name_ <period> ] _collation_
 
 <type> ::=
     <non_array_datatype>
-  | [TYPE OF] _domain_
-  | TYPE OF COLUMN _rel_._col_
+  | [TYPE OF] [ _schema-name_ <period> ] _domain_
+  | TYPE OF COLUMN [ _schema-name_ <period> ] _rel_._col_
 
 <non_array_datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -6029,6 +6074,9 @@ EXECUTE BLOCK [(<inparams>)]
 
 |non_array_datatype
 |Тип данных SQL за исключение массивов.
+
+|schema-name
+|Имя схемы.
 
 |collation
 |Порядок сортировки.

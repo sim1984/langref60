@@ -19,7 +19,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
-CREATE PROCEDURE [IF NOT EXISTS] \[__schema-name__.]_procname_ [( <in_params> )]
+CREATE PROCEDURE [IF NOT EXISTS] [ _proc-schema_ <period> ] _procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine body>
 
@@ -33,12 +33,12 @@ CREATE PROCEDURE [IF NOT EXISTS] \[__schema-name__.]_procname_ [( <in_params> )]
 
 <value> ::=  {_literal_ | NULL | _context_var_}
 
-<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [_schema-name_.{endsb}__collation__]
+<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
 
 <type> ::=
     <datatype>
-  | [TYPE OF] \[__schema-name__.]_domain_
-  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
+  | [TYPE OF] [ _dom-schema_ <period> ] _domain_
+  | TYPE OF COLUMN [ _rel-schema_ <period> ] _rel_._col_
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype>
@@ -77,11 +77,11 @@ CREATE PROCEDURE [IF NOT EXISTS] \[__schema-name__.]_procname_ [( <in_params> )]
 ^| Параметр
 ^| Описание
 
+|proc-schema
+|Имя схемы хранимой процедуры. Если не указано, то хранимая процедура создаётся в текущей схеме.
+
 |procname
 |Имя хранимой процедуры. Может содержать до 63 символов.
-
-|schema-name
-|Имя схемы.
 
 |inparam
 |Описание входного параметра.
@@ -118,11 +118,20 @@ CREATE PROCEDURE [IF NOT EXISTS] \[__schema-name__.]_procname_ [( <in_params> )]
 |datatype
 |Тип данных SQL.
 
+|coll-schema
+|Имя схемы сортировки (сравнения). Если не указано, то сортировка будет найдена в пути поиска.
+
 |collation
 |Порядок сортировки.
 
+|coll-schema
+|Имя схемы домена. Если не указано, то домен будет найден в пути поиска.
+
 |domain_name
 |Имя домена.
+
+|rel-schema
+|Имя схемы таблицы или представления. Если не указано, то таблица или представление будут найдены в пути поиска.
 
 |rel
 |Имя таблицы или представления.
@@ -369,7 +378,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER PROCEDURE \[__schema-name__.]_procname_ [( <in_params> )]
+ALTER PROCEDURE [ _proc-schema_ <period> ] _procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 
@@ -448,7 +457,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-CREATE OR ALTER PROCEDURE \[__schema-name__.]_procname_ [( <in_params> )]
+CREATE OR ALTER PROCEDURE [ _proc-schema_ <period> ] _procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 
@@ -505,7 +514,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes"]
 ----
-DROP PROCEDURE [IF EXISTS] \[__schema-name__.]_procname_
+DROP PROCEDURE [IF EXISTS] [ _proc-schema_ <period> ] _procname_
 ----
 
 .Параметры оператора `DROP PROCEDURE`
@@ -514,11 +523,12 @@ DROP PROCEDURE [IF EXISTS] \[__schema-name__.]_procname_
 ^| Параметр
 ^| Описание
 
+|proc-schema
+|Имя схемы хранимой процедуры. Если не указано, то процедура будет найдена в пути поиска.
+
 |procname
 |Имя хранимой процедуры.
 
-|schema-name
-|Имя схемы.
 |===
 
 Оператор `DROP PROCEDURE` удаляет существующую хранимую процедуру.
@@ -580,7 +590,7 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-RECREATE PROCEDURE \[__schema-name__.]_procname_ [( <in_params> )]
+RECREATE PROCEDURE [ _proc-schema_ <period> ] _procname_ [( <in_params> )]
 [ RETURNS ( <out_params> ) ]
 <routine-body>
 

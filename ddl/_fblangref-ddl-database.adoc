@@ -30,8 +30,8 @@ CREATE DATABASE <filespec>
   | OWNER _ownername_
 
 <db_config_option> ::=
-    DEFAULT CHARACTER SET _default_charset_
-      [COLLATION _collation_]
+    DEFAULT CHARACTER SET [SYSTEM <period>] _default_charset_
+      [COLLATION [SYSTEM <period>] _collation_]
   | DIFFERENCE FILE '_diff_file_'
 
 
@@ -380,7 +380,7 @@ DSQL, ESQL
 ALTER DATABASE
     {ADD DIFFERENCE FILE '_diff_file_' | DROP DIFFERENCE FILE}
   | {{BEGIN | END} BACKUP}
-  | {SET DEFAULT CHARACTER SET _charset_}
+  | {SET DEFAULT CHARACTER SET [SYSTEM <period>] _charset_}
   | {SET DEFAULT SQL SECURITY {DEFINER | INVOKER}}
   | {SET LINGER TO _linger_duration_ | DROP LINGER}
   | {ENCRYPT WITH _plugin_name_ [KEY _key_name_] | DECRYPT}

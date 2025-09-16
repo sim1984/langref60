@@ -19,10 +19,10 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,attributes,macros"]
 ----
-CREATE DOMAIN [IF NOT EXISTS] \[__schema-name__.]_domain_name_ [AS] <datatype>
+CREATE DOMAIN [IF NOT EXISTS] [ _dom-schema_ <period> ] _domain_name_ [AS] <datatype>
   [DEFAULT {<literal> | NULL | <context_var>}]
   [NOT NULL] [CHECK (<dom_condition>)]
-  [COLLATE [_schema-name_.{endsb}__collation__] ;
+  [COLLATE [ _coll-schema_ <period> ] _collation_ ] ;
 
 <datatype> ::=
     <scalar_datatype> | <blob_datatype> | <array_datatype>
@@ -63,17 +63,17 @@ CREATE DOMAIN [IF NOT EXISTS] \[__schema-name__.]_domain_name_ [AS] <datatype>
   | <context_var>
   | <expression>
   | NULL
-  | NEXT VALUE FOR \[__schema-name__.]_genname_
-  | GEN_ID(\[__schema-name__.]_genname_, <val>)
+  | NEXT VALUE FOR [ _gen-schema_ <period> ] _genname_
+  | GEN_ID([ _gen-schema_ <period> ] _genname_, <val>)
   | CAST(<val> AS <cast_type>)
   | (<select_one>)
-  | _func_(<val> [, <val> ...])
+  | [<routine-location> <period>] _func_(<val> [, <val> ...])
 }
 
 <cast_type> ::=
    <datatype>
-  | [TYPE OF] \[__schema-name__.]_domain_
-  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
+  | [TYPE OF] [ _dom-schema_ <period> ] _domain_
+  | TYPE OF COLUMN [ _rel-schema_ <period> ] _rel_._col_
 ----
 
 
@@ -84,12 +84,11 @@ CREATE DOMAIN [IF NOT EXISTS] \[__schema-name__.]_domain_name_ [AS] <datatype>
 ^|Параметр
 ^|Описание
 
-|domain_name
-|Имя домена.
-Может содержать до 63 символов.
+|dom-schema
+|Имя схемы домена. Если не указано, то домен создаётся в текущей схеме.
 
-|schema-name
-|Имя схемы
+|domain_name
+|Имя домена. Может содержать до 63 символов.
 
 |datatype
 |Тип данных SQL.
@@ -103,11 +102,11 @@ CREATE DOMAIN [IF NOT EXISTS] \[__schema-name__.]_domain_name_ [AS] <datatype>
 |dom_condition
 |Условие домена.
 
-|collation_name
-|Порядок сортировки.
+|coll-schema
+|Имя схемы сортировки (сравнения). Если не указано, то сортировка будет найдена в пути поиска.
 
-|charset
-|Набор символов.
+|collation_name
+|Имя сортировки (сравнения).
 
 |select_one
 |Оператор `SELECT` выбирающий один столбец и возвращающий только одну строку.
@@ -120,6 +119,9 @@ CREATE DOMAIN [IF NOT EXISTS] \[__schema-name__.]_domain_name_ [AS] <datatype>
 
 |expression
 |Выражение.
+
+|gen-schema
+|Имя схемы последовательности (генератора). Если не указано, то последовательность будет найдена в пути поиска.
 
 |genname
 |Имя последовательности (генератора).
@@ -282,7 +284,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER DOMAIN \[__schema-name__.]_domain_name_
+ALTER DOMAIN [ _dom-schema_ <period> ] _domain_name_
   [TO _new_name_]
   [TYPE <datatype>]
   [{SET DEFAULT {<literal> | NULL | <context_var>}} | DROP DEFAULT]
@@ -328,17 +330,17 @@ ALTER DOMAIN \[__schema-name__.]_domain_name_
   | <context_var>
   | <expression>
   | NULL
-  | NEXT VALUE FOR \[__schema-name__.]_genname_
-  | GEN_ID(\[__schema-name__.]_genname_, <val>)
+  | NEXT VALUE FOR [ _gen-schema_ <period> ] _genname_
+  | GEN_ID([ _gen-schema_ <period> ] _genname_, <val>)
   | CAST(<val> AS <cast_type>)
   | (<select_one>)
-  | _func_(<val> [, <val> ...])
+  | [<routine-location> <period>] _func_(<val> [, <val> ...])
 
 
 <cast_type> ::=
     <datatype>
-  | [TYPE OF] \[__schema-name__.]_domain_
-  | TYPE OF COLUMN \[__schema-name__.]_rel_._col_
+  | [TYPE OF] [ _dom-schema_ <period> ] _domain_
+  | TYPE OF COLUMN [ _rel-schema_ <period> ] _rel_._col_
 ----
 
 [[fblangref-ddl-tbl-alterdomn]]
@@ -348,15 +350,14 @@ ALTER DOMAIN \[__schema-name__.]_domain_name_
 ^|Параметр
 ^|Описание
 
+|dom-schema
+|Имя схемы домена. Если не указано, то домен будет найден в пути поиска.
+
 |domain_name
 |Имя домена.
 
-|schema-name
-|Имя схемы.
-
 |new_name
-|Новое имя домена.
-Может содержать до 63 символов.
+|Новое имя домена. Может содержать до 63 символов.
 
 |datatype
 |Тип данных SQL.
@@ -384,6 +385,9 @@ ALTER DOMAIN \[__schema-name__.]_domain_name_
 
 |expression
 |Выражение.
+
+|gen-schema
+|Имя схемы последовательности (генератора). Если не указано, то последовательность будет найдена в пути поиска.
 
 |genname
 |Имя последовательности (генератора).
@@ -537,7 +541,7 @@ DSQL, ESQL.
 .Синтаксис
 [listing,subs=+quotes]
 ----
-DROP DOMAIN [IF EXISTS] \[__schema-name__.]_domain_name_
+DROP DOMAIN [IF EXISTS] [ _dom-schema_ <period> ] _domain_name_
 ----
 
 
@@ -547,11 +551,12 @@ DROP DOMAIN [IF EXISTS] \[__schema-name__.]_domain_name_
 | Параметр
 | Описание
 
+|dom-schema
+|Имя схемы домена. Если не указано, то домен будет найден в пути поиска.
+
 |domain_name
 |Имя домена.
 
-|schema-name
-|Имя схемы.
 |===
 
 Оператор `DROP DOMAIN` удаляет домен, существующий в базе данных.
