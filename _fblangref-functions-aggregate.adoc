@@ -558,7 +558,7 @@ GROUP BY dept_no
 Данная группа функций работает с битами целых чисел, выполняя побитовые операции `AND`, `OR` или `XOR`.
 
 [[fblangref-aggfuncs-bin-and-agg]]
-=== `BIN_AND_AGG`
+=== `BIN_AND_AGG()`
 
 .Доступно в
 DSQL
@@ -607,7 +607,7 @@ GROUP BY name
 <<fblangref-scalarfuncs-bin-and>>, <<fblangref-aggfuncs-bin-or-agg>>, <<fblangref-aggfuncs-bin-xor-agg>>.
 
 [[fblangref-aggfuncs-bin-or-agg]]
-=== `BIN_OR_AGG`
+=== `BIN_OR_AGG()`
 
 .Доступно в
 DSQL
@@ -656,7 +656,7 @@ GROUP BY name
 <<fblangref-scalarfuncs-bin-or>>, <<fblangref-aggfuncs-bin-and-agg>>, <<fblangref-aggfuncs-bin-xor-agg>>.
 
 [[fblangref-aggfuncs-bin-xor-agg]]
-=== `BIN_XOR_AGG`
+=== `BIN_XOR_AGG()`
 
 .Доступно в
 DSQL
