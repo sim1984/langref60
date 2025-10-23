@@ -119,7 +119,7 @@
 Состояние транзакций при обращении к нескольким базам данных.
 
 <<fblangref-systables-trigger_messages,`RDB$TRIGGER_MESSAGES`>>::
-Сообщения триггеров.
+Сообщения системных триггеров.
 
 <<fblangref-systables-triggers,`RDB$TRIGGERS`>>::
 Описания триггеров.
@@ -2340,7 +2340,7 @@
 [[fblangref-systables-trigger_messages]]
 == `RDB$TRIGGER_MESSAGES`
 
-Сообщения триггеров.
+Сообщения системных триггеров. Начиная с Firebird 6.0 не используется.
 
 .Описание столбцов таблицы `RDB$TRIGGER_MESSAGES`
 [cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
