@@ -187,9 +187,7 @@ ANY_VALUE(<expression>)
 ^| Описание
 
 |expr
-|Выражение.
-Может содержать столбец таблицы, литерал, переменную, выражение, неагрегатную функцию или UDF.
-Агрегатные функции в качестве выражения не допускаются.
+|Выражение. Может содержать столбец таблицы, литерал, переменную, выражение, неагрегатную функцию или UDF.
 |===
 
 .Тип возвращаемого результата
@@ -208,12 +206,33 @@ ANY_VALUE(<expression>)
 [source,sql]
 ----
 SELECT
-  department,
-  ANY_VALUE(employee) employee
-FROM employee_department
-GROUP BY department
+  EMPLOYEE.EMP_NO,
+  ANY_VALUE(EMPLOYEE.FIRST_NAME) AS FIRST_NAME,
+  ANY_VALUE(EMPLOYEE.LAST_NAME) AS LAST_NAME,
+  SUM(SALES.TOTAL_VALUE) AS TOTAL_SUM
+FROM
+  SALES
+  JOIN EMPLOYEE ON EMPLOYEE.EMP_NO = SALES.SALES_REP
+GROUP BY 1;
 ----
 ====
+
+В данном примере агрегатная функция `ANY_VALUE` позволяет избежать группировок по дополнительным столбцам `EMPLOYEE.FIRST_NAME` и `EMPLOYEE.LAST_NAME`, то есть такого SQL запроса:
+
+[source,sql]
+----
+SELECT
+  EMPLOYEE.EMP_NO,
+  EMPLOYEE.FIRST_NAME AS FIRST_NAME,
+  EMPLOYEE.LAST_NAME AS LAST_NAME,
+  SUM(SALES.TOTAL_VALUE) AS TOTAL_SUM
+FROM
+  SALES
+  JOIN EMPLOYEE ON EMPLOYEE.EMP_NO = SALES.SALES_REP
+GROUP BY 1, 2, 3;
+----
+
+Поле `EMP_NO` является первичным ключом и уже обеспечивает уникальность сотрудников, однако SQL требует, чтобы в `GROUP BY` содержались все выражения из `SELECT` кроме агрегатных функций. Очевидно что запрос с использованием агрегатных функций `ANY_VALUE` менее затратен, чем запрос с группировками по дополнительным столбца. Раньше вместо агрегатной функции `ANY_VALUE` для этих же целей использовались функции `MIN` или `MAX`. Вычисление `ANY_VALUE` более дёшево, поскольку `MIN/MAX` требуют сравнения значений, в то время как `ANY_VALUE` просто возвращает первое попавшееся значение в группе.
 
 [[fblangref-aggfuncs-count]]
 === `COUNT()`
