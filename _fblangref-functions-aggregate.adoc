@@ -725,9 +725,9 @@ LISTAGG([ALL | DISTINCT] <expr> [, _separator_]) [ <listagg overflow clause> ] [
 
 
 [[fblangref-aggfuncs-list-exmpl]]
-==== Примеры `LIST`
+==== Примеры `LISTAGG`
 
-.Использование функции LIST
+.Использование функции LISTAGG
 [example]
 ====
 Получение списка, порядок не определён.
@@ -739,7 +739,7 @@ FROM GR_WORK;
 ----
 ====
 
-.Использование функции LIST с заданным порядком
+.Использование функции LISTAGG с заданным порядком
 [example]
 ====
 Получение списка в алфавитном порядке.
