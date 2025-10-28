@@ -721,7 +721,7 @@ LISTAGG([ALL | DISTINCT] <expr> [, _separator_]) [ <listagg overflow clause> ] [
 
 Порядок значений в списке определяется выражением сортировки, указанном в опции `WITHIN GROUP`. Если спецификация `WITHIN GROUP` отсутствует, то порядок конкатенации не определён.
 
-// TODO: примеры
+// TODO: написать примеры когда можно будет потрогать
 
 
 [[fblangref-aggfuncs-list-exmpl]]
