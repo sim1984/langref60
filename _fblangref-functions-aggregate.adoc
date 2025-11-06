@@ -670,9 +670,9 @@ DSQL
 .Синтаксис
 [listing,subs=+quotes]
 ----
-LIST([ALL | DISTINCT] <expr> [, _separator_]) [ <listagg overflow clause> ] [ <within group specification> ]
-
-LISTAGG([ALL | DISTINCT] <expr> [, _separator_]) [ <listagg overflow clause> ] [ <within group specification> ]
+<list_agg_function> ::=
+  {LIST | LISTAGG} ([ALL | DISTINCT] <expr> [, _separator_])
+  [ <listagg overflow clause> ] [ <within group specification> ]
 
 <listagg overflow clause> ::=
   ON OVERFLOW <overflow behavior>
