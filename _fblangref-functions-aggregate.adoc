@@ -104,8 +104,7 @@ AVG([ALL | DISTINCT] <expr>)
 ^| Описание
 
 |expr
-|Выражение.
-Может содержать столбец таблицы, литерал, переменную, выражение, неагрегатную функцию или UDF, которая возвращает числовой тип данных.
+|Выражение. Может содержать столбец таблицы, литерал, переменную, выражение, неагрегатную функцию или UDF, которая возвращает числовой тип данных.
 |===
 
 .Тип возвращаемого результата
@@ -651,9 +650,12 @@ GROUP BY name
 
 Функции упорядоченного набора используются в групповых запросах аналогично обычным функциям набора. Что касается синтаксиса, в стандарте SQL определено предложение `WITHIN GROUP`, в котором можно задать правило упорядочивания. Общий синтаксис функций упорядоченного набора выглядит следующим образом:
 
-[listing]
+[listing, subs="+quotes, macros"]
 ----
-agg_func ( [<args>] ) WITHIN GROUP ( ORDER BY <sort_expr> )
+<ordered_set_function> ::=
+  _agg_func_ ( [ [ALL | DISTINCT] <args>] )
+  WITHIN GROUP ( ORDER BY <sort_expr> )
+  [FILTER (WHERE <condition>)]
 ----
 
 [[fblangref-aggfuncs-list]]
@@ -721,11 +723,9 @@ LISTAGG([ALL | DISTINCT] <expr> [, _separator_]) [ <listagg overflow clause> ] [
 
 Порядок значений в списке определяется выражением сортировки, указанном в опции `WITHIN GROUP`. Если спецификация `WITHIN GROUP` отсутствует, то порядок конкатенации не определён. Если указано ключевое слово `DISTINCT`, то сортировка указанная в `WITHIN GROUP` игнорируется, за исключением случая когда `WITHIN GROUP (ORDER BY <sort specification list>)` упоминает агрегированное выражение в самом начале своего списка `<sort specification list>` -- в таких случаях направление сортировки учитывается внутри `DISTINCT`.
 
-// TODO: написать примеры когда можно будет потрогать
-
 
 [[fblangref-aggfuncs-list-exmpl]]
-==== Примеры `LISTAGG`
+==== Примеры `LIST / LISTAGG`
 
 .Использование функции LISTAGG
 [example]
@@ -735,6 +735,9 @@ LISTAGG([ALL | DISTINCT] <expr> [, _separator_]) [ <listagg overflow clause> ] [
 [source,sql]
 ----
 SELECT LIST (display_name, '; ')
+FROM GR_WORK;
+
+SELECT LISTAGG (display_name, '; ')
 FROM GR_WORK;
 ----
 ====
@@ -746,12 +749,285 @@ FROM GR_WORK;
 
 [source,sql]
 ----
-SELECT LIST (display_name, '; ')
-FROM (SELECT display_name
-      FROM GR_WORK
-      ORDER BY display_name);
+SELECT LISTAGG (display_name, '; ') WITHIN GROUP (ORDER BY display_name)
+FROM GR_WORK;
+
+SELECT LIST (display_name, '; ') WITHIN GROUP (ORDER BY display_name)
+FROM GR_WORK;
 ----
 ====
+
+.Использование функции LISTAGG с заданным порядком и группировкой
+[example]
+====
+Получение списка в порядке обратном алфавитному и сгруппированному по столбцу `work_type`.
+
+[source,sql]
+----
+SELECT
+  work_type,
+  LISTAGG (display_name, '; ') WITHIN GROUP (ORDER BY display_name DESC) as works
+FROM GR_WORK
+GROUP BY work_type;
+----
+====
+
+.Использование функции LISTAGG с заданным порядком и исключением дубликатов
+[example]
+====
+Получение списка в порядке обратном алфавитному и сгруппированному по столбцу `work_type`. Дубликаты имён удаляются.
+
+[source,sql]
+----
+SELECT
+  work_type,
+  LISTAGG (DISTINCT display_name, '; ') WITHIN GROUP (ORDER BY display_name DESC) as works
+FROM GR_WORK
+GROUP BY work_type;
+----
+====
+
+Далее приведены примеры различных вариантов использования функции `LISTAGG` и их результаты. В любом из этих примеров вы можете заменить `LISTAGG` на `LIST` без изменения результата.
+
+[source,sql]
+----
+CREATE TABLE TEST_T
+	(COL1 INT, COL2 VARCHAR(2), COL3 VARCHAR(2), COL4 VARCHAR(2), COL5 BOOLEAN, COL6 VARCHAR(2)
+	CHARACTER SET WIN1251);
+COMMIT;
+INSERT INTO TEST_T values(1, 'A', 'A', 'J', false, 'П');
+INSERT INTO TEST_T values(2, 'B', 'B', 'I', false, 'Д');
+INSERT INTO TEST_T values(3, 'C', 'A', 'L', true,  'Ж');
+INSERT INTO TEST_T values(4, 'D', 'B', 'K', true,  'Й');
+COMMIT;
+
+SELECT LISTAGG (ALL COL4, ':')
+FROM TEST_T;
+----
+
+----
+=======
+J:I:L:K
+----
+
+[source,sql]
+----
+SELECT LISTAGG (DISTINCT COL4, ':')
+FROM TEST_T;
+----
+
+----
+========
+I:J:K:L
+----
+
+В примере ниже дубликаты значений столбца `COL3` удаляются. Направление сортировки указанное в `WITHIN GROUP` учитывается, если выражение сортировки в `WITHIN GROUP` совпадает с аргументом конкатенации.
+
+[source,sql]
+----
+SELECT LISTAGG (DISTINCT COL3, ':')
+FROM TEST_T;
+----
+
+----
+====
+A:B
+----
+
+[source,sql]
+----
+SELECT
+  LISTAGG (DISTINCT COL3, ':') WITHIN GROUP (ORDER BY COL3 ASCENDING)
+FROM TEST_T;
+----
+
+----
+====
+A:B
+----
+
+[source,sql]
+----
+SELECT
+  LISTAGG (DISTINCT COL3, ':') WITHIN GROUP (ORDER BY COL3 DESCENDING)
+FROM TEST_T;
+----
+
+----
+====
+B:A
+----
+
+Предложение `DISTINCT` учитывает направление сортировки, если первый аргумент сортировки в `WITHIN GROUP` имеет тоже выражение, что используется для конкатенации.
+
+[source,sql]
+----
+SELECT
+  LISTAGG (DISTINCT COL3, ':') WITHIN GROUP (ORDER BY COL3 DESCENDING, COL4, COL5)
+FROM TEST_T;
+----
+
+----
+====
+B:A
+----
+
+Если выражение первого аргумента сортировки в `WITHIN GROUP` отличается от того что используется для конкатенации, то сортировка игнорируется.
+
+[source,sql]
+----
+SELECT
+  LISTAGG (DISTINCT COL3, ':') WITHIN GROUP (ORDER BY COL4, COL3 DESCENDING, COL5)
+FROM TEST_T;
+----
+
+----
+====
+A:B
+----
+
+Вышесказанное справедливо, если аргумент сортировки только один.
+
+[source,sql]
+----
+SELECT
+  LISTAGG (DISTINCT COL3, ':') WITHIN GROUP (ORDER BY COL2)
+FROM TEST_T;
+----
+
+----
+====
+A:B
+----
+
+[source,sql]
+----
+SELECT
+  LISTAGG (DISTINCT COL3, ':') WITHIN GROUP (ORDER BY COL2 DESCENDING)
+FROM TEST_T;
+----
+
+----
+====
+A:B
+----
+
+Сортировка в `WITHIN GROUP` может быть разнонаправленная для каждого из аргументов сортировки.
+
+[source,sql]
+----
+SELECT
+  LISTAGG (COL2, ':') WITHIN GROUP (ORDER BY COL3 DESC, COL4 ASC)
+FROM TEST_T;
+----
+
+----
+=======
+B:D:A:C
+----
+
+[source,sql]
+----
+SELECT
+  LISTAGG (COL2, ':') WITHIN GROUP (ORDER BY COL3 DESC, COL4 DESC)
+FROM TEST_T;
+----
+
+----
+=======
+D:B:C:A
+----
+
+[source,sql]
+----
+SELECT
+  LISTAGG (COL2, ':') WITHIN GROUP (ORDER BY COL3 ASC, COL4 DESC)
+FROM TEST_T;
+----
+
+----
+=======
+C:A:D:B
+----
+
+
+Предложение `OVERFLOW ...` игнорируется и не влияет на результат.
+
+[source,sql]
+----
+SELECT
+  LISTAGG (COL4, ':' ON OVERFLOW TRUNCATE '...' WITHOUT COUNT) WITHIN GROUP (ORDER BY COL3 ASC)
+FROM TEST_T;
+----
+
+----
+=======
+J:L:I:K
+----
+
+[source,sql]
+----
+SELECT
+  LISTAGG (COL4, ':' ON OVERFLOW TRUNCATE '...' WITH COUNT) WITHIN GROUP (ORDER BY COL3 DESC)
+FROM TEST_T;
+----
+
+----
+======
+I:K:J:L
+----
+
+[source,sql]
+----
+SELECT
+  LISTAGG (DISTINCT COL3, ':' ON OVERFLOW ERROR) WITHIN GROUP (ORDER BY COL3)
+FROM TEST_T;
+----
+
+----
+===
+A:B
+----
+
+В следующий примерах показано как учитываются значения `NULL` в сортировке.
+
+[source,sql]
+----
+INSERT INTO TEST_T values(5, 'E', NULL, NULL, NULL, NULL);
+INSERT INTO TEST_T values(6, 'F', 'C', 'N', true, 'К');
+
+SELECT LISTAGG (ALL COL2, ':') WITHIN GROUP (ORDER BY COL3)
+FROM TEST_T;
+----
+
+----
+===========
+E:A:C:B:D:F
+----
+
+[source,sql]
+----
+SELECT
+  LISTAGG (ALL COL2, ':') WITHIN GROUP (ORDER BY COL3 NULLS LAST)
+FROM TEST_T;
+----
+
+----
+===========
+A:C:B:D:F:E
+----
+
+[source,sql]
+----
+SELECT
+  LISTAGG (ALL COL2, ':') WITHIN GROUP (ORDER BY COL6 NULLS FIRST)
+FROM TEST_T;
+----
+
+----
+===========
+E:B:C:D:F:A
+----
 
 .См. также:
 <<fblangref-dml-select,`SELECT`>>.
