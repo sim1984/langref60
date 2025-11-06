@@ -479,7 +479,42 @@ ORDER BY department, salary;
 ----
 ====
 
-// TODO: Функции упорядоченного набора как оконные функции
+[[fblangref-windowfuncs-withingroup]]
+== Функции упорядоченного набора как оконные функции
+
+Функции упорядоченного набора являются агрегатными функциями, результат которых зависит от порядка обработки записей. Такие функции могут быть использованы в качестве оконных, но с некоторыми ограничениями:
+
+* Спецификация окна не может содержать предложения `ORDER BY` для задания порядка обработки строк в окне;
+* Спецификация окна не может содержать выражения для задание рамки окна;
+* Однако спецификация окна может содержать выражения для секционирования строк (`PARTITION BY`).
+
+.Использование функции LISTAGG в качестве оконной
+====
+[source,sql]
+----
+-- окно без секций
+SELECT
+  CODE_BREED,
+  CODE_DEPARTURE,
+  LISTAGG(NAME) WITHIN GROUP(ORDER BY NAME) OVER() AS BREEDS
+FROM BREED;
+
+-- окно с секциями
+SELECT
+  CODE_BREED,
+  CODE_DEPARTURE,
+  LISTAGG(NAME) WITHIN GROUP(ORDER BY NAME) OVER(PARTITION BY CODE_DEPARTURE) AS BREEDS
+FROM BREED;
+
+-- именованное окно
+SELECT
+  CODE_BREED,
+  CODE_DEPARTURE,
+  LISTAGG(NAME) WITHIN GROUP(ORDER BY NAME) OVER W AS BREEDS
+FROM BREED
+WINDOW W AS (PARTITION BY CODE_DEPARTURE);
+----
+====
 
 [[fblangref-windowfuncs-rankfuncs]]
 == Ранжирующие функции

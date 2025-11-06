@@ -658,6 +658,8 @@ GROUP BY name
   [FILTER (WHERE <condition>)]
 ----
 
+Функции упорядоченного набора также могут использоваться в качестве оконных, подробнее см. <<fblangref-windowfuncs-withingroup>>.
+
 [[fblangref-aggfuncs-list]]
 === `LISTAGG() / LIST()`
 
