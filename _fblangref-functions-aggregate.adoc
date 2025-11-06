@@ -641,7 +641,7 @@ GROUP BY name
 ====
 
 .См. также:
-<<fblangref-scalarfuncs-bin-zor>>, <<fblangref-aggfuncs-bin-or-agg>>, <<fblangref-aggfuncs-bin-and-agg>>.
+<<fblangref-scalarfuncs-bin-xor>>, <<fblangref-aggfuncs-bin-or-agg>>, <<fblangref-aggfuncs-bin-and-agg>>.
 
 [[fblangref-aggfuncs-withingroup]]
 == Функции упорядоченного набора
