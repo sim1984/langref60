@@ -77,7 +77,8 @@ UNLIST (<input> [, <separator>] [<data type conversion>]) [AS] <correlation name
 |Необязательный псевдоним столбца, возвращаемого функцией `UNLIST`. Если этот параметр пропущен, то возвращаемый столбец имеет имя `UNLIST`.
 |===
 
-.Примеры использования UNLIST в SQL запросах
+.Использование UNLIST в SQL запросах
+[example]
 ====
 [source,sql]
 ----
@@ -99,7 +100,8 @@ FROM
 ----
 ====
 
-.Примеры использования UNLIST в PSQL
+.Использование UNLIST в PSQL
+[example]
 ====
 [source,sql]
 ----
@@ -123,7 +125,8 @@ SELECT * FROM TEST_PROC;
 ----
 ====
 
-.Примеры преобразования к типу домену или типу столбца
+.Преобразование результирующего столбца функции UNLIST к типу домену или типу столбца
+[example]
 ====
 [source,sql]
 ----
@@ -155,4 +158,80 @@ SELECT * FROM UNLIST('1,2,3') AS A;
 Однако этот запрос отработает без ошибок и в наборе данных имя возвращаемого столбца будет `UNLIST`.
 ====
 
-// TODO: GENERATE_SERIES doc
+[[fblangref-tablefunc-genseries]]
+== GENERATE_SERIES
+
+Функция `GENERATE_SERIES` создаёт ряд чисел в заданном интервале. Интервал и шаг между значениями рядов определяются пользователем.
+
+.Синтаксис
+[listing,subs="+quotes, macros"]
+----
+<generate_series_function> ::=
+    GENERATE_SERIES(<start>, <finish> [, <step>]) [AS] <correlation name> [ ( <derived column name> ) ]
+----
+
+.Параметры функции `GENERATE_SERIES`
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|start
+|Начальное значение интервала. `start` может быть переменной, литералом или скалярным выражением типа `SMALLINT`, `INTEGER`, `BIGINT`, `INT128` или `NUMERIC/DECIMAL`.
+
+|finish
+|Конечное значение интервала. `finish` может быть переменной, литералом или скалярным выражением типа `SMALLINT`, `INTEGER`, `BIGINT`, `INT128` или `NUMERIC/DECIMAL`. Генерация последовательности останавливается, когда последнее сгенерированное значение шага превышает/принижает (зависит от знака `step`) значение `finish`.
+
+|step
+|Значение на которое изменяется результат между рядами на каждом шаге выполнения. `step` может быть выражением
+типа `SMALLINT`, `INTEGER`, `BIGINT`, `INT128` или `NUMERIC/DECIMAL`. Значение `step` может быть как отрицательным, так и положительным, но не может быть равен нулю (0). Этот аргумент необязателен. По умолчанию значение `step` равно 1.
+
+|===
+
+Функция `GENERATE_SERIES` возвращает набор данных столбцом типа `BIGINT`, `INT128` или `NUMERIC(18, x)/NUMERIC(38, x)`, где масштаб определяется максимальным из масштабов аргументов функции.
+
+Правила:
+
+* Если `start > finish` и указано отрицательное значение `step`, возвращается пустой набор.
+* Если `start < finish` и указано положительное значение `step`, возвращается пустой набор.
+* Если аргумент `step` равен нулю, то возникает ошибка.
+
+.Использование GENERATE_SERIES в SQL запросах
+[example]
+====
+[source,sql]
+----
+SELECT n
+FROM GENERATE_SERIES(1, 3) AS S(n);
+
+SELECT n
+FROM GENERATE_SERIES(3, 1, -1) AS S(n);
+
+SELECT n
+FROM GENERATE_SERIES(0, 9.9, 0.1) AS S(n);
+
+SELECT
+  DATEADD(n MINUTE TO timestamp '2025-01-01 12:00') AS START_TIME,
+  DATEADD(n MINUTE TO timestamp '2025-01-01 12:00:59.9999') AS FINISH_TIME
+FROM GENERATE_SERIES(0, 59) AS S(n);
+----
+====
+
+[IMPORTANT]
+====
+Непосредственное указание `GENERATE_SERIES` в качестве столбца в предложении `SELECT` запрещено.
+
+[source,sql]
+----
+SELECT GENERATE_SERIES FROM GENERATE_SERIES(1, 3) AS S;
+----
+
+Данный запрос вызовет ошибку "столбец GENERATE_SERIES не существует".
+
+[source,sql]
+----
+SELECT GENERATE_SERIES FROM GENERATE_SERIES(1, 3) AS S;
+----
+
+Однако этот запрос отработает без ошибок и в наборе данных имя возвращаемого столбца будет `GENERATE_SERIES`.
+====
