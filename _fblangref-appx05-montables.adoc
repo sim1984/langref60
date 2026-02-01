@@ -620,6 +620,156 @@ WHERE VAR.MON$ATTACHMENT_ID = CURRENT_CONNECTION
 
 Счётчики этой таблицы являются накопительными и накапливают информацию по каждой из групп статистики.
 
+[[fblangref-montables-local_tables]]
+== `MON$LOCAL_TEMPORARY_TABLES`
+
+Предоставляет информация об активных локальных временных таблицах (LTT) для всех соединений.
+
+.Описание столбцов таблицы `MON$LOCAL_TEMPORARY_TABLES`
+[cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
+|===
+^| Наименование столбца
+^| Тип данных
+^| Описание
+
+|MON$ATTACHMENT_ID
+|BIGINT
+|Идентификатор соединения.
+
+|MON$TABLE_ID
+|INTEGER
+|Внутренний идентификатор таблицы (уникальный внутри соединения).
+
+|MON$TABLE_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя таблицы.
+
+|MON$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы.
+
+|MON$TABLE_TYPE
+|VARCHAR(32) CHARACTER SET ASCII
+|Тип таблицы: (`PRESERVE ROWS` или `DELETE ROWS`).
+
+|===
+
+.Получение списка локальных таблиц созданных в своём соединении
+[example]
+====
+[source,sql]
+----
+SELECT LTT.MON$SCHEMA_NAME, LTT.MON$TABLE_NAME, LTT.MON$TABLE_TYPE
+FROM
+   SYSTEM.MON$LOCAL_TEMPORARY_TABLES LTT
+WHERE LTT.MON$ATTACHMENT_ID = CURRENT_CONNECTION
+ORDER BY LTT.MON$SCHEMA_NAME, LTT.MON$TABLE_NAME
+----
+====
+
+[[fblangref-montables-local_table_columns]]
+== `MON$LOCAL_TEMPORARY_TABLE_COLUMNS`
+
+Предоставляет информация о столбцах активных локальных временных таблицах (LTT) для всех соединений.
+
+.Описание столбцов таблицы `MON$LOCAL_TEMPORARY_TABLE_COLUMNS`
+[cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
+|===
+^| Наименование столбца
+^| Тип данных
+^| Описание
+
+|MON$ATTACHMENT_ID
+|BIGINT
+|Идентификатор соединения.
+
+|MON$TABLE_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя таблицы.
+
+|MON$SCHEMA_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя схемы.
+
+|MON$FIELD_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя столбца.
+
+|MON$FIELD_POSITION
+|SMALLINT
+|Позиция столбца.
+
+|MON$FIELD_TYPE
+|SMALLINT
+|Тип столбца.
+
+7 -- `SMALLINT`; +
+8 -- `INTEGER`; +
+10 -- `FLOAT`; +
+12 -- `DATE`; +
+13 -- `TIME WITHOUT TIME ZONE`; +
+14 -- `CHAR` или `BINARY`; +
+16 -- `BIGINT`; +
+23 -- `BOOLEAN`; +
+24 -- `DECFLOAT(16)`; +
+25 -- `DECFLOAT(34)`; +
+26 -- `INT128`; +
+27 -- `DOUBLE PRECISION`; +
+28 -- `TIME WITH TIME ZONE`; +
+29 -- `TIMESTAMP WITH TIME ZONE`; +
+35 -- `TIMESTAMP WITHOUT TIME ZONE`; +
+37 -- `VARCHAR` или `VARBINARY`; +
+261 -- `BLOB`.
+
+|MON$FIELD_PRECISION
+|SMALLINT
+|Точность.
+
+|MON$FIELD_SCALE
+|SMALLINT
+|Масштаб.
+
+|MON$CHAR_LENGTH
+|SMALLINT
+|Максимальная длина в символах для строковых типов.
+
+|MON$FIELD_LENGTH
+|SMALLINT
+|Размер поля в байтах.
+
+|MON$FIELD_SUB_TYPE
+|SMALLINT
+|Подтип.
+
+|MON$NOT_NULL
+|SMALLINT
+|Возможность содержать значение `NULL` (1 для `NOT NULL` полей, 0 - для nullable).
+
+|MON$CHARACTER_SET_ID
+|SMALLINT
+|Идентификатор набора символов.
+
+|MON$COLLATION_ID
+|SMALLINT
+|Идентификатор сопоставления символов.
+
+|===
+
+.Получение списка столбцов для локальной таблицы с заданным именем, созданной в своём соединении
+[example]
+====
+[source,sql]
+----
+SELECT *
+FROM
+   SYSTEM.MON$LOCAL_TEMPORARY_TABLE_COLUMNS C
+WHERE C.MON$ATTACHMENT_ID = CURRENT_CONNECTION
+  AND C.MON$TABLE_NAME = 'TEMP_DATA'
+  AND C.MON$SCHEMA_NAME = 'PUBLIC'
+ORDER BY C.MON$FIELD_POSITION
+----
+====
+
 [[fblangref-montables-memory_usage]]
 == `MON$MEMORY_USAGE`
 
@@ -909,7 +1059,15 @@ WHERE MON$ATTACHMENT_ID = 32
 
 |MON$SCHEMA_NAME
 |CHAR(63) CHARACTER SET UTF8
-|Имя схемы в которой расположена таблица.
+|Имя схемы, в которой расположена таблица.
+
+|MON$TABLE_TYPE
+|VARCHAR(32) CHARACTER SET ASCII
+|Тип таблицы:
+
+`PERSISTENT` - обычная постоянная таблица; +
+`GLOBAL TEMPORARY` - глобальная временная таблица; +
+`LOCAL TEMPORARY` - локальная временная таблица.
 
 |===
 

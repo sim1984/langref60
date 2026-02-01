@@ -1,7 +1,7 @@
 [[fblangref]]
 = Руководство по языку SQL СУБД Firebird 6.0
 Денис Симонов; Дмитрий Филиппов; Александр Карпейкин; Алексей Ковязин; Дмитрий Кузьменко; Paul Vinkenoog; Дмитрий Еманов; Mark Rotteveel
-0.4.4, от 18.11.2025
+0.5.0, от 01.12.2026
 :doctype: book
 :sectnums:
 :sectanchors:
@@ -22,7 +22,7 @@ include::../../attributes-ru.adoc[]
 :fb-full-version: 6.0 Initial
 :secdb: security6.fdb
 
-Авторские права (C) 2017-2025 Firebird Project и всех участвующих авторов на https://www.firebirdsql.org/manual/pdl.html[Public Documentation License Version 1.0].
+Авторские права (C) 2017-2026 Firebird Project и всех участвующих авторов на https://www.firebirdsql.org/manual/pdl.html[Public Documentation License Version 1.0].
 Пожалуйста, обратитесь к <<fblangref-license,License Notice in the Appendix>>
 
 toc::[]
