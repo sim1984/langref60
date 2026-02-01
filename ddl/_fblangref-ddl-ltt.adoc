@@ -146,7 +146,7 @@ create index idx_temp_orders_cust on temp_orders (customer_id);
 .Доступно в
 DSQL, ESQL
 
-[[fblangref-ddl-tbl-create-syntax]]
+[[fblangref-ddl-tbl-create-ltt-syntax]]
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
@@ -181,9 +181,6 @@ CREATE LOCAL TEMPORARY TABLE [IF NOT EXISTS] [ _tbl-schema_ <period> ] _tablenam
 
 |tablename
 |Имя таблицы, может содержать до 63 символов.
-
-|filespec
-|Спецификация файла (только для внешних таблиц).
 
 |datatype
 |Тип данных SQL.
@@ -392,7 +389,6 @@ ALTER TABLE [ _tbl-schema_ <period> ] _tablename_
 <scalar_datatype> ::=  См. <<fblangref-datatypes-syntax-scalar,Синтаксис скалярных типов данных>>
 
 <blob_datatype> ::= См. <<fblangref-datatypes-syntax-blob,Синтаксис типа данных BLOB>>
-
 ----
 
 [[fblangref-ddl-ltt-altertbl]]
@@ -530,7 +526,7 @@ DROP TABLE IF EXISTS temp_data;
 .Доступно в
 DSQL, ESQL
 
-[[fblangref-ddl-tbl-recreate-syntax]]
+[[fblangref-ddl-tbl-recreate-ltt-syntax]]
 .Синтаксис
 [listing,subs="+quotes,macros,attributes"]
 ----
