@@ -71,4 +71,3 @@
 * Станьте разработчиком (для документации свяжитесь с нами по firebird-docs, для Firebird в целом используйте список рассылки Firebird-devel)
 * Пожертвуйте в Firebird Foundation (см. https://www.firebirdsql.org/en/donate/)
 * Станьте платным членом или спонсором Firebird Foundation (см. https://www.firebirdsql.org/en/firebird-foundation/)
-
