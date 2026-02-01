@@ -1,4 +1,3 @@
-
 :sectnums!:
 
 [appendix]
@@ -27,38 +26,43 @@
 
 .Таблицы мониторинга
 
-<<fblangref-montables-attachments,`MON$ATTACHMENTS`>>::
+<<fblangref-montables-attachments>>::
 Сведения о текущих соединениях с базой данных.
 
-<<fblangref-montables-call_stack,`MON$CALL_STACK`>>::
-Обращения к стеку активными запросами хранимых процедур и
-триггеров.
+<<fblangref-montables-call_stack`>>::
+Обращения к стеку активными запросами хранимых процедур и триггеров.
 
-<<fblangref-montables-compiled-statements,`MON$COMPILED_STATEMENTS`>>::
+<<fblangref-montables-compiled-statements>>::
 Подготовленные к выполнению запросы и PSQL модули.
 
-<<fblangref-montables-context_variables,`MON$CONTEXT_VARIABLES`>>::
+<<fblangref-montables-context_variables>>::
 Сведения о пользовательских контекстных переменных.
 
-<<fblangref-montables-database,`MON$DATABASE`>>::
+<<fblangref-montables-database>>::
 Сведения о базе данных, с которой выполнено соединение.
 
-<<fblangref-montables-io_stats,`MON$IO_STATS`>>::
+<<fblangref-montables-io_stats>>::
 Статистика по вводу-выводу.
 
-<<fblangref-montables-memory_usage,`MON$MEMORY_USAGE`>>::
+<<fblangref-montables-local_tables>>::
+Сведения об активных локальных временных таблицах (LTT) для всех соединений.
+
+<<fblangref-montables-local_table_columns>>::
+Предоставляет информацию о столбцах активных локальных временных таблицах (LTT) для всех соединений.
+
+<<fblangref-montables-memory_usage>>::
 Статистика использования памяти.
 
-<<fblangref-montables-record_stats,`MON$RECORD_STATS`>>::
+<<fblangref-montables-record_stats>>::
 Статистика на уровне записей.
 
-<<fblangref-montables-statements,`MON$STATEMENTS`>>::
+<<fblangref-montables-statements>>::
 Выполняемые запросы.
 
-<<fblangref-montables-table_stats,`MON$TABLE_STATS`>>::
+<<fblangref-montables-table_stats>>::
 Статистика на уровне таблиц.
 
-<<fblangref-montables-transactions,`MON$TRANSACTIONS`>>::
+<<fblangref-montables-transactions>>::
 Запущенные транзакции.
 
 
@@ -623,7 +627,7 @@ WHERE VAR.MON$ATTACHMENT_ID = CURRENT_CONNECTION
 [[fblangref-montables-local_tables]]
 == `MON$LOCAL_TEMPORARY_TABLES`
 
-Предоставляет информация об активных локальных временных таблицах (LTT) для всех соединений.
+Предоставляет информацию об активных локальных временных таблицах (LTT) для всех соединений.
 
 .Описание столбцов таблицы `MON$LOCAL_TEMPORARY_TABLES`
 [cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
@@ -670,7 +674,7 @@ ORDER BY LTT.MON$SCHEMA_NAME, LTT.MON$TABLE_NAME
 [[fblangref-montables-local_table_columns]]
 == `MON$LOCAL_TEMPORARY_TABLE_COLUMNS`
 
-Предоставляет информация о столбцах активных локальных временных таблицах (LTT) для всех соединений.
+Предоставляет информацию о столбцах активных локальных временных таблицах (LTT) для всех соединений.
 
 .Описание столбцов таблицы `MON$LOCAL_TEMPORARY_TABLE_COLUMNS`
 [cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
