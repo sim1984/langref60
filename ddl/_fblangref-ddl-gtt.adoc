@@ -1,0 +1,163 @@
+[[fblangref-ddl-table-gtt]]
+= Глобальные временные таблицы (GTT)
+
+(((GLOBAL TEMPORARY TABLE)))
+Глобальные временные таблицы (в дальнейшем сокращённо "`GTT`") так же, как и обычные таблицы, являются постоянными метаданными, но данные в них ограничены по времени существования транзакцией (значение по умолчанию) или соединением с БД. Каждая транзакция или соединение имеет свой собственный экземпляр GTT с данными, изолированный от всех остальных. Экземпляры создаются только при условии обращения к GTT, и данные в ней удаляются при завершении транзакции или отключении от БД. Метаданные GTT могут быть изменены или удалены с помощью инструкций `ALTER TABLE` и `DROP TABLE`.
+
+Жизненный цикл данных зависит от предложения `ON COMMIT`: при `ON COMMIT DELETE ROWS` (по умолчанию) данные являются частными для каждой транзакции и удаляются при завершении транзакции; при `ON COMMIT PRESERVE ROWS` данные являются общими для всех транзакций в соединении и сохраняются до завершения соединения.
+
+== Ограничения GTT
+
+GTT обладают всеми атрибутами обычных таблиц (ключи, внешние ключи, индексы и триггеры), но имеют ряд ограничений:
+
+* GTT и обычные таблицы не могут ссылаться друг на друга;
+* GTT уровня соединения ("`PRESERVE ROWS`") GTT не могут ссылаться на GTT транзакционного уровня ("`DELETE ROWS`");
+* Ограничения домена не могут ссылаться на любую GTT;
+* Уничтожения экземпляра GTT в конце своего жизненного цикла не вызывает срабатывания триггеров `{BEFORE | AFTER} DELETE`.
+
+[TIP]
+====
+В существующей базе данных не всегда легко отличить обычную таблицу от GTT, или GTT транзакционного уровня от GTT уровня соединения.
+
+Используйте следующий запрос для определения типа таблицы:
+
+[source,sql]
+----
+SELECT t.rdb$type_name
+FROM rdb$relations r
+JOIN rdb$types t ON r.rdb$relation_type = t.rdb$type
+WHERE t.rdb$field_name = 'RDB$RELATION_TYPE'
+  AND r.rdb$relation_name = 'TABLENAME'
+----
+
+Для просмотра информации о типах всех таблиц используйте запрос:
+
+[source,sql]
+----
+SELECT r.rdb$relation_name, t.rdb$type_name
+FROM rdb$relations r
+JOIN rdb$types t ON r.rdb$relation_type = t.rdb$type
+WHERE t.rdb$field_name = 'RDB$RELATION_TYPE'
+  AND coalesce (r.rdb$system_flag, 0) = 0
+----
+
+Поле `RDB$TYPE_NAME` будет отображать PERSISTENT для обычной таблицы, VIEW для представления, GLOBAL_TEMPORARY_PRESERVE для GTT уровня соединения, и GLOBAL_TEMPORARY_DELETE для GTT уровня транзакции.
+====
+
+[[fblangref-ddl-table-gtt-create]]
+== CREATE GLOBAL TEMPORARY TABLE
+
+(((CREATE GLOBAL TEMPORARY TABLE)))
+Глобальные временные таблицы создаются с помощью оператора `CREATE GLOBAL TEMPORARY TABLE`. Синтаксис этого оператор представлен ниже:
+
+.Синтаксис
+[listing,subs=+quotes]
+----
+CREATE GLOBAL TEMPORARY TABLE [IF NOT EXISTS] [ _tbl-schema_ <period> ] _tablename_
+  (<column_def> [, {<column_def> | <table_constraint>} ...])
+  [ON COMMIT {DELETE | PRESERVE} ROWS]
+  [SQL SECURITY {DEFINER | INVOKER}]
+----
+
+Полный синтаксис см. <<fblangref-ddl-table-create>>.
+
+(((CREATE GLOBAL TEMPORARY TABLE, ON COMMIT DELETE ROWS))) (((CREATE GLOBAL TEMPORARY TABLE, ON COMMIT PRESERVE ROWS)))
+Если в операторе создания глобальной временной таблицы указано необязательное предложение `ON COMMIT DELETE ROWS`, то будет создана GTT транзакционного уровня (по умолчанию). При указании предложения `ON COMMIT PRESERVE ROWS` -- будет создана GTT уровня соединения с базой данных.
+
+Предложение `EXTERNAL [FILE]` нельзя использовать для глобальной временной таблицы.
+
+[NOTE]
+====
+Операторы `COMMIT RETAINING` и `ROLLBACK RETAINING` сохраняют данные в глобальных временных таблицах объявленных как `ON COMMIT DELETE ROWS`.
+
+В Firebird 2.x была ошибка: `COMMIT RETAINING` и `ROLLBACK RETAINING` делали записи не видимыми для текущей транзакции.
+Для возврата поведения 2.x установить параметр `ClearGTTAtRetaining` равным 1 в `firebird.conf`.
+====
+
+[[fblangref-ddl-table-create-gtt-examples]]
+=== Примеры
+
+.Создание глобальной временной таблицы уровня соединения
+[example]
+====
+[source,sql]
+----
+CREATE GLOBAL TEMPORARY TABLE MYCONNGTT (
+    ID INTEGER NOT NULL PRIMARY KEY,
+    TXT VARCHAR(32),
+    TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+ON COMMIT PRESERVE ROWS;
+----
+====
+
+.Создание глобальной временной таблицы уровня транзакции ссылающейся внешним ключом на глобальную временную таблицу уровня соединения.
+[example]
+====
+[source,sql]
+----
+CREATE GLOBAL TEMPORARY TABLE MYTXGTT (
+    ID INTEGER NOT NULL PRIMARY KEY,
+    PARENT_ID INTEGER NOT NULL REFERENCES MYCONNGTT(ID),
+    TXT VARCHAR(32),
+    TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+----
+====
+
+Как и в случае обычных таблиц главная и подчинённая таблица могут располагаться в разных схемах.
+
+[source,sql]
+----
+CREATE GLOBAL TEMPORARY TABLE APP.MYTXGTT (
+    ID INTEGER NOT NULL PRIMARY KEY,
+    PARENT_ID INTEGER NOT NULL REFERENCES MANAGEMENT.MYCONNGTT(ID),
+    TXT VARCHAR(32),
+    TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+----
+
+[[fblangref-ddl-gtt-alter]]
+== `ALTER TABLE` (GTT)
+
+Глобальные временные таблицы могут быть изменены с помощью оператора `ALTER TABLE`, описание которого см. <<fblangref-ddl-table-alter>>.
+
+[[fblangref-ddl-gtt-drop]]
+== `DROP TABLE` (GTT)
+
+Глобальные временные таблицы могут быть удалены с помощью оператора `DROP TABLE`, описание которого см. <<fblangref-ddl-table-drop>>.
+
+[[fblangref-ddl-gtt-recreate]]
+== `RECREATE GLOBAL TEMPORARY TABLE`
+
+.Назначение
+Создание новой глобальной временной таблицы или пересоздание существующей.
+(((RECREATE TABLE)))
+
+.Доступно в
+DSQL.
+
+.Синтаксис
+[listing,subs="+quotes"]
+----
+RECREATE GLOBAL TEMPORARY TABLE [ _tbl-schema_ <period> ] _tablename_
+  (<col_def> [, <col_def> | <tconstraint> ...])
+  [ON COMMIT {DELETE | PRESERVE} ROWS]
+  [SQL SECURITY {DEFINER | INVOKER}]
+----
+
+Полное описание определений столбцов и ограничений таблицы смотрите в разделе <<fblangref-ddl-table-create,CREATE TABLE>>.
+
+Оператор `RECREATE GLOBAL TEMPORARY TABLE` создаёт или пересоздаёт глобальную временную таблицу. Если таблица с таким именем уже существует, то оператор `RECREATE GLOBAL TEMPORARY TABLE` попытается удалить её и создать новую. Оператор `RECREATE GLOBAL TEMPORARY TABLE` не выполнится, если существующая таблица имеет зависимости.
+
+Таблица создаётся или пересоздаётся в указанной схеме. Если указано только имя таблицы, то её поиск производится только в текущей схеме (первая валидная схема в путях поиска). Имя таблицы должно быть уникальным среди имён всех таблиц, представлений (VIEWs) и хранимых процедур внутри заданной (текущей) схемы.
+
+[[fblangref-ddl-gtt-recreate-examples]]
+=== Примеры
+
+[source,sql]
+----
+RECREATE GLOBAL TEMPORARY TABLE MYTXGTT (
+    ID INTEGER NOT NULL PRIMARY KEY,
+    PARENT_ID INTEGER NOT NULL REFERENCES MYCONNGTT(ID),
+    TXT VARCHAR(32),
+    TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+----

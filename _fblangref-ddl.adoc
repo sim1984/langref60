@@ -13,6 +13,8 @@ include::ddl/_fblangref-ddl-domain.adoc[leveloffset=+1]
 
 include::ddl/_fblangref-ddl-table.adoc[leveloffset=+1]
 
+include::ddl/_fblangref-ddl-gtt.adoc[leveloffset=+1]
+
 include::ddl/_fblangref-ddl-ltt.adoc[leveloffset=+1]
 
 include::ddl/_fblangref-ddl-external-table.adoc[leveloffset=+1]

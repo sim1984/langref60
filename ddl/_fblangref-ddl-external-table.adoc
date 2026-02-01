@@ -1,5 +1,5 @@
 [[fblangref_ddl_table_ext]]
-= Внешние (EXTERNAL) таблицы
+= EXTERNAL TABLE
 
 Внешняя таблица -- это таблица данные которой хранятся во внешнем файле, то есть не в самой БД Firebird.
 
@@ -37,57 +37,6 @@
 
 Как правило, внешние файлы более удобны если строки разделены разделителем, в виде последовательности "новой строки", которая может быть распознана приложением на предназначенной платформе. Для Windows -- это двухбайтная 'CRLF' последовательность, возврат каретки (ASCII код 13) и перевод строки (ASCII код 10). Для POSIX -- LF обычно самодостаточен, в некоторых MacOS X приложениях она может быть LFCR. Существуют различные способы для автоматического заполнения столбца разделителя. В нашем примере это сделано с помощью `BEFORE INSERT` триггера и встроенной функции `ASCII_CHAR`.
 
-
-[[fblangref-ddl-table-external-examples]]
-== Примеры использования внешних таблиц
-
-В нашем примере мы будем определять внешнюю таблицу журнала, которая может быть использована в обработчике исключений внутри хранимой процедуры или триггера. Внешняя таблица выбрана потому, что сообщения из любых обрабатываемых исключений будут сохранены в журнале, даже если транзакция, в которой был запущен процесс, будет откачена из-за другого необработанного исключения. В целях демонстрации наша таблица содержит всего два столбца: метку времени и текстовое сообщение. Третий столбец хранит разделитель строки:
-
-[source,sql]
-----
-CREATE TABLE ext_log
-EXTERNAL FILE 'd:\externals\log_me.txt' (
-   stamp   CHAR(24),
-   message CHAR(100),
-   crlf    CHAR(2) -- Для Windows
-);
-
-COMMIT;
-----
-
-Теперь создадим триггер, для автоматического сохранения метки времени и разделителя строки, каждый раз когда сообщение записывается в таблицу:
-
-[source,sql]
-----
-SET TERM ^;
-CREATE TRIGGER bi_ext_log FOR ext_log
-ACTIVE BEFORE INSERT
-AS
-BEGIN
-  IF (NEW.stamp IS NULL) THEN
-    NEW.stamp = CAST (CURRENT_TIMESTAMP AS CHAR(24));
-  NEW.crlf = ASCII_CHAR(13) || ASCII_CHAR(10);
-END ^
-COMMIT ^
-SET TERM ;^
-----
-
-Вставка некоторых записей (это может быть сделано в обработчике исключения):
-
-[source,sql]
-----
-INSERT INTO ext_log (message)
-VALUES('Shall I compare thee to a summer''s day?');
-INSERT INTO ext_log (message)
-VALUES('Thou art more lovely and more temperate');
-----
-
-Содержимое внешнего файла:
-
-----
-2015-10-07 15:19:03.4110Shall I compare thee to a summer's day?
-2015-10-07 15:19:58.7600Thou art more lovely and more temperate
-----
 
 == CREATE TABLE (EXTERNAL)
 
@@ -153,6 +102,57 @@ CREATE TABLE [IF NOT EXISTS] [ _tbl-schema_ <period> ] _tablename_
 
 Подробнее см. <<fblangref-ddl-table-create>>.
 
+[[fblangref-ddl-table-external-examples]]
+=== Примеры использования внешних таблиц
+
+В нашем примере мы будем определять внешнюю таблицу журнала, которая может быть использована в обработчике исключений внутри хранимой процедуры или триггера. Внешняя таблица выбрана потому, что сообщения из любых обрабатываемых исключений будут сохранены в журнале, даже если транзакция, в которой был запущен процесс, будет откачена из-за другого необработанного исключения. В целях демонстрации наша таблица содержит всего два столбца: метку времени и текстовое сообщение. Третий столбец хранит разделитель строки:
+
+[source,sql]
+----
+CREATE TABLE ext_log
+EXTERNAL FILE 'd:\externals\log_me.txt' (
+   stamp   CHAR(24),
+   message CHAR(100),
+   crlf    CHAR(2) -- Для Windows
+);
+
+COMMIT;
+----
+
+Теперь создадим триггер, для автоматического сохранения метки времени и разделителя строки, каждый раз когда сообщение записывается в таблицу:
+
+[source,sql]
+----
+SET TERM ^;
+CREATE TRIGGER bi_ext_log FOR ext_log
+ACTIVE BEFORE INSERT
+AS
+BEGIN
+  IF (NEW.stamp IS NULL) THEN
+    NEW.stamp = CAST (CURRENT_TIMESTAMP AS CHAR(24));
+  NEW.crlf = ASCII_CHAR(13) || ASCII_CHAR(10);
+END ^
+COMMIT ^
+SET TERM ;^
+----
+
+Вставка некоторых записей (это может быть сделано в обработчике исключения):
+
+[source,sql]
+----
+INSERT INTO ext_log (message)
+VALUES('Shall I compare thee to a summer''s day?');
+INSERT INTO ext_log (message)
+VALUES('Thou art more lovely and more temperate');
+----
+
+Содержимое внешнего файла:
+
+----
+2015-10-07 15:19:03.4110Shall I compare thee to a summer's day?
+2015-10-07 15:19:58.7600Thou art more lovely and more temperate
+----
+
 [[fblangref-ddl-table-ext-alter]]
 == ALTER TABLE (EXTERNAL)
 
@@ -198,6 +198,14 @@ ALTER TABLE [ _tbl-schema_ <period> ] _tablename_
 == DROP TABLE (EXTERNAL)
 
 Синтаксис команды `DROP TABLE` для внешних таблиц, точно такой же ккк и для обычных. Подробнее см. <<fblangref-ddl-table-drop>>.
+
+[example]
+====
+[source,sql]
+----
+DROP TABLE ext_log;
+----
+====
 
 == RECREATE TABLE (EXTERNAL)
 

@@ -343,7 +343,7 @@ create local temporary table my_schema.work_table (
 
 
 [[fblangref-ddl-ltt-alter]]
-== `ALTER TABLE`
+== `ALTER TABLE` (LTT)
 
 .Назначение
 Изменение структуры таблицы.
@@ -467,7 +467,7 @@ alter table temp_data alter column id type bigint;
 <<fblangref-ddl-ltt-create>>, <<fblangref-ddl-ltt-recreate>>.
 
 [[fblangref-ddl-ltt-drop]]
-== `DROP TABLE`
+== `DROP TABLE` (LTT)
 
 .Назначение
 Удаление существующей таблицы.
