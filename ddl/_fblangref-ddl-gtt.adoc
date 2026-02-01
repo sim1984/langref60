@@ -1,4 +1,4 @@
-[[fblangref-ddl-gtt]]
+[[fblangref_ddl_gtt]]
 = GLOBAL TEMPORARY TABLE (GTT)
 
 (((GLOBAL TEMPORARY TABLE)))
