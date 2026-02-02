@@ -243,6 +243,8 @@
 |`WITHIN`
 |`WITHOUT`
 |`YEAR`
+|{nbsp}
+|{nbsp}
 |===
 
 
@@ -772,7 +774,6 @@
 |`YEAR`
 |`YEARDAY`
 |`ZONE`
-|{nbsp}
 |===
 
 :sectnums:
