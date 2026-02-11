@@ -11,6 +11,7 @@
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "cSpell.words": [
-        "DECFLOAT", "PSQL", "SAVEPOINT", "SMALLINT", "VARCHAR"
+        "BTRIM", "DECFLOAT", "PSQL", "TRUNC", "SAVEPOINT", "SMALLINT",
+        "VARBINARY", "VARCHAR"
     ]
 }
