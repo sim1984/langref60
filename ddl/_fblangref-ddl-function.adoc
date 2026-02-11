@@ -501,7 +501,7 @@ ALTER FUNCTION [ _func-schema_ <period> ] _funcname_
   | <alter-function-option> ... }
 
 <alter-function-body> ::=
-  [( <in_params> )]
+  [ ( <in_params> ) ]
   RETURNS <type>
     [COLLATE [ _coll-schema_ <period> ] _collation_]
   [ [NOT] DETERMINISTIC ]

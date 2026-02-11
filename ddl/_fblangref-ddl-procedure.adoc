@@ -378,9 +378,18 @@ DSQL, ESQL
 .Синтаксис
 [listing,subs="+quotes,macros"]
 ----
-ALTER PROCEDURE [ _proc-schema_ <period> ] _procname_ [( <in_params> )]
-[ RETURNS ( <out_params> ) ]
-<routine-body>
+ALTER PROCEDURE [ _proc-schema_ <period> ] _procname_
+{   <alter-procedure-body>
+  | <alter-procedure-option> }
+
+<alter-procedure-body> ::=
+  [ ( <in_params> ) ]
+  [ RETURNS ( <out_params> ) ]
+  <routine-body>
+
+<alter-procedure-option> ::=
+    SQL SECURITY {INVOKER | DEFINER}
+  | DROP SQL SECURITY
 
 Подробнее см. <<fblangref-ddl-proc-create-syntax,CREATE PROCEDURE>>.
 ----
@@ -397,8 +406,14 @@ ALTER PROCEDURE [ _proc-schema_ <period> ] _procname_ [( <in_params> )]
 [WARNING]
 ====
 Будьте осторожны при изменении количества и типов входных и выходных параметров хранимых процедур. Существующий код приложения может стать неработоспособным из-за того, что формат вызова процедуры несовместим с новым описанием параметров. Кроме того, PSQL модули, использующие изменённую хранимую процедуру, могут стать некорректными.
-Информация о том, как это обнаружить, находится в приложении <<fblangref-appx-supp-rdb-validblr,Поле RDB$VALID_BLR>>.
+Информация о том, как это обнаружить, находится в приложении <<fblangref-appx-supp-rdb-validblr>>.
 ====
+
+[[fblangref-ddl-procedure-alter_sql_security]]
+=== Привилегии выполнения
+
+(((ALTER PROCEDURE, SQL SECURITY)))
+Оператор `ALTER PROCEDURE` позволяет изменить привилегии выполнения процедуры без повторного указания входных и выходных параметров и тела функции. Для установки привилегий выполнения используется предложение `SQL SECURITY` с одной из опций: `INVOKER` или `DEFINER`. Если необходимо удалить привилегии выполнения процедуры укажите предложение `DROP SQL SECURITY`.
 
 [[fblangref-ddl-procedure-alter-who]]
 === Кто может изменить хранимую процедуру?
@@ -435,6 +450,24 @@ BEGIN
   DO
     SUSPEND;
 END
+----
+====
+
+.Изменение только привилегий выполнения процедуры
+[example]
+====
+[source,sql]
+----
+-- Устанавливает процедуре, что она будет выполнятся
+-- с привилегиями вызывающего пользователя.
+ALTER PROCEDURE GET_EMP_PROJ SQL SECURITY INVOKER;
+-- Устанавливает процедуре, что она будет выполнятся
+-- с привилегиями определяющего пользователя (владельца процедуры).
+ALTER PROCEDURE GET_EMP_PROJ SQL SECURITY DEFINER;
+-- Удаляет привилегии выполнения для процедуры.
+-- После выполнения этого оператора привилегии выполнения будут унаследованы
+-- от схемы, в которой создана эта процедура.
+ALTER PROCEDURE GET_EMP_PROJ DROP SQL SECURITY;
 ----
 ====
 
