@@ -300,24 +300,19 @@ DSQL
 [listing,subs="+quotes,macros,attributes"]
 ----
 ALTER PACKAGE [ _pkg-schema_ <period> ] _package_name_
-[<rights clause>]
-AS
-BEGIN
-  [<package_item> ...]
-END
+{   <alter-package-header>
+  | <alter-package-option> }
 
-<package_item> ::=
-    <function_decl>;
-  | <procedure_decl>;
+<alter-package-header> :==
+  [SQL SECURITY {DEFINER | INVOKER}]
+  AS
+  BEGIN
+    [<package_item> ...]
+  END
 
-<function_decl> ::=
-  FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [ [NOT] DETERMINISTIC ]
-
-<procedure_decl> ::=
-  PROCEDURE _proc_name_ [(<in_params>)]
-  [RETURNS (<out_params>)]
+<alter-package-option> ::=
+    SQL SECURITY {INVOKER | DEFINER}
+  | DROP SQL SECURITY
 
 Подробнее см. <<fblangref-ddl-pkg-create-syntax,CREATE PACKAGE>>
 ----
@@ -325,6 +320,12 @@ END
 Оператор `ALTER PACKAGE` изменяет заголовок пакета. Позволяется изменять количество и состав процедур и функций, их входных и выходных параметров. При этом исходный код тела пакета сохраняется. Состояние соответствия тела пакета его заголовку отображается в столбце `RDB$PACKAGES.RDB$VALID_BODY_FLAG`.
 
 Если указано только имя пакета, то его поиск производится в путях поиска (`SEARCH_PATH`). Будет изменён первый найденный пакет с заданным именем среди схем перечисленных в путях поиска.
+
+[[fblangref-ddl-package-alter_sql_security]]
+=== Привилегии выполнения
+
+(((ALTER PACKAGE, SQL SECURITY)))
+Оператор `ALTER PACKAGE` позволяет изменить привилегии выполнения пакет без указания остальных определений в заголовке пакета. Для установки привилегий выполнения используется предложение `SQL SECURITY` с одной из опций: `INVOKER` или `DEFINER`. Если необходимо удалить привилегии выполнения пакета укажите предложение `DROP SQL SECURITY`.
 
 [[fblangref-ddl-package-alter_who]]
 === Кто может изменить заголовок пакета?
@@ -335,7 +336,6 @@ END
 * Владелец пакета;
 * Владелец схемы в которой расположен пакет;
 * Пользователи с привилегией `ALTER ANY PACKAGE` для схемы в которой расположен пакет.
-
 
 [[fblangref-ddl-package-alter_examples]]
 ==== Примеры
@@ -352,6 +352,24 @@ BEGIN
   FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC;
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE DEFAULT CURRENT_DATE);
 END
+----
+====
+
+.Изменение только привилегий выполнения пакета
+[example]
+====
+[source,sql]
+----
+-- Устанавливает PSQL пакету, что он будет выполнятся
+-- с привилегиями вызывающего пользователя.
+ALTER PACKAGE APP_VAR SQL SECURITY INVOKER;
+-- Устанавливает PSQL пакету, что он будет выполнятся
+-- с привилегиями определяющего пользователя (владельца пакета).
+ALTER PACKAGE APP_VAR SQL SECURITY DEFINER;
+-- Удаляет привилегии выполнения для PSQ пакета.
+-- После выполнения этого оператора привилегии выполнения будут унаследованы
+-- от схемы, в которой создан этот PSQL пакет.
+ALTER PACKAGE APP_VAR DROP SQL SECURITY;
 ----
 ====
 
