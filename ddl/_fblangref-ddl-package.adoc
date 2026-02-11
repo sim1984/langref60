@@ -39,8 +39,9 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [DETERMINISTIC]
+  RETURNS <type> [NOT NULL]
+    [COLLATE [ _coll-schema_ <period> ] _collation_]
+  [ [NOT] DETERMINISTIC ]
 
 <procedure_decl> ::=
   PROCEDURE _proc_name_ [(<in_params>)]
@@ -109,8 +110,7 @@ END
 |Любая контекстная переменная, тип которой совместим с типом параметра.
 
 |paramname
-|Имя входного или выходного параметра процедуры/функции. Может содержать до 63 символов.
-Имя параметра должно быть уникальным среди входных и выходных параметров процедуры/функции, а также её локальных переменных.
+|Имя входного или выходного параметра процедуры/функции. Может содержать до 63 символов. Имя параметра должно быть уникальным среди входных и выходных параметров процедуры/функции, а также её локальных переменных.
 
 |datatype
 |Тип данных SQL.
@@ -313,7 +313,7 @@ END
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
   RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [DETERMINISTIC]
+  [ [NOT] DETERMINISTIC ]
 
 <procedure_decl> ::=
   PROCEDURE _proc_name_ [(<in_params>)]
@@ -386,8 +386,9 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [DETERMINISTIC]
+  RETURNS <type> [NOT NULL]
+    [COLLATE [ _coll-schema_ <period> ] _collation_]
+  [ [NOT] DETERMINISTIC ]
 
 <procedure_decl> ::=
   PROCEDURE _proc_name_ [(<in_params>)]
@@ -522,8 +523,9 @@ END
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [DETERMINISTIC]
+  RETURNS <type> [NOT NULL]
+    [COLLATE [ _coll-schema_ <period> ] _collation_]
+  [ [NOT] DETERMINISTIC ]
 
 <procedure_decl> ::=
   PROCEDURE _proc_name_ [(<in_params>)]
