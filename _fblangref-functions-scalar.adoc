@@ -3039,10 +3039,10 @@ DATEDIFF (<args>)
 |unit
 |Составляющая даты/времени.
 
-|monent_1
+|moment_1
 |Выражение типа `DATE`, `TIME` или `TIMESTAMP`.
 
-|monent_2
+|moment_2
 |Выражение типа `DATE`, `TIME` или `TIMESTAMP`.
 |===
 
@@ -3120,7 +3120,7 @@ EXTRACT (<part> FROM <datetime>)
 |===
 
 .Тип возвращаемого результата:
-`SMALLINT` или `NUNERIC`
+`SMALLINT` или `NUMERIC`
 
 Функция `EXTRACT` извлекает составляющие даты и времени из типов данных `DATE`, `TIME` и `TIMESTAMP`.
 
@@ -3670,7 +3670,7 @@ TOTALORDER (_decfloat1_, _decfloat2_)
 * 0 -- если значения равны;
 * 1 -- если первое значение больше второго.
 
-Сравнений значений `DEFLOAT` происходит в следующем порядке:
+Сравнений значений `DECFLOAT` происходит в следующем порядке:
 
 [listing]
 ----
@@ -4930,7 +4930,7 @@ GEN_ID (\[__schema-name__.]_generator-name_, _step_)
 
 * Начиная с Firebird 2.0 для получения следующего значение последовательности (генератора) стало доступно использование совместимого с SQL-стандартом оператора <<fblangref-commons-nxtvlufor,`NEXT VALUE FOR`>>.
 
-[WARINING]
+[WARNING]
 ====
 Если значение параметра _step_ меньше нуля, произойдёт уменьшение значения генератора. Следует быть крайне аккуратным при таких манипуляциях в базе данных, они могут привести к потере целостности данных.
 ====
@@ -5628,7 +5628,7 @@ SELECT * FROM RDB$ROLES WHERE RDB$ROLE_IN_USE(RDB$ROLE_NAME)
 .См. также:
 <<fblangref-security-grant-role,GRANT ROLE>>, <<fblangref-management-setrole,SET ROLE>>, <<fblangref-contextvars-current-role,CURRENT_ROLE>>.
 
-[[fblangref-scalarfuncs-system-privelege]]
+[[fblangref-scalarfuncs-system-privilege]]
 === `RDB$SYSTEM_PRIVILEGE()`
 
 .Доступно в

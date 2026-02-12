@@ -11,7 +11,15 @@
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "cSpell.words": [
-        "BTRIM", "DECFLOAT", "PSQL", "TRUNC", "SAVEPOINT", "SMALLINT",
+        "ACOSH", "ASINH",
+        "BTRIM",
+        "DATEADD", "DATEDIFF", "DBKEY", "DECFLOAT", "DOWNTO",
+        "GDSCODE",
+        "LISTAGG", "LOCALTIME", "LOCALTIMESTAMP", "LPAD", "LTRIM",
+        "MAXVALUE", "MINVALUE", "NCHAR", "NTILE", "NULLIF",
+        "PSQL", "RPAD", "RTRIM", "TOTALORDER", "TRUNC",
+        "SAVEPOINT", "SMALLINT", "STDDEV", "SYSDBA",
+        "UNLIST",
         "VARBINARY", "VARCHAR"
     ]
 }
