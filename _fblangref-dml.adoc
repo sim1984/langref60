@@ -1051,6 +1051,7 @@ FROM <table-reference> [, <table-reference> ...]
 <table-primary> ::=
     <table-or-query-name> [[AS] _correlation-name_]
   | [LATERAL] <derived-table> [<correlation-or-recognition>]
+  | table-value-function-name ([<table-function-args>]) <correlation-or-recognition>
   | <parenthesized-joined-table>
 
 <table-or-query-name> ::=
@@ -1115,6 +1116,12 @@ FROM <table-reference> [, <table-reference> ...]
 
 |procedure-args
 |Аргументы селективной хранимой процедуры.
+
+|table-value-function-name
+|Имя табличной функции.
+
+|table-function-args
+|Аргументы табличной функции.
 
 |derived-table
 |Производная таблица.
