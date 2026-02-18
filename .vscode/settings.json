@@ -20,6 +20,7 @@
         "PSQL", "RPAD", "RTRIM", "TOTALORDER", "TRUNC",
         "SAVEPOINT", "SMALLINT", "SQLCODE", "SQLSTATE", "STDDEV", "SYSDBA",
         "UNLIST",
-        "VARBINARY", "VARCHAR"
+        "VARBINARY", "VARCHAR",
+        "подзапрос", "подзапроса", "подзапросов", "подзапросом", "подзапросы", "подзапросами"
     ]
 }
