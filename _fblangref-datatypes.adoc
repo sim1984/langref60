@@ -1570,8 +1570,7 @@ max_char_length = FLOOR((page_size / 4 – 9) / N),
 В кодировках, нечувствительных к регистру ("`++_CI++`"), один символ в _индексе_ будет занимать не 4, а 6 байт, поэтому максимальная длина ключа для страницы, например для страницы 4096 байт составит 169 символов.
 ====
 
-Последовательность сортировки (COLLATE) тоже может повлиять на максимальную длину индексируемой строки.
-Полный список доступных наборов символов и нестандартных порядков сортировки доступен в приложении
+Последовательность сортировки (`COLLATE`) тоже может повлиять на максимальную длину индексируемой строки. Полный список доступных наборов символов и нестандартных порядков сортировки доступен в приложении
 <<fblangref-appx-charsets,Наборы символов и порядки сортировки>>.
 
 .См. также
@@ -1581,17 +1580,19 @@ max_char_length = FLOOR((page_size / 4 – 9) / N),
 === `BINARY`
 
 (((Типы данных, BINARY)))
-`BINARY` является типом данных с фиксированной длиной для хранения бинарных данных. Если переданное количество байт меньше объявленной длины, то значение будет дополнено нулями. В случае если не указана длина, то считается, что она равна единице.
+`BINARY` является типом данных с фиксированной длиной для хранения бинарных данных. Если переданное количество байт меньше объявленной длины, то значение будет дополнено нулями.
 
 .Синтаксис
 [listing,subs=+quotes]
 ----
-BINARY [(<length>)]
+BINARY [(_length_)]
 ----
+
+Если длина типа `BINARY` не указана, то считается, что она равна единице.
 
 [NOTE]
 ====
-Этот тип является псевдонимом типа `CHAR [(<length>)] CHARACTER SET OCTETS` и обратно совместим с ним.
+Этот тип является псевдонимом типа `CHAR [(_length_)] CHARACTER SET OCTETS` и обратно совместим с ним.
 ====
 
 [TIP]
@@ -1613,11 +1614,11 @@ BINARY [(<length>)]
 .Синтаксис
 [listing,subs=+quotes]
 ----
-{CHAR | CHARACTER} [(length)]
+{CHAR | CHARACTER} [(_length_)]
   [CHARACTER SET <charset>] [COLLATE <collate>]
 ----
 
-В случае если не указана длина, то считается, что она равна единице.
+Если длина типа `CHAR` не указана, то считается, что она равна единице.
 
 Данный тип символьных данных можно использовать для хранения в справочниках кодов, длина которых стандартна и определённой "`ширины`". Примером такого может служить почтовый индекс в России – 6 символов.
 
@@ -1633,22 +1634,23 @@ BINARY [(<length>)]
 .Синтаксис
 [listing,subs=+quotes]
 ----
-{VARBINARY  | BINARY VARYING} (<length>)
+{VARBINARY  | BINARY VARYING} [(_length_)]
 ----
+
+Если длина типа `VARBINARY` не указана, то считается, что она равной 255.
 
 [NOTE]
 ====
-Этот тип является псевдонимом типа `VARCHAR (<length>) CHARACTER SET OCTETS` и обратно совместим с ним.
+Этот тип является псевдонимом типа `VARCHAR [(_length_)] CHARACTER SET OCTETS` и обратно совместим с ним.
 ====
-
 
 .Использование типов BINARY и VARBINARY в PSQL
 [example]
 ====
 [source,sql]
 ----
-
 DECLARE VARIABLE VAR1 VARBINARY(10);
+DECLARE VAR2 VARBINARY; -- VARBINARY с максимальной длинной 255 байт
 ----
 ====
 
@@ -1681,9 +1683,11 @@ CREATE TABLE INFO (
 .Синтаксис
 [listing,subs=+quotes]
 ----
-{VARCHAR | {CHAR | CHARACTER} VARYING} (length)
+{VARCHAR | {CHAR | CHARACTER} VARYING} [(_length_)]
   [CHARACTER SET <charset>] [COLLATE <collate>]
 ----
+
+Если длина типа `VARCHAR` не указана, то считается, что она равной 255 символов.
 
 [[fblangref-datatypes-chartypes-nchar]]
 === `NCHAR`
@@ -1694,12 +1698,26 @@ CREATE TABLE INFO (
 .Синтаксис
 [listing,subs=+quotes]
 ----
-{NCHAR | NATIONAL {CHAR | CHARACTER}} [(length)]
+{NCHAR | NATIONAL {CHAR | CHARACTER}} [(_length_)]
 ----
 
 Синонимом является написание `NATIONAL CHAR`.
 
-Аналогичный тип данных доступен для строкового типа переменной длины: `NATIONAL CHARACTER VARYING`.
+Если длина типа `NCHAR` не указана, то считается, что она равна единице.
+
+[[fblangref-datatypes-chartypes-nvarchar]]
+=== `NATIONAL CHARACTER VARYING`
+
+(((Типы данных, NATIONAL CHARACTER VARYING)))
+Представляет собой символьный тип данных переменной длины с предопределённым набором символов ISO8859_1.
+
+.Синтаксис
+[listing,subs=+quotes]
+----
+NATIONAL {CHAR | CHARACTER} VARYING [(_length_)]
+----
+
+Если длина типа `NATIONAL CHARACTER VARYING` не указана, то считается, что она равной 255 символам.
 
 [[fblangref-datatypes-booleantypes]]
 == Логический тип данных
@@ -2782,6 +2800,7 @@ UPDATE ATABLE
 SELECT 30||' days hath September, April, June and November' CONCAT$
 FROM RDB$DATABASE
 ----
+
 [listing]
 ----
 CONCAT$
@@ -2837,11 +2856,10 @@ FROM RDB$DATABASE;
 К необязательным относятся:
 
 * значение по умолчанию;
-* возможности использования NULL для домена;
-* ограничения CHECK для данных домена;
-* набор символов (для символьных типов данных и BLOB полей);
+* возможности использования `NULL` для домена;
+* ограничения `CHECK` для данных домена;
+* набор символов (для символьных типов данных и `BLOB` полей);
 * порядок сортировки (для символьных типов данных).
-
 
 .Создание домена
 [example]
@@ -3013,7 +3031,7 @@ DROP DOMAIN Test_Domain;
   | DATE
   | {TIME | TIMESTAMP} [{WITH | WITHOUT} TIME ZONE]
   | {DECIMAL | NUMERIC} [(_precision_ [, _scale_])]
-  | {VARCHAR | {CHAR | CHARACTER} VARYING} (_length_)
+  | {VARCHAR | {CHAR | CHARACTER} VARYING} [(_length_)]
     [CHARACTER SET [ SYSTEM <period> ] _charset_ ]
   | {CHAR | CHARACTER} [(_length_)] [CHARACTER SET [ SYSTEM <period> ] _charset_ ]
   | {NCHAR | NATIONAL {CHARACTER | CHAR}} VARYING (_length_)
@@ -3041,17 +3059,13 @@ DROP DOMAIN Test_Domain;
 |Имя столбца таблицы или представления (только столбцы не типа массив).
 
 |binary-precision
-|Двоичная точность.
-От 1 до 53 бит.
+|Двоичная точность. От 1 до 53 бит.
 
 |precision
-|Десятичная точность.
-От 1 до 38 десятичных цифр.
+|Десятичная точность. От 1 до 38 десятичных цифр.
 
 |scale
-|Масштаб или количество знаков после запятой.
-От 0 до 38.
-Оно должно быть меньше или равно точности.
+|Масштаб или количество знаков после запятой. От 0 до 38. Оно должно быть меньше или равно точности.
 
 |length
 |Максимальная длина строки в символах.
@@ -3060,7 +3074,7 @@ DROP DOMAIN Test_Domain;
 |Набор символов.
 
 |domain_or_non_array_type
-|Типы, не являющиеся массивами, которые можно использовать в коде PSQL и операторе CAST.
+|Типы, не являющиеся массивами, которые можно использовать в коде PSQL и операторе `CAST`.
 |===
 
 [[fblangref-datatypes-syntax-scalar-domns]]
@@ -3131,10 +3145,10 @@ DROP DOMAIN Test_Domain;
   | DATE <array_dim>
   | {TIME | TIMESTAMP} [{WITH | WITHOUT} TIME ZONE] <array_dim>
   | {DECIMAL | NUMERIC} [(_precision_ [, _scale_])]  <array_dim>
-  | {VARCHAR | {CHAR | CHARACTER} VARYING} (_length_)  <array_dim>
+  | {VARCHAR | {CHAR | CHARACTER} VARYING} [(_length_)]  <array_dim>
     [CHARACTER SET [ SYSTEM <period> ] _charset_ ]
   | {CHAR | CHARACTER} [(_length_)]  <array_dim> [CHARACTER SET [ SYSTEM <period> ] _charset_ ]
-  | {NCHAR | NATIONAL {CHARACTER | CHAR}} VARYING (_length_) <array_dim>
+  | {NCHAR | NATIONAL {CHARACTER | CHAR}} VARYING [(_length_)] <array_dim>
   | {NCHAR | NATIONAL {CHARACTER | CHAR}} [(_length_)] <array_dim>
   | {BINARY | VARBINARY} (_length_) <array_dim>
 
