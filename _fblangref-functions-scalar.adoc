@@ -4780,22 +4780,44 @@ DSQL, PSQL
 .Синтаксис
 [listing]
 ----
-GEN_UUID([<version>])
-
-<version> ::= 4 | 7
+GEN_UUID([ _version_ ])
 ----
+
+[[fblangref-funcs-tbl-gen_uuid]]
+.Параметры функции `GEN_UUID`
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|version
+|Версия UUID. Допустимы значения 4 или 7. Значение по умолчанию является 4, если не указано.
+|===
 
 .Тип возвращаемого результата
 `BINARY(16)`
 
-Функция `GEN_UUID` возвращает универсальный уникальный идентификатор UUID в виде 16-байтной строки символов, отвечающий требованиям стандарта RFC-4122. Функция возвращает строку UUID 4-ой или 7-ой версии (по умолчанию 4-ой), где несколько битов зарезервированы, а остальные являются случайными.
+Функция `GEN_UUID` возвращает универсальный уникальный идентификатор (UUID) версии 4 или 7 в виде 16-байтовой двоичной строки.
 
-Строковый формат совместимого UUID v4/v7 -- `XXXXXXXX-XXXX-YXXX-ZXXX-XXXXXXXXXXXX`, где Y -- версия (4 или 7), а Z -- 8, 9, A или B.
+Строковый формат совместимого UUID v4/v7 -- `XXXXXXXX-XXXX-YXXX-ZXXX-XXXXXXXXXXXX`, где Y -- версия (4 или 7), а Z -- 8, 9, A или B. См. функцию <<fblangref-scalarfuncs-uuid-to-char>>.
+
+.Поддерживаемые версии
+[horizontal.compact]
+`4`::
+UUID формируется из истинно случайных или псевдослучайных чисел (за исключением битов версии и варианта).
+`7`::
+UUID, первые 48 бит которого соответствуют миллисекундам, прошедшим с полуночи 1 января 1970 года по UTC (эпоха Unix), а оставшиеся 74 бита — за исключением битов версии и варианта — представляют собой истинно случайные или псевдослучайные числа.
+
+Преимущество версии 7 заключается в том, что значение UUID упорядочено по времени (с точностью до миллисекунды).
+
+Другие версии UUID не поддерживаются функцией `GEN_UUID`.
+
+См. также https://www.rfc-editor.org/rfc/rfc9562[RFC 9562 -- Universally Unique IDentifiers (UUIDs)^]
 
 [[fblangref-scalarfuncs-gen-uuid-exmpl]]
 ==== Примеры `GEN_UUID`
 
-.Использование функции `GEN_UUID`
+.Использование функции `GEN_UUID` для генерации UUID v4 (версия по умолчанию)
 [example]
 ====
 [source,sql]
@@ -4807,12 +4829,27 @@ SELECT GEN_UUID() AS GUID FROM RDB$DATABASE
 ----
 GUID
 ========
-
 017347BFE212B2479C00FA4323B36320
 ----
 ====
 
-.Использование функции `GEN_UUID` v7
+.Использование функции `GEN_UUID` для генерации UUID v4 в явно заданном виде
+[example]
+====
+[source,sql]
+----
+SELECT GEN_UUID(4) AS GUID FROM RDB$DATABASE
+----
+
+[listing]
+----
+GUID
+========
+C93F78AEED7C470692F949EFE59C1838
+----
+====
+
+.Использование функции `GEN_UUID` для генерации UUID v7
 [example]
 ====
 [source,sql]
@@ -4824,13 +4861,12 @@ SELECT GEN_UUID(7) AS GUID FROM RDB$DATABASE
 ----
 GUID
 ========
-
 019048F5B5FA7FD884ACBC17319B0EB6
 ----
 ====
 
 .См. также:
-<<fblangref-scalarfuncs-char-to-uuid,CHAR_TO_UUID>>, <<fblangref-scalarfuncs-uuid-to-char,UUID_TO_CHAR>>.
+<<fblangref-scalarfuncs-char-to-uuid>>, <<fblangref-scalarfuncs-uuid-to-char>>.
 
 [[fblangref-scalarfuncs-uuid-to-char]]
 === `UUID_TO_CHAR()`
