@@ -16,7 +16,7 @@
 .Доступно в
 DSQL, ESQL.
 
-[#fblangref-ddl-domain-create]
+[#fblangref-ddl-domain-create-syntax]
 .Синтаксис
 [listing,subs="+quotes,attributes,macros"]
 ----
@@ -300,7 +300,7 @@ ALTER DOMAIN [ _dom-schema_ <period> ] _domain_name_
 
 <blob_datatype> ::= См. <<fblangref-datatypes-syntax-blob,Синтаксис типа данных BLOB>>
 
-См. также <<fblangref-ddl-domain-create, `CREATE DOMAIN` синтаксис>>
+См. также <<fblangref-ddl-domain-create-syntax, `CREATE DOMAIN` синтаксис>>
 ----
 
 [[fblangref-ddl-tbl-alterdomn]]
