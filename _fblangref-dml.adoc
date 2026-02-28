@@ -6199,7 +6199,7 @@ DSQL
 [listing,subs="+quotes,macros"]
 ----
 USING [ ( <input_parameter_list> ) ]
-    [ <subroutines> ]
+    [ <local_declarations> ]
 DO <sql_command>
 
 <input_parameter_list> ::= <param_decl> = ? [, <param_decl> = ? ... ]
@@ -6220,11 +6220,10 @@ DO <sql_command>
 
 <blob_datatype> ::= См. <<fblangref-datatypes-syntax-blob,Синтаксис типа данных BLOB>>
 
-<subroutines> := <subroutine> [... <subroutine>]
+<local_declarations> := <local_declaration> [... <local_declaration>]
 
-<subroutines> ::=
+<local_declaration> ::=
     <declare variable>
-  | <declare cursor>
   | <subproc-declaration>
   | <subproc-implementation>
   | <subfunc-declaration>
@@ -6277,8 +6276,8 @@ DO <sql_command>
 |col
 |Имя столбца таблицы или представления.
 
-|subroutines
-|Одна или несколько объявленных локальных переменных, курсоров, процедур или функций.
+|local_declarations
+|Одна или несколько объявленных локальных переменных, процедур или функций.
 
 |sql_command
 |DSQL оператор.
@@ -6294,7 +6293,7 @@ DO <sql_command>
 
 `<input_parameter_list>`:: Строго типизированный список параметров. Их можно связать со значениями, используя заполнитель `?`.
 
-`<subroutines>`:: Стандартные объявления функций или процедур PSQL. Здесь же можно объявлять локальные переменные и курсоры.
+`<local_declarations>`:: Стандартные локальные объявления PSQL (переменные, подпроцедуры и подфункции).
 
 `<sql_command>`:: Оператор DSQL для выполнения. Поддерживаемые операторы:
 
