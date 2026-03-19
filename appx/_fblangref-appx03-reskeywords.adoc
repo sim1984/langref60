@@ -148,6 +148,8 @@
 |`OUTER`
 |`OVER`
 |`PARAMETER`
+|`PERCENTILE_CONT`
+|`PERCENTILE_DISC`
 |`PLAN`
 |`POSITION`
 |`POST_EVENT`
@@ -243,8 +245,6 @@
 |`WITHIN`
 |`WITHOUT`
 |`YEAR`
-|{nbsp}
-|{nbsp}
 |===
 
 
@@ -578,6 +578,8 @@
 |`PARTITION`
 |`PASSWORD`
 |`PERCENT_RANK`
+|`PERCENTILE_CONT`
+|`PERCENTILE_DISC`
 |`PI`
 |`PKCS_1_5`
 |`PLACING`
@@ -774,6 +776,7 @@
 |`YEAR`
 |`YEARDAY`
 |`ZONE`
+|{nbsp}
 |===
 
 :sectnums:
