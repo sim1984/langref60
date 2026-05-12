@@ -346,6 +346,7 @@
 |`CONNECT`
 |`CONNECTIONS`
 |`CONSISTENCY`
+|`CONSTANT`
 |`CONSTRAINT`
 |`CONTAINING`
 |`CONTINUE`
@@ -780,6 +781,8 @@
 |`YEAR`
 |`YEARDAY`
 |`ZONE`
+|{nbsp}
+|{nbsp}
 |===
 
 :sectnums:

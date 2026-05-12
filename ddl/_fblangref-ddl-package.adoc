@@ -36,6 +36,7 @@ END
 <package_item> ::=
     <function_decl>;
   | <procedure_decl>;
+  | <constant_decl>;
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
@@ -46,6 +47,9 @@ END
 <procedure_decl> ::=
   PROCEDURE _proc_name_ [(<in_params>)]
   [RETURNS (<out_params>)]
+
+<constant_decl> ::=
+  CONSTANT _const_name_ <type> = <constant expression>
 
 <in_params> ::= <inparam> [, <inparam> ...]
 
@@ -91,11 +95,17 @@ END
 |procedure_decl
 |Объявление процедуры.
 
+|constant_decl
+|Объявление константы.
+
 |proc_name
 |Имя процедуры. Может содержать до 63 символов.
 
 |func_name
 |Имя функции. Может содержать до 63 символов.
+
+|const_name
+|Имя константы. Может содержать до 63 символов.
 
 |inparam
 |Описание входного параметра.
@@ -135,6 +145,9 @@ END
 
 |col
 |Имя столбца таблицы или представления.
+
+|constant expression
+|Выражение для инициализации константы.
 |===
 
 Оператор `CREATE PACKAGE` создаёт новый заголовок пакета. Если перед именем пакета указана схема, то пакет будет создан в указанной схеме, в противном случае пакет будет создан в текущей схеме (первая валидная схема в пути поиска).
@@ -148,9 +161,11 @@ END
 
 Если используется предложение `IF NOT EXISTS`, то оператор `CREATE PACKAGE` попытается создать новый заголовок пакета без выдачи ошибки, если он уже существует. DDL триггеры не будут запускаться, если заголовок пакета уже существует.
 
-Процедуры и функции, объявленные в заголовке пакета, доступны вне тела пакета через полный идентификатор имён процедур и функций (`_package_name_._procedure_name_` и `_package_name_._function_name_`). Процедуры и функции, определенные в теле пакета, но не объявленные в заголовке пакета, не видны вне тела пакета.
+Процедуры, функции и константы, объявленные в заголовке пакета, доступны вне тела пакета через полный идентификатор имён процедур и функций (`_package_name_._procedure_name_`, `_package_name_._function_name_` и `_package_name_._constant_name_`). Процедуры и функции, определенные в теле пакета, но не объявленные в заголовке пакета, не видны вне тела пакета.
 
-Имена процедур и функций, объявленные в заголовке пакета, должны быть уникальны среди имён процедур и функций, объявленных в заголовке и теле пакета.
+Константы объявленные в теле пакета не видны вне тела пакета. Константа объявленная в заголовке пакета, не может быть повторно объявлена в теле пакета.
+
+Имена процедур, функций и констант, объявленные в заголовке пакета, должны быть уникальны среди имён процедур, функций и констант, объявленных в заголовке и теле пакета.
 
 [[fblangref-ddl-package-create-sql-security]]
 === Привилегии выполнения
@@ -245,8 +260,15 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 CREATE PACKAGE APP_VAR
 AS
 BEGIN
+  -- публичные константы пакета
+  CONSTANT MIN_DATE DATE = DATE '1900-01-01';
+  CONSTANT MAX_DATE DATE = DATE '2100-12-31';
+
+  -- публичные функции пакета
   FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC;
   FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC;
+
+  -- публичные процедуры пакета
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE DEFAULT CURRENT_DATE);
 END
 ----
@@ -259,8 +281,12 @@ CREATE PACKAGE APP_VAR
 SQL SECURITY DEFINER
 AS
 BEGIN
+  CONSTANT MIN_DATE DATE = DATE '1900-01-01';
+  CONSTANT MAX_DATE DATE = DATE '2100-12-31';
+
   FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC;
   FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC;
+
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE DEFAULT CURRENT_DATE);
 END
 ----
@@ -274,8 +300,12 @@ END
 CREATE PACKAGE APP.APP_VAR
 AS
 BEGIN
+  CONSTANT MIN_DATE DATE = DATE '1900-01-01';
+  CONSTANT MAX_DATE DATE = DATE '2100-12-31';
+
   FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC;
   FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC;
+
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE DEFAULT CURRENT_DATE);
 END
 ----

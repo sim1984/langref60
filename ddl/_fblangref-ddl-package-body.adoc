@@ -25,6 +25,7 @@ END
 <package_item> ::=
     <function_decl>;
   | <procedure_decl>;
+  | <constant_decl>;
 
 <function_decl> ::=
   FUNCTION _func_name_ [(<in_params>)]
@@ -34,6 +35,9 @@ END
 <procedure_decl> ::=
   PROCEDURE _proc_name_ [(<in_params>)]
   [RETURNS (<out_params>)]
+
+<constant_decl> ::=
+  CONSTANT _const_name_ <type> = <constant expression>
 
 <package_body_item> ::=
     <function_impl>
@@ -110,6 +114,9 @@ END
 |procedure_decl
 |Объявление процедуры.
 
+|constant_decl
+|Объявление константы.
+
 |function_impl
 |Реализация функции.
 
@@ -123,6 +130,9 @@ END
 |func_name
 |Имя функции.
 Может содержать до 63 символов.
+
+|const_name
+|Имя константы. Может содержать до 63 символов.
 
 |inparam
 |Описание входного параметра.
@@ -186,6 +196,9 @@ END
 
 |col
 |Имя столбца таблицы или представления.
+
+|constant expression
+|Выражение для инициализации константы.
 |===
 
 Оператор `CREATE PACKAGE BODY` создаёт новое тело пакета. Тело пакета может быть создано только после того как будет создан заголовок пакета. Если заголовка пакета с именем _package_name_ не существует в указанной (текущей) схеме, то будет выдана соответствующая ошибка. Если указано только имя пакета, то его поиск его заголовка происходит в пути поиска.
@@ -199,7 +212,9 @@ END
 
 Все процедуры и функции, объявленные в заголовке пакета, должны быть реализованы в теле пакета. Кроме того, должны быть реализованы и все процедуры и функции, объявленные в теле пакета. Процедуры и функции, определенные в теле пакета, но не объявленные в заголовке пакета, не видны вне тела пакета.
 
-Имена процедур и функций, объявленные в теле пакета, должны быть уникальны среди имён процедур и функций, объявленных в заголовке и теле пакета.
+Константы объявленные в заголовке пакета, не могут быть повторно объявлены в теле пакета.
+
+Имена процедур, функций и констант, объявленные в теле пакета, должны быть уникальны среди имён процедур, функций и констант, объявленных в заголовке и теле пакета.
 
 .Правила:
 
@@ -234,24 +249,27 @@ UDF деклараций (`DECLARE` внешняя функция) в насто
 CREATE PACKAGE BODY APP_VAR
 AS
 BEGIN
+  -- приватная константа пакета
+  CONSTANT CONTEXT_NAME VARCHAR(63) = 'USER_SESSION';
+
   -- Возвращает дату начала периода
   FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC
   AS
   BEGIN
-    RETURN RDB$GET_CONTEXT('USER_SESSION', 'DATEBEGIN');
+    RETURN RDB$GET_CONTEXT(CONTEXT_NAME, 'DATEBEGIN');
   END
   -- Возвращает дату окончания периода
   FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC
   AS
   BEGIN
-    RETURN RDB$GET_CONTEXT('USER_SESSION', 'DATEEND');
+    RETURN RDB$GET_CONTEXT(CONTEXT_NAME, 'DATEEND');
   END
   -- Устанавливает диапазон дат рабочего периода
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE)
   AS
   BEGIN
-    RDB$SET_CONTEXT('USER_SESSION', 'DATEBEGIN', ADATEBEGIN);
-    RDB$SET_CONTEXT('USER_SESSION', 'DATEEND', ADATEEND);
+    RDB$SET_CONTEXT(CONTEXT_NAME, 'DATEBEGIN', ADATEBEGIN);
+    RDB$SET_CONTEXT(CONTEXT_NAME, 'DATEEND', ADATEEND);
   END
 END
 ----

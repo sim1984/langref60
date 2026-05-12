@@ -48,6 +48,7 @@ GRANT <privileges>
     SCHEMA _schema_name_
   | EXCEPTION [_schema_name_.] _exception_name_
   | {GENERATOR | SEQUENCE} [_schema_name_.] _sequence_name_ }
+  | PACKAGE [_schema_name_.] _package_name_ }
 
 <ddl_privileges> ::=
   {ALL [PRIVILEGES] | <ddl_privilege_list>}
@@ -324,6 +325,8 @@ TO PROCEDURE MANAGEMENT.ADD_EMP_PROJ;
 
 Для хранимых процедур привилегия `EXECUTE` позволяет не только выполнять хранимые процедуры, но и делать выборку данных из селективных процедур (с помощью оператора `SELECT`).
 
+Привилегия `EXECUTE` на пакет позволяет выполнять процедуры и функции пакета, но не другие действия.
+
 [NOTE]
 ====
 Привилегия может быть назначена только для всего пакета, а не для отдельных его подпрограмм.
@@ -350,6 +353,10 @@ GRANT EXECUTE ON FUNCTION APP.GET_BEGIN_DATE TO ROLE MANAGER;
 -- для всех пользователей
 GRANT EXECUTE ON PACKAGE APP.APP_VAR TO PUBLIC;
 
+-- Выдача привилегии USAGE на пакет APP_VAR из схемы APP
+-- для всех пользователей
+GRANT USAGE ON PACKAGE APP.APP_VAR TO PUBLIC;
+
 -- Выдача привилегии EXECUTE на функцию GET_BEGIN_DATE из схемы APP
 -- для пакета APP_VAR из схемы APP
 GRANT EXECUTE ON FUNCTION APP.GET_BEGIN_DATE
@@ -360,7 +367,7 @@ TO PACKAGE APP.APP_VAR;
 [[fblangref-security-grant-usage]]
 === Привилегия `USAGE`
 
-Привилегия `USAGE` (использование) применима к схемам, а также другим объектам метаданных, таких как исключения и последовательности (генераторы).
+Привилегия `USAGE` (использование) применима к схемам, а также другим объектам метаданных, таких как исключения, последовательности (генераторы) и пакеты.
 
 [NOTE]
 ====
@@ -377,6 +384,8 @@ TO PACKAGE APP.APP_VAR;
 ====
 Привилегия `USAGE` даёт права только на приращения генераторов (последовательностей) с помощью функции `GEN_ID` или конструкции `NEXT VALUE FOR`. Оператор `SET GENERATOR` является аналогом оператора `ALTER SEQUENCE ... RESTART WITH`, которые относятся к DDL операторам. По умолчанию права на такие операции имеет только владелец генератора (последовательности). Права на установку начального значения любого генератора (последовательности) можно предоставить с помощью `GRANT ALTER ANY SEQUENCE`, что не рекомендуется для обычных пользователей.
 ====
+
+Привилегия `USAGE` на пакет позволяет ссылаться на константы пакета.
 
 [[fblangref-security-grant-usage-exmpl]]
 ==== Примеры предоставления привилегии `USAGE`

@@ -27,6 +27,7 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
     [<routine-location>] _routinename_ <period> _paramname_
   | {PROCEDURE | [EXTERNAL] FUNCTION}
     [<routine-location>] _routinename_
+  | CONSTANT [ _package-schema_ <period> ] _package-name_ <period> _constant-name_
 
 <schema-bound-type> ::=
     CHARACTER SET | COLLATION | DOMAIN
@@ -84,6 +85,9 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
 
 |routinename
 |Имя хранимой процедуры или функции.
+
+|constant-name
+|Имя константы.
 
 |paramname
 |Имя параметра хранимой процедуры или функции.
@@ -204,7 +208,7 @@ IS 'Код сотрудника';
 ----
 ====
 
-.Добавление комментария для пакета, его процедур и функций, и их параметров.
+.Добавление комментария для пакета, его процедур и функций, и их параметров, а также констант.
 [example]
 ====
 [source,sql]
@@ -212,6 +216,12 @@ IS 'Код сотрудника';
 -- добавляется комментарий к первому найденному в путях поиска пакету APP_VAR
 
 COMMENT ON PACKAGE APP_VAR IS 'Переменные приложения';
+
+COMMENT ON CONSTANT APP_VAR.MIN_DATE
+IS 'Минимально допустимая дата периода';
+
+COMMENT ON CONSTANT APP_VAR.MAX_DATE
+IS 'Максимально допустимая дата периода';
 
 COMMENT ON FUNCTION APP_VAR.GET_DATEBEGIN
 IS 'Возвращает дату начала периода';
@@ -231,6 +241,12 @@ IS 'Дата начала';
 [source,sql]
 ----
 COMMENT ON PACKAGE APP.APP_VAR IS 'Переменные приложения';
+
+COMMENT ON CONSTANT APP.APP_VAR.MIN_DATE
+IS 'Минимально допустимая дата периода';
+
+COMMENT ON CONSTANT APP.APP_VAR.MAX_DATE
+IS 'Максимально допустимая дата периода';
 
 COMMENT ON FUNCTION APP.APP_VAR.GET_DATEBEGIN
 IS 'Возвращает дату начала периода';
