@@ -1,7 +1,7 @@
 [[fblangref-build-in-packages]]
 = Системные пакеты
 
-Системные пакеты предоставляют служебные хранимые процедуры и функции. Они располагаются в системной схеме `SYSTEM`.
+Системные пакеты предоставляют служебные хранимые процедуры, функции и константы. Они располагаются в системной схеме `SYSTEM`.
 
 .Список системных пакетов
 <<fblangref-build-in-package-blob-util-pkg>>::
@@ -25,6 +25,34 @@
 
 Эти подпрограммы работают с двоичными данными напрямую, даже с текстовыми BLOB.
 
+[[fblangref-build-in-package-blob-util-from-begin]]
+=== Константа `RDB$BLOB_UTIL.FROM_BEGIN`
+
+Константа `RDB$BLOB_UTIL.FROM_BEGIN` имеет тип `INTEGER` и значение `0`.
+
+Может быть использована для указания режима поиска в функции `RDB$BLOB_UTIL.SEEK`. При установке в параметр `MODE` константы `RDB$BLOB_UTIL.FROM_BEGIN` поиск будет осуществляться с начала `BLOB`.
+
+См. также <<fblangref-build-in-package-blob-util-seek>>.
+
+[[fblangref-build-in-package-blob-util-from-current]]
+=== Константа `RDB$BLOB_UTIL.FROM_CURRENT`
+
+Константа `RDB$BLOB_UTIL.FROM_CURRENT` имеет тип `INTEGER` и значение `1`.
+
+Может быть использована для указания режима поиска в функции `RDB$BLOB_UTIL.SEEK`. При установке в параметр `MODE` константы `RDB$BLOB_UTIL.FROM_CURRENT` поиск будет осуществляться с текущей позиции `BLOB`.
+
+См. также <<fblangref-build-in-package-blob-util-seek>>.
+
+[[fblangref-build-in-package-blob-util-from-end]]
+=== Константа `RDB$BLOB_UTIL.FROM_END`
+
+Константа `RDB$BLOB_UTIL.FROM_END` имеет тип `INTEGER` и значение `2`.
+
+Может быть использована для указания режима поиска в функции `RDB$BLOB_UTIL.SEEK`. При установке в параметр `MODE` константы `RDB$BLOB_UTIL.FROM_END` поиск будет осуществляться с конца `BLOB`.
+
+См. также <<fblangref-build-in-package-blob-util-seek>>.
+
+[[fblangref-build-in-package-blob-util-new-blob]]
 === Функция `RDB$BLOB_UTIL.NEW_BLOB`
 
 Функция `RDB$BLOB_UTIL.NEW_BLOB` используется для создания нового BLOB. Он возвращает BLOB, подходящий для добавления данных, как это делает `BLOB_APPEND`.
@@ -54,6 +82,7 @@
 .Тип возвращаемого результата
 `BLOB SUB_TYPE BINARY`
 
+[[fblangref-build-in-package-blob-util-open-blob]]
 === Функция `RDB$BLOB_UTIL.OPEN_BLOB`
 
 Функция `RDB$BLOB_UTIL.OPEN_BLOB` используется для открытия существующего BLOB для чтения.
@@ -74,6 +103,7 @@
 .Тип возвращаемого результата
 `INTEGER`
 
+[[fblangref-build-in-package-blob-util-is-writable]]
 === Функция `RDB$BLOB_UTIL.IS_WRITABLE`
 
 Функция `RDB$BLOB_UTIL.IS_WRITABLE` возвращает `TRUE`, если BLOB подходит для добавления данных без копирования с использованием `BLOB_APPEND`.
@@ -120,11 +150,12 @@
 .Тип возвращаемого результата
 `VARBINARY(32765)`
 
+[[fblangref-build-in-package-blob-util-seek]]
 === Функция `RDB$BLOB_UTIL.SEEK`
 
 Функция `RDB$BLOB_UTIL.SEEK` используется для установки позиции для следующего `READ_DATA`. Она возвращает новую позицию.
 
-Параметр `MODE` может быть 0 (с начала), 1 (с текущей позиции) или 2 (с конца).
+Параметр `MODE` может быть 0 (с начала), 1 (с текущей позиции) или 2 (с конца). Для указания режима поиска можно использовать соответствующие константы пакета `RDB$BLOB_UTIL.FROM_BEGIN`, `RDB$BLOB_UTIL.FROM_CURRENT` и `RDB$BLOB_UTIL.FROM_END`.
 
 Когда параметр `MODE` равен 2, `OFFSET` должен быть нулевым или отрицательным.
 
@@ -151,6 +182,9 @@
 .Тип возвращаемого результата
 `INTEGER`
 
+См. также: <<fblangref-build-in-package-blob-util-from-begin>>, <<fblangref-build-in-package-blob-util-from-current>>, <<fblangref-build-in-package-blob-util-from-end>>.
+
+[[fblangref-build-in-package-blob-util-cancel-blob]]
 === Процедура `RDB$BLOB_UTIL.CANCEL_BLOB`
 
 Процедура `RDB$BLOB_UTIL.CANCEL_BLOB` используется для немедленного освобождения временного BLOB-объекта, например созданного с помощью `BLOB_APPEND`.
@@ -169,6 +203,7 @@
 |BLOB для отмены.
 |===
 
+[[fblangref-build-in-package-blob-util-close-handle]]
 === Процедура `RDB$BLOB_UTIL.CLOSE_HANDLE`
 
 Процедура `RDB$BLOB_UTIL.CLOSE_HANDLE` используется для закрытия дескриптора BLOB, открытого с помощью `RDB$BLOB_UTIL.OPEN_BLOB`.
@@ -194,18 +229,18 @@
 ====
 [source,sql]
 ----
-execute block returns (b blob)
-as
-begin
+EXECUTE BLOCK RETURNS (B BLOB)
+AS
+BEGIN
     -- Create a BLOB handle in the temporary space.
-    b = system.rdb$blob_util.new_blob(false, true);
+    B = RDB$BLOB_UTIL.NEW_BLOB(FALSE, TRUE);
 
     -- Add chunks of data.
-    b = blob_append(b, '12345');
-    b = blob_append(b, '67');
+    B = BLOB_APPEND(B, '12345');
+    B = BLOB_APPEND(B, '67');
 
-    suspend;
-end
+    SUSPEND;
+END
 ----
 ====
 
@@ -214,32 +249,32 @@ end
 ====
 [source,sql]
 ----
-execute block returns (s varchar(10))
-as
-    declare b blob = '1234567';
-    declare bhandle integer;
-begin
+EXECUTE BLOCK RETURNS (S VARCHAR(10))
+AS
+    DECLARE b BLOB = '1234567';
+    DECLARE bHandle INTEGER;
+BEGIN
     -- Open the BLOB and get a BLOB handle.
-    bhandle = system.rdb$blob_util.open_blob(b);
+    bHandle = rdb$blob_util.open_blob(b);
 
     -- Get chunks of data as string and return.
 
-    s = system.rdb$blob_util.read_data(bhandle, 3);
-    suspend;
+    S = RDB$BLOB_UTIL.READ_DATA(bHandle, 3);
+    SUSPEND;
 
-    s = system.rdb$blob_util.read_data(bhandle, 3);
-    suspend;
+    S = RDB$BLOB_UTIL.READ_DATA(bHandle, 3);
+    SUSPEND;
 
-    s = system.rdb$blob_util.read_data(bhandle, 3);
-    suspend;
+    S = RDB$BLOB_UTIL.READ_DATA(bHandle, 3);
+    SUSPEND;
 
     -- Here EOF is found, so it returns NULL.
-    s = system.rdb$blob_util.read_data(bhandle, 3);
-    suspend;
+    S = RDB$BLOB_UTIL.READ_DATA(bHandle, 3);
+    SUSPEND;
 
     -- Close the BLOB handle.
-    call system.rdb$blob_util.close_handle(bhandle);
-end
+    CALL RDB$BLOB_UTIL.CLOSE_HANDLE(bHandle);
+END
 ----
 ====
 
@@ -248,44 +283,47 @@ end
 ====
 [source,sql]
 ----
-set term !;
+SET TERM !;
 
-execute block returns (s varchar(10))
-as
-    declare b blob;
-    declare bhandle integer;
-begin
-    -- Create a stream BLOB handle.
-    b = system.rdb$blob_util.new_blob(false, true);
+EXECUTE BLOCK RETURNS (S VARCHAR(10))
+AS
+    DECLARE B BLOB;
+    DECLARE bHandle INTEGER;
+BEGIN
+    -- Создание потокового BLOB во временном хранилище.
+    B = RDB$BLOB_UTIL.NEW_BLOB(FALSE, TRUE);
 
-    -- Add data.
-    b = blob_append(b, '0123456789');
+    -- Добавление данных в BLOB.
+    B = BLOB_APPEND(B, '0123456789');
 
-    -- Open the BLOB.
-    bhandle = system.rdb$blob_util.open_blob(b);
+    -- Открытие BLOB.
+    bHandle = RDB$BLOB_UTIL.OPEN_BLOB(b);
 
-    -- Seek to 5 since the start.
-    system.rdb$blob_util.seek(bhandle, 0, 5);
-    s = system.rdb$blob_util.read_data(bhandle, 3);
-    suspend;
+    -- Установка на позицию 5 с начала BLOB.
+    -- Режим поиска задан литералом - 0.
+    RDB$BLOB_UTIL.SEEK(bHandle, 0, 5);
+    S = RDB$BLOB_UTIL.READ_DATA(bHandle, 3);
+    SUSPEND;
 
-    -- Seek to 2 since the start.
-    system.rdb$blob_util.seek(bhandle, 0, 2);
-    s = system.rdb$blob_util.read_data(bhandle, 3);
-    suspend;
+    -- Установка на позицию 2 с начала BLOB.
+    -- Для указания режима поиска используется константа пакета RDB$BLOB_UTIL.FROM_BEGIN.
+    -- Использование констант для режима поиска предпочтительно.
+    RDB$BLOB_UTIL.SEEK(bHandle, RDB$BLOB_UTIL.FROM_BEGIN, 2);
+    S = RDB$BLOB_UTIL.READ_DATA(bHandle, 3);
+    SUSPEND;
 
-    -- Advance 2.
-    system.rdb$blob_util.seek(bhandle, 1, 2);
-    s = system.rdb$blob_util.read_data(bhandle, 3);
-    suspend;
+    -- Перемещение позиции на 2 относительно текущей позиции BLOB.
+    RDB$BLOB_UTIL.SEEK(bHandle, RDB$BLOB_UTIL.FROM_CURRENT, 2);
+    S = RDB$BLOB_UTIL.READ_DATA(bHandle, 3);
+    SUSPEND;
 
-    -- Seek to -1 since the end.
-    system.rdb$blob_util.seek(bhandle, 2, -1);
-    s = system.rdb$blob_util.read_data(bhandle, 3);
-    suspend;
-end!
+    -- Перемещение позиции на -1 с конца BLOB.
+    RDB$BLOB_UTIL.SEEK(bHandle, RDB$BLOB_UTIL.FROM_END, -1);
+    S = RDB$BLOB_UTIL.READ_DATA(bHandle, 3);
+    SUSPEND;
+END!
 
-set term ;!
+SET TERM ;!
 ----
 ====
 
@@ -294,24 +332,27 @@ set term ;!
 ====
 [source,sql]
 ----
-create table t(b blob);
+CREATE TABLE T(B BLOB);
 
-set term !;
+SET TERM !;
 
-execute block returns (bool boolean)
-as
-    declare b blob;
-begin
-    b = blob_append(null, 'writable');
-    bool = system.rdb$blob_util.is_writable(b);
-    suspend;
+EXECUTE BLOCK RETURNS (BOOL BOOLEAN)
+AS
+    DECLARE B BLOB;
+BEGIN
+    B = BLOB_APPEND(NULL, 'writable');
 
-    insert into t (b) values ('not writable') returning b into b;
-    bool = system.rdb$blob_util.is_writable(b);
-    suspend;
-end!
+    BOOL = RDB$BLOB_UTIL.IS_WRITABLE(B);
+    SUSPEND;
 
-set term ;!
+    INSERT INTO T (B) VALUES ('not writable')
+    RETURNING B INTO B;
+
+    BOOL = RDB$BLOB_UTIL.IS_WRITABLE(B);
+    SUSPEND;
+END!
+
+SET TERM ;!
 ----
 ====
 
