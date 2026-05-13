@@ -484,40 +484,6 @@ EXECUTE BLOCK
 
 Подробнее см. <<fblangref-ddl-pkg-create-syntax>>.
 
-Константа пакета -- это значение, инициализированное константным выражением.
-
-Константное выражение определяется простым правилом: его значение не изменяется после перекомпиляции.
-
-Допускаются следующие выражения:
-
-* Литерал любого скалярного типа данных
-* `NULL`
-
-Следующие выражения допустимы только в том случае, если все операнды являются константами:
-
-. Арифметические операции, конкатенация строк, унарные плюс/минус
-. `CAST`, `COALESCE`, `DECODE`, `EXTRACT`, `UPPER`, `LOWER`, `SUBSTRING`
-. `BIT_LENGTH`, `CHAR_LENGTH`, `CHARACTER_LENGTH`, `OCTET_LENGTH`
-. `TRIM`, `LTRIM`, `RTRIM`, `BTRIM`
-. `NULLIF`, `IIF`, `CASE`
-. Другие константы
-. `ABS`, `ACOS`, `ASIN`, `ASINH`, `ATAN`, `ATANH`, `ATAN2`, `SIGN`, `SIN`, `SINH`, `TAN`, `TANH`, `COS`, `COT`
-. `BIN_*`, `CEIL`, `CEILING`, `FLOOR`, `ROUND`, `MOD`, `EXP`, `MAXVALUE`, `MINVALUE`, `POWER`, `COMPARE_DECFLOAT`, `TRUNC`, `SQRT`
-. `GREATEST`, `LEAST`
-. `LN`, `LOG`, `LOG10`, `PI`
-. `MAKE_DBKEY`, `OVERLAY`, `NORMALIZE_DECFLOAT`, `QUANTIZE`, `TOTALORDER`
-. `HEX_DECODE`, `HEX_ENCODE`, `BASE64_DECODE`, `BASE64_ENCODE`, `RSA_DECRYPT`, `RSA_ENCRYPT`, `RSA_SIGN_HASH`, `RSA_VERIFY_HASH`
-. `DECRYPT`, `ENCRYPT`, `HASH`, `CRYPT_HASH`
-. `LEFT`, `REPLACE`, `REVERSE`, `RIGHT`, `LPAD`, `RPAD`, `POSITION`
-. `CHAR_TO_UUID`, `UNICODE_CHAR`, `UNICODE_VAL`, `UUID_TO_CHAR`, `ASCII_CHAR`, `ASCII_VAL`
-. `LAST_DAY`, `FIRST_DAY`, `DATEADD`, `DATEDIFF`
-
-Например, выражение `CAST(PI() / 2 as CHAR(50))` является константой.
-
-Однако выражение `EXTRACT(YEAR FROM CURRENT_DATE)` таковым не является (`CURRENT_DATE` изменяется в зависимости от времени вычисления).
-
-Пользовательские функции не могут быть использованы для инициализации константных выражений, даже если они является детерминированными.
-
 ==== Реализация процедуры
 
 Реализация процедуры может быть выполнена только в теле пакета. Все процедуры объявленные в заголовке или теле пакета должны быть реализованы в теле пакета. При реализации процедур не допускается определение значений по умолчанию для входных параметров процедуры, если для этой процедуры есть объявление (значения по умолчанию должны быть в объявлении процедуры). Если для процедуры нет объявления, то допускается указывать значения по умолчанию для входных параметров процедуры.

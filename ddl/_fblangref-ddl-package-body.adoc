@@ -256,18 +256,26 @@ BEGIN
   FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC
   AS
   BEGIN
+    -- Приватная константа CONTEXT_NAME может использоваться
+    -- без квалификации внутри собственного пакета
     RETURN RDB$GET_CONTEXT(CONTEXT_NAME, 'DATEBEGIN');
   END
+
   -- Возвращает дату окончания периода
   FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC
   AS
   BEGIN
+    -- Приватная константа CONTEXT_NAME может использоваться
+    -- без квалификации внутри собственного пакета
     RETURN RDB$GET_CONTEXT(CONTEXT_NAME, 'DATEEND');
   END
+
   -- Устанавливает диапазон дат рабочего периода
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE)
   AS
   BEGIN
+    -- Приватная константа CONTEXT_NAME может использоваться
+    -- без квалификации внутри собственного пакета
     RDB$SET_CONTEXT(CONTEXT_NAME, 'DATEBEGIN', ADATEBEGIN);
     RDB$SET_CONTEXT(CONTEXT_NAME, 'DATEEND', ADATEEND);
   END

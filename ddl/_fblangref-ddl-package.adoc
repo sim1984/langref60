@@ -238,6 +238,46 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 Указание инструкции `DETERMINISTIC` на самом деле нечто вроде "`обещания`", что код функции будет возвращать одно и то же. В данный момент детерминистическая функция считается инвариантом и работает по тем же принципам, что и другие инварианты. То есть вычисляется и кэшируется на уровне текущего выполнения данного запроса.
 ====
 
+=== Константы
+
+Константа пакета -- это значение, инициализированное константным выражением.
+
+Объявление константы может быть как в заголовке, так и в теле пакета. Если константы объявлена в теле пакета, то на неё можно ссылаться из других процедур и функций этого пакета ниже точки объявления.
+
+Если константы объявлена в заголовке пакета, то она доступна как в теле этого пакета, так и за его пределами.
+
+Константное выражение определяется простым правилом: его значение не изменяется после перекомпиляции.
+
+Допускаются следующие выражения:
+
+* Литерал любого скалярного типа данных
+* `NULL`
+
+Следующие выражения допустимы только в том случае, если все операнды являются константами:
+
+. Арифметические операции, конкатенация строк, унарные плюс/минус
+. `CAST`, `COALESCE`, `DECODE`, `EXTRACT`, `UPPER`, `LOWER`, `SUBSTRING`
+. `BIT_LENGTH`, `CHAR_LENGTH`, `CHARACTER_LENGTH`, `OCTET_LENGTH`
+. `TRIM`, `LTRIM`, `RTRIM`, `BTRIM`
+. `NULLIF`, `IIF`, `CASE`
+. Другие константы
+. `ABS`, `ACOS`, `ASIN`, `ASINH`, `ATAN`, `ATANH`, `ATAN2`, `SIGN`, `SIN`, `SINH`, `TAN`, `TANH`, `COS`, `COT`
+. `BIN_*`, `CEIL`, `CEILING`, `FLOOR`, `ROUND`, `MOD`, `EXP`, `MAXVALUE`, `MINVALUE`, `POWER`, `COMPARE_DECFLOAT`, `TRUNC`, `SQRT`
+. `GREATEST`, `LEAST`
+. `LN`, `LOG`, `LOG10`, `PI`
+. `MAKE_DBKEY`, `OVERLAY`, `NORMALIZE_DECFLOAT`, `QUANTIZE`, `TOTALORDER`
+. `HEX_DECODE`, `HEX_ENCODE`, `BASE64_DECODE`, `BASE64_ENCODE`, `RSA_DECRYPT`, `RSA_ENCRYPT`, `RSA_SIGN_HASH`, `RSA_VERIFY_HASH`
+. `DECRYPT`, `ENCRYPT`, `HASH`, `CRYPT_HASH`
+. `LEFT`, `REPLACE`, `REVERSE`, `RIGHT`, `LPAD`, `RPAD`, `POSITION`
+. `CHAR_TO_UUID`, `UNICODE_CHAR`, `UNICODE_VAL`, `UUID_TO_CHAR`, `ASCII_CHAR`, `ASCII_VAL`
+. `LAST_DAY`, `FIRST_DAY`, `DATEADD`, `DATEDIFF`
+
+Например, выражение `CAST(PI() / 2 as CHAR(50))` является константой.
+
+Однако выражение `EXTRACT(YEAR FROM CURRENT_DATE)` таковым не является (`CURRENT_DATE` изменяется в зависимости от времени вычисления).
+
+Пользовательские функции не могут быть использованы для инициализации константных выражений, даже если они является детерминированными.
+
 [[fblangref-ddl-package-create-who]]
 === Кто может создать пакет?
 
@@ -307,6 +347,41 @@ BEGIN
   FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC;
 
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE DEFAULT CURRENT_DATE);
+END
+----
+====
+
+.Создание пакета с публичными константами
+[example]
+====
+[source,sql]
+----
+CREATE OR ALTER PACKAGE TYPE_LIMITS
+AS
+BEGIN
+  CONSTANT MIN_BOOLEAN_VALUE BOOLEAN = FALSE;
+  CONSTANT MAX_BOOLEAN_VALUE BOOLEAN = TRUE;
+
+  CONSTANT MIN_SMALLINT_VALUE SMALLINT = -BIN_SHL(1, 15);
+  CONSTANT MAX_SMALLINT_VALUE SMALLINT = BIN_SHL(1, 15) - 1;
+
+  CONSTANT MIN_INTEGER_VALUE INTEGER = -BIN_SHL(1, 31);
+  CONSTANT MAX_INTEGER_VALUE INTEGER = BIN_SHL(1, 31) - 1;
+
+  CONSTANT MIN_BIGINT_VALUE BIGINT = -BIN_SHL(CAST(1 AS INT128), 63);
+  CONSTANT MAX_BIGINT_VALUE BIGINT = BIN_SHL(CAST(1 AS INT128), 63) - 1;
+
+  CONSTANT MIN_INT128_VALUE INT128 = -BIN_SHL(CAST(1 AS INT128), 126) * 2;
+  CONSTANT MAX_INT128_VALUE INT128 = BIN_SHL(CAST(1 AS INT128), 126) - 1 + BIN_SHL(CAST(1 AS INT128), 126);
+
+  CONSTANT MIN_DATE_VALUE DATE = DATE '0001-01-01';
+  CONSTANT MAX_DATE_VALUE DATE = DATE '9999-12-31';
+
+  CONSTANT MIN_TIME_VALUE TIME = TIME '00:00';
+  CONSTANT MAX_TIME_VALUE TIME = TIME '23:59:59.9999';
+
+  CONSTANT MIN_TIMESTAMP_VALUE TIMESTAMP = TIMESTAMP '0001-01-01 00:00';
+  CONSTANT MAX_TIMESTAMP_VALUE TIMESTAMP = TIMESTAMP '9999-12-31 23:59:59.9999';
 END
 ----
 ====
