@@ -124,6 +124,15 @@ FROM PROCEDURE MANAGEMENT.ADD_EMP_PROJ;
 ----
 ====
 
+.Отзыв табличных привилегий у пакета (для упакованных временных таблиц)
+[example]
+====
+[source,sql]
+----
+revoke select, insert on package pkg from user some_user;
+----
+====
+
 .Отзыв привилегии `EXECUTE`
 [example]
 ====

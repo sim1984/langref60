@@ -1052,7 +1052,6 @@ WHERE MON$ATTACHMENT_ID = 32
 `3` -- оператор (statement); +
 `4` -- вызов (call).
 
-
 |MON$TABLE_NAME
 |CHAR(63) CHARACTER SET UTF8
 |Имя таблицы.
@@ -1073,6 +1072,12 @@ WHERE MON$ATTACHMENT_ID = 32
 `GLOBAL TEMPORARY` - глобальная временная таблица; +
 `LOCAL TEMPORARY` - локальная временная таблица.
 
+Упакованные временные таблицы имеют тип - `GLOBAL TEMPORARY`.
+
+|MON$PACKAGE_NAME
+|CHAR(63) CHARACTER SET UTF8
+|Имя пакета, в которой расположена таблица (для упакованных временных таблиц).
+
 |===
 
 
@@ -1083,7 +1088,9 @@ WHERE MON$ATTACHMENT_ID = 32
 ----
 SELECT
     T.MON$SCHEMA_NAME,
+    T.MON$PACKAGE_NAME,
     T.MON$TABLE_NAME,
+    T.MON$TABLE_TYPE,
     R.MON$RECORD_INSERTS,
     R.MON$RECORD_UPDATES,
     R.MON$RECORD_DELETES,

@@ -22,11 +22,12 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
   | <schema-bound-type> [ _object-schema_ <period> ] _objectname_
   | <schema-lees-type> _objectname_
   | USER _username_ [USING PLUGIN _plugin_name_]
-  | COLUMN [ _rel-schema_ <period> ] _relationname_ <period> _fieldname_
-  | [PROCEDURE | FUNCTION] PARAMETER
-    [<routine-location>] _routinename_ <period> _paramname_
+  | TABLE [<relation-location>] _relationname_
+  | COLUMN [<relation-location>] _relationname_ <period> _fieldname_
   | {PROCEDURE | [EXTERNAL] FUNCTION}
     [<routine-location>] _routinename_
+  | [PROCEDURE | FUNCTION] PARAMETER
+    [<routine-location>] _routinename_ <period> _paramname_
   | CONSTANT [ _package-schema_ <period> ] _package-name_ <period> _constant-name_
 
 <schema-bound-type> ::=
@@ -40,6 +41,12 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
   | FILTER
   | ROLE
   | [GLOBAL] MAPPING
+
+<relation-location> ::=
+    _relation-schema_
+  | [ _relation-schema_ <period> ] _package-name_
+  | _relation-name_%PACKAGE
+  | _relation-schema_%SCHEMA
 
 <routine-location> ::=
     _routine-schema_
@@ -257,6 +264,22 @@ IS 'Установка диапазона дат';
 COMMENT ON
 PROCEDURE PARAMETER APP.APP_VAR.SET_DATERANGE.ADATEBEGIN
 IS 'Дата начала';
+----
+====
+
+.Добавление комментария для временных таблиц пакета и его столбцов
+[example]
+====
+[source,sql]
+----
+comment on table pkg.t_pub is 'Public packaged temporary table';
+comment on column pkg.t_pub.id is 'Identifier in public packaged temporary table';
+comment on table pkg.t_priv is 'Private packaged temporary table';
+comment on column pkg.t_priv.id is 'Identifier in private packaged temporary table';
+comment on table pkg%package.t_pub is 'Public packaged temporary table via %package';
+comment on column pkg%package.t_pub.id is 'Identifier via %package';
+comment on table pkg%package.t_priv is 'Private packaged temporary table via %package';
+comment on column pkg%package.t_priv.id is 'Identifier in private table via %package';
 ----
 ====
 

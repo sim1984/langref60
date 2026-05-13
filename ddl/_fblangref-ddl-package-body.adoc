@@ -23,21 +23,30 @@ BEGIN
 END
 
 <package_item> ::=
-    <function_decl>;
-  | <procedure_decl>;
-  | <constant_decl>;
+    <function declaration>;
+  | <procedure declaration>;
+  | <constant declaration>;
+  | <temporary table declaration>;
 
-<function_decl> ::=
+<function declaration> ::=
   FUNCTION _func_name_ [(<in_params>)]
   RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
   [DETERMINISTIC]
 
-<procedure_decl> ::=
+<procedure declaration> ::=
   PROCEDURE _proc_name_ [(<in_params>)]
   [RETURNS (<out_params>)]
 
-<constant_decl> ::=
+<constant declaration> ::=
   CONSTANT _const_name_ <type> = <constant expression>
+
+<temporary table declaration> ::=
+  TEMPORARY TABLE _table_name_
+  (
+    <column_definition> [, ...]
+  )
+  [ON COMMIT {DELETE | PRESERVE} ROWS]
+  [{[UNIQUE] [ASC | DESC] INDEX _index_name_ (_column_name_)}...]
 
 <package_body_item> ::=
     <function_impl>
@@ -108,14 +117,17 @@ END
 |package_name
 |Имя пакета. Может содержать до 63 символов.
 
-|function_decl
+|function declaration
 |Объявление функции.
 
-|procedure_decl
+|procedure declaration
 |Объявление процедуры.
 
-|constant_decl
+|constant declaration
 |Объявление константы.
+
+|temporary table declaration
+|Объявление временной таблицы.
 
 |function_impl
 |Реализация функции.
@@ -133,6 +145,15 @@ END
 
 |const_name
 |Имя константы. Может содержать до 63 символов.
+
+|table_name
+|Имя временной таблицы. Может содержать до 63 символов.
+
+|index_name
+|Имя индекса временной таблицы. Может содержать до 63 символов.
+
+|column_name
+|Имя столбца временной таблицы. Может содержать до 63 символов.
 
 |inparam
 |Описание входного параметра.
@@ -212,9 +233,9 @@ END
 
 Все процедуры и функции, объявленные в заголовке пакета, должны быть реализованы в теле пакета. Кроме того, должны быть реализованы и все процедуры и функции, объявленные в теле пакета. Процедуры и функции, определенные в теле пакета, но не объявленные в заголовке пакета, не видны вне тела пакета.
 
-Константы объявленные в заголовке пакета, не могут быть повторно объявлены в теле пакета.
+Константы и временные таблицы объявленные в заголовке пакета, не могут быть повторно объявлены в теле пакета.
 
-Имена процедур, функций и констант, объявленные в теле пакета, должны быть уникальны среди имён процедур, функций и констант, объявленных в заголовке и теле пакета.
+Имена процедур, функций, констант и временных таблиц, объявленные в теле пакета, должны быть уникальны среди имён процедур, функций, констант  временных таблиц, объявленных в заголовке и теле пакета.
 
 .Правила:
 
@@ -315,6 +336,44 @@ END
 ----
 ====
 
+.Создание тела пакета с закрытой временной таблицей
+[example]
+====
+[source,sql]
+----
+set term !;
+
+create package body pkg
+as
+begin
+    -- объявление приватной временной таблицы пакета
+    temporary table t_priv(
+        id integer
+    ) on commit preserve rows
+      unique index uq_t_priv_id (id);
+
+    procedure p1(n integer)
+    as
+    begin
+      -- вставка записи в публичную временную таблицу пакета
+      insert into t_pub(id) values (:n);
+      -- вставка записи в закрытую временную таблицу пакета
+      insert into t_priv(id) values (:n);
+    end
+
+    procedure p2 returns (n integer)
+    as
+    begin
+      for
+        select id from t_pub into :n do
+          suspend;
+    end
+end!
+
+set term ;!
+----
+====
+
 .См. также:
 <<fblangref-ddl-package-body-drop,`DROP PACKAGE BODY`>>, <<fblangref-ddl-package-create,`CREATE PACKAGE`>>.
 
@@ -337,35 +396,6 @@ BEGIN
   [<package_item> ...]
   [<package_body_item> ...]
 END
-
-<package_item> ::=
-    <function_decl>;
-  | <procedure_decl>;
-
-<function_decl> ::=
-  FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [<function_options>]
-
-<procedure_decl> ::=
-  PROCEDURE _proc_name_ [(<in_params>)]
-  [RETURNS (<out_params>)]
-  [<procedure_options>]
-
-<package_body_item> ::=
-    <function_impl>
-  | <procedure_impl>
-
-<function_impl> ::=
-  FUNCTION _func_name_ [(<in_impl_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [DETERMINISTIC]
-  <routine-body>
-
-<procedure_impl> ::=
-  PROCEDURE _proc_name_ [(<in_impl_params>)]
-  [RETURNS (<out_params>)]
-  <routine-body>
 
 Подробнее см. <<fblangref-ddl-pkg-body-create-syntax,CREATE PACKAGE BODY>>.
 ----
@@ -431,34 +461,6 @@ BEGIN
   [<package_body_item> ...]
 END
 
-<package_item> ::=
-    <function_decl>;
-  | <procedure_decl>;
-
-<function_decl> ::=
-  FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [<function_options>]
-
-<procedure_decl> ::=
-  PROCEDURE _proc_name_ [(<in_params>)]
-  [RETURNS (<out_params>)]
-  [<procedure_options>]
-
-<package_body_item> ::=
-    <function_impl>
-  | <procedure_impl>
-
-<function_impl> ::=
-  FUNCTION _func_name_ [(<in_impl_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [DETERMINISTIC]
-  <routine-body>
-
-<procedure_impl> ::=
-  PROCEDURE _proc_name_ [(<in_impl_params>)]
-  [RETURNS (<out_params>)]
-  <routine-body>
 
 Подробнее см. <<fblangref-ddl-pkg-body-create-syntax,CREATE PACKAGE BODY>>.
 ----
@@ -595,35 +597,6 @@ BEGIN
   [<package_item> ...]
   [<package_body_item> ...]
 END
-
-<package_item> ::=
-    <function_decl>;
-  | <procedure_decl>;
-
-<function_decl> ::=
-  FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [<function_options>]
-
-<procedure_decl> ::=
-  PROCEDURE _proc_name_ [(<in_params>)]
-  [RETURNS (<out_params>)]
-  [<procedure_options>]
-
-<package_body_item> ::=
-    <function_impl>
-  | <procedure_impl>
-
-<function_impl> ::=
-  FUNCTION _func_name_ [(<in_impl_params>)]
-  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [DETERMINISTIC]
-  <routine-body>
-
-<procedure_impl> ::=
-  PROCEDURE _proc_name_ [(<in_impl_params>)]
-  [RETURNS (<out_params>)]
-  <routine-body>
 
 Подробнее см. <<fblangref-ddl-pkg-body-create-syntax,CREATE PACKAGE BODY>>.
 ----

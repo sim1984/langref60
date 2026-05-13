@@ -39,6 +39,13 @@ GRANT <privileges>
   | UPDATE [(_col_ [, _col_ ...])]
   | REFERENCES [(_col_ [, _col_ ...)]
 
+<packaged_table_privilege_item> ::=
+  SELECT | INSERT | UPDATE | DELETE
+
+<packaged_table_privilege> ::=
+  <packaged_table_privilege_item> [, <packaged_table_privilege_item> ...]
+  ON PACKAGE [_schema_name_.] _package_name_
+
 <execute_privilege> ::= EXECUTE ON {
     PROCEDURE [_schema_name_.] _proc_name_
   | FUNCTION [_schema_name_.] _func_name_
@@ -243,7 +250,7 @@ GRANT <role_granted>
 [[fblangref-security-grant-tablepriv]]
 === Табличные привилегии
 
-Для таблиц и представлений в отличие от других объектов метаданных возможно использовании сразу нескольких привилегий.
+Для таблиц, представлений и пакетов в отличие от других объектов метаданных возможно использовании сразу нескольких привилегий.
 
 [[fblangref-security-tbl-tableprivs]]
 .Список привилегий для таблиц
@@ -315,6 +322,23 @@ TO PROCEDURE ADD_EMP_PROJ;
 -- для хранимой процедуры ADD_EMP_PROJ из схемы MANAGEMENT
 GRANT INSERT ON SHOP.EMPLOYEE_PROJECT
 TO PROCEDURE MANAGEMENT.ADD_EMP_PROJ;
+----
+====
+
+[[fblangref-security-grant-pkg-table-exmpl]]
+==== Примеры `GRANT <privilege>` для упакованных временных таблиц
+
+* Права доступа к временным таблицам в пакете привязаны к самому пакету, а не к отдельным таблицам в пакете.
+* Для прямого доступа к общедоступным таблицам заголовка требуется соответствующая привилегия пакета для запрашиваемой операции, например, `SELECT`, `INSERT`, `UPDATE` или `DELETE`.
+* Доступ к закрытым таблицам тела запроса невозможен извне с помощью прав доступа пакета.
+* Если пакет создан в непубличной схеме, вызывающей стороне также требуется привилегия `USAGE` для этой схемы.
+
+.Предоставление привилегий для упакованных временных таблиц
+[example]
+====
+[source,sql]
+----
+grant select, insert on package pkg to user some_user;
 ----
 ====
 

@@ -34,22 +34,31 @@ END
   SQL SECURITY {DEFINER | INVOKER}
 
 <package_item> ::=
-    <function_decl>;
-  | <procedure_decl>;
-  | <constant_decl>;
+    <function declaration>;
+  | <procedure declaration>;
+  | <constant declaration>;
+  | <temporary table declaration>;
 
-<function_decl> ::=
+<function declaration> ::=
   FUNCTION _func_name_ [(<in_params>)]
   RETURNS <type> [NOT NULL]
     [COLLATE [ _coll-schema_ <period> ] _collation_]
   [ [NOT] DETERMINISTIC ]
 
-<procedure_decl> ::=
+<procedure declaration> ::=
   PROCEDURE _proc_name_ [(<in_params>)]
   [RETURNS (<out_params>)]
 
-<constant_decl> ::=
+<constant declaration> ::=
   CONSTANT _const_name_ <type> = <constant expression>
+
+<temporary table declaration> ::=
+  TEMPORARY TABLE _table_name_
+  (
+    <column_definition> [, ...]
+  )
+  [ON COMMIT {DELETE | PRESERVE} ROWS]
+  [{[UNIQUE] [ASC | DESC] INDEX _index_name_ (_column_name_)}...]
 
 <in_params> ::= <inparam> [, <inparam> ...]
 
@@ -89,14 +98,17 @@ END
 |package_name
 |Имя пакета. Может содержать до 63 символов.
 
-|function_decl
+|function declaration
 |Объявление функции.
 
-|procedure_decl
+|procedure declaration
 |Объявление процедуры.
 
-|constant_decl
+|constant declaration
 |Объявление константы.
+
+|temporary table declaration
+|Объявление временной таблицы.
 
 |proc_name
 |Имя процедуры. Может содержать до 63 символов.
@@ -106,6 +118,15 @@ END
 
 |const_name
 |Имя константы. Может содержать до 63 символов.
+
+|table_name
+|Имя временной таблицы. Может содержать до 63 символов.
+
+|index_name
+|Имя индекса временной таблицы. Может содержать до 63 символов.
+
+|column_name
+|Имя столбца временной таблицы. Может содержать до 63 символов.
 
 |inparam
 |Описание входного параметра.
@@ -161,11 +182,11 @@ END
 
 Если используется предложение `IF NOT EXISTS`, то оператор `CREATE PACKAGE` попытается создать новый заголовок пакета без выдачи ошибки, если он уже существует. DDL триггеры не будут запускаться, если заголовок пакета уже существует.
 
-Процедуры, функции и константы, объявленные в заголовке пакета, доступны вне тела пакета через полный идентификатор имён процедур и функций (`_package_name_._procedure_name_`, `_package_name_._function_name_` и `_package_name_._constant_name_`). Процедуры и функции, определенные в теле пакета, но не объявленные в заголовке пакета, не видны вне тела пакета.
+Процедуры, функции, константы и временные таблицы, объявленные в заголовке пакета, доступны вне тела пакета через полный идентификатор имён (`_package_name_._procedure_name_`, `_package_name_._function_name_` и `_package_name_._constant_name_`, `_package_name_._table_name_`). Процедуры и функции, определенные в теле пакета, но не объявленные в заголовке пакета, не видны вне тела пакета.
 
-Константы объявленные в теле пакета не видны вне тела пакета. Константа объявленная в заголовке пакета, не может быть повторно объявлена в теле пакета.
+Константы и временные таблицы объявленные в теле пакета не видны вне тела пакета. Константа или временная таблица объявленная в заголовке пакета, не может быть повторно объявлена в теле пакета.
 
-Имена процедур, функций и констант, объявленные в заголовке пакета, должны быть уникальны среди имён процедур, функций и констант, объявленных в заголовке и теле пакета.
+Имена процедур, функций, констант и временных таблиц, объявленные в заголовке пакета, должны быть уникальны среди имён процедур, функций, констант и временных таблиц, объявленных в заголовке и теле пакета.
 
 [[fblangref-ddl-package-create-sql-security]]
 === Привилегии выполнения
@@ -238,6 +259,7 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 Указание инструкции `DETERMINISTIC` на самом деле нечто вроде "`обещания`", что код функции будет возвращать одно и то же. В данный момент детерминистическая функция считается инвариантом и работает по тем же принципам, что и другие инварианты. То есть вычисляется и кэшируется на уровне текущего выполнения данного запроса.
 ====
 
+[[fblangref-ddl-package-create-const]]
 === Константы
 
 Константа пакета -- это значение, инициализированное константным выражением.
@@ -277,6 +299,48 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 Однако выражение `EXTRACT(YEAR FROM CURRENT_DATE)` таковым не является (`CURRENT_DATE` изменяется в зависимости от времени вычисления).
 
 Пользовательские функции не могут быть использованы для инициализации константных выражений, даже если они является детерминированными.
+
+[[fblangref-ddl-package-create-temp-table]]
+=== Временные таблицы
+
+Начиная с Firebird 6.0 поддерживается объявление временных таблиц внутри SQL-пакетов. Такие временные таблицы называются упакованными временными таблицами (Packaged Temporary Table).
+
+Внутри они хранятся как постоянные метаданные временных таблиц, принадлежащие пакету и идентифицируемые с помощью `RDB$PACKAGE_NAME`. Их данные остаются временными: локальными для транзакций при `ON COMMIT DELETE ROWS` и локальными для соединений при `ON COMMIT DELETE ROWS`.
+
+* `ON COMMIT DELETE ROWS` (по умолчанию): данные таблицы являются локальными для транзакции и удаляются по завершении транзакции.
+* `ON COMMIT PRESERVE ROWS`: данные таблицы являются локальными для соединения и сохраняются между транзакциями в рамках одного и того же соединения.
+
+Определение таблицы является частью метаданных пакета и сохраняется, как и другие члены пакета; данные таблицы остаются
+временными.
+
+==== Видимость временных таблиц пакета и разрешение имён
+
+Видимость зависит от места объявления таблицы:
+
+* Таблицы, объявленные в `CREATE PACKAGE` (заголовок пакета), являются открытыми членами пакета.
+* Таблицы, объявленные в `CREATE PACKAGE BODY` (тело пакета), являются закрытыми для тела этого пакета.
+* Неквалифицированные ссылки на соответствующее имя объявленной таблицы внутри подпрограмм пакета разрешаются в таблицу пакета.
+
+Права доступа:
+
+* Права доступа к временным таблицам в пакете привязаны к самому пакету, а не к отдельным таблицам в пакете.
+* Для прямого доступа к общедоступным таблицам заголовка требуется соответствующая привилегия пакета для запрашиваемой операции, например, `SELECT`, `INSERT`, `UPDATE` или `DELETE`.
+* Доступ к закрытым таблицам тела запроса невозможен извне с помощью прав доступа пакета.
+* Если пакет создан в непубличной схеме, вызывающей стороне также требуется привилегия `USAGE` для этой схемы.
+
+==== Индексы для временных таблиц пакета
+
+* Индексы для временных таблиц, упакованных в пакет, должны быть объявлены непосредственно в `TEMPORARY TABLE`.
+* Автономные команды DDL для индексов не допускаются для упакованных таблиц: `CREATE INDEX`, `ALTER INDEX`, `DROP INDEX`, `SET STATISTICS INDEX`.
+
+==== Изоляция имён временных таблиц
+
+Имена таблиц изолируются контекстом пакета.
+
+* Разные пакеты могут объявлять таблицы с одинаковым именем.
+* Имя таблицы в пакете может также совпадать с обычным именем таблицы в той же схеме.
+
+Внутри подпрограмм пакета предпочтение отдается объявлению, локальному для пакета.
 
 [[fblangref-ddl-package-create-who]]
 === Кто может создать пакет?
@@ -386,6 +450,30 @@ END
 ----
 ====
 
+.Создание заголовка пакета с публичной временной таблицей
+[example]
+====
+[source,sql]
+----
+set term !;
+
+recreate package pkg
+as
+begin
+    -- объявление публичной временной таблицы пакета
+    temporary table t_pub(
+        id integer
+    ) on commit preserve rows
+      index idx_t_pub_id (id);
+
+    procedure p1(n integer);
+    procedure p2 returns (n integer);
+end!
+
+set term ;!
+----
+====
+
 .См. также:
 <<fblangref-ddl-package-body-create,CREATE PACKAGE BODY>>,
 <<fblangref-ddl-package-alter,ALTER PACKAGE>>,
@@ -453,8 +541,12 @@ ALTER PACKAGE [ _pkg-schema_ <period> ] _package_name_
 ALTER PACKAGE APP_VAR
 AS
 BEGIN
+  CONSTANT MIN_DATE DATE = DATE '1900-01-01';
+  CONSTANT MAX_DATE DATE = DATE '2100-12-31';
+
   FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC;
   FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC;
+
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE DEFAULT CURRENT_DATE);
 END
 ----
@@ -504,18 +596,10 @@ BEGIN
 END
 
 <package_item> ::=
-    <function_decl>;
-  | <procedure_decl>;
-
-<function_decl> ::=
-  FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL]
-    [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [ [NOT] DETERMINISTIC ]
-
-<procedure_decl> ::=
-  PROCEDURE _proc_name_ [(<in_params>)]
-  [RETURNS (<out_params>)]
+    <function declaration>;
+  | <procedure declaration>;
+  | <constant declaration>;
+  | <temporary table declaration>;
 
 Подробнее см. <<fblangref-ddl-pkg-create-syntax,CREATE PACKAGE>>
 ----
@@ -535,8 +619,12 @@ END
 CREATE OR ALTER PACKAGE APP_VAR
 AS
 BEGIN
+  CONSTANT MIN_DATE DATE = DATE '1900-01-01';
+  CONSTANT MAX_DATE DATE = DATE '2100-12-31';
+
   FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC;
   FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC;
+
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE DEFAULT CURRENT_DATE);
 END
 ----
@@ -641,18 +729,10 @@ BEGIN
 END
 
 <package_item> ::=
-    <function_decl>;
-  | <procedure_decl>;
-
-<function_decl> ::=
-  FUNCTION _func_name_ [(<in_params>)]
-  RETURNS <type> [NOT NULL]
-    [COLLATE [ _coll-schema_ <period> ] _collation_]
-  [ [NOT] DETERMINISTIC ]
-
-<procedure_decl> ::=
-  PROCEDURE _proc_name_ [(<in_params>)]
-  [RETURNS (<out_params>)]
+    <function declaration>;
+  | <procedure declaration>;
+  | <constant declaration>;
+  | <temporary table declaration>;
 
 Подробнее см. <<fblangref-ddl-pkg-create-syntax,CREATE PACKAGE>>
 ----
@@ -672,8 +752,12 @@ END
 RECREATE PACKAGE APP_VAR
 AS
 BEGIN
+  CONSTANT MIN_DATE DATE = DATE '1900-01-01';
+  CONSTANT MAX_DATE DATE = DATE '2100-12-31';
+
   FUNCTION GET_DATEBEGIN() RETURNS DATE DETERMINISTIC;
   FUNCTION GET_DATEEND() RETURNS DATE DETERMINISTIC;
+
   PROCEDURE SET_DATERANGE(ADATEBEGIN DATE, ADATEEND DATE DEFAULT CURRENT_DATE);
 END
 ----
