@@ -2110,6 +2110,38 @@
 
 |===
 
+.Список столбцов таблицы `COLOR` схемы `PUBLIC`
+[example]
+====
+[source,sql]
+----
+SELECT
+  F.RDB$FIELD_POSITION,
+  F.RDB$FIELD_NAME
+FROM RDB$RELATION_FIELDS F
+WHERE F.RDB$SCHEMA_NAME = 'PUBLIC'
+  AND F.RDB$PACKAGE_NAME IS NULL
+  AND F.RDB$RELATION_NAME = 'COLOR'
+ORDER BY F.RDB$FIELD_POSITION
+----
+====
+
+.Список столбцов временной таблицы `PKG_T_PRIV` пакета `TEST_PKG` схемы `PUBLIC`
+[example]
+====
+[source,sql]
+----
+SELECT
+  F.RDB$FIELD_POSITION,
+  F.RDB$FIELD_NAME
+FROM RDB$RELATION_FIELDS F
+WHERE F.RDB$SCHEMA_NAME = 'PUBLIC'
+  AND F.RDB$PACKAGE_NAME = 'TEST_PKG'
+  AND F.RDB$RELATION_NAME = 'PKG_T_PRIV'
+ORDER BY F.RDB$FIELD_POSITION
+----
+====
+
 [[fblangref-systables-relations]]
 == `RDB$RELATIONS`
 
@@ -2220,6 +2252,59 @@
 1 -- частная упакованная временная таблица (объявлена в теле пакета).
 
 |===
+
+.Список таблиц и представлений текущей схемы
+[example]
+====
+[source,sql]
+----
+SELECT
+  R.RDB$RELATION_ID,
+  R.RDB$RELATION_NAME,
+  R.RDB$RELATION_TYPE
+FROM RDB$RELATIONS R
+WHERE R.RDB$SCHEMA_NAME = CURRENT_SCHEMA
+  AND R.RDB$PACKAGE_NAME IS NULL
+ORDER BY R.RDB$RELATION_NAME
+----
+====
+
+.Список таблиц и представлений доступные для текущего пути поиска
+[example]
+====
+[source,sql]
+----
+SELECT
+  R.RDB$RELATION_ID,
+  R.RDB$SCHEMA_NAME,
+  R.RDB$RELATION_NAME,
+  R.RDB$RELATION_TYPE,
+  R.RDB$SYSTEM_FLAG
+FROM RDB$RELATIONS R
+WHERE R.RDB$SCHEMA_NAME IN (
+    SELECT N.NAME
+    FROM RDB$SQL.PARSE_UNQUALIFIED_NAMES(RDB$GET_CONTEXT('SYSTEM', 'SEARCH_PATH')) N
+  )
+  AND R.RDB$PACKAGE_NAME IS NULL
+ORDER BY R.RDB$SCHEMA_NAME, R.RDB$RELATION_NAME
+----
+====
+
+.Список временных таблиц пакета `TEST_PKG` принадлежащего схеме `PUBLIC`
+[example]
+====
+[source,sql]
+----
+SELECT
+  R.RDB$RELATION_NAME,
+  R.RDB$RELATION_TYPE,
+  R.RDB$PRIVATE_FLAG
+FROM RDB$RELATIONS R
+WHERE R.RDB$SCHEMA_NAME = 'PUBLIC'
+  AND R.RDB$PACKAGE_NAME = 'TEST_PKG'
+ORDER BY R.RDB$RELATION_NAME
+----
+====
 
 [[fblangref-systables-roles]]
 == `RDB$ROLES`
