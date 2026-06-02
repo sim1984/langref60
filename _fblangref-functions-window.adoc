@@ -27,37 +27,33 @@ DSQL
    | <navigation_function>
 
 <window_specification> ::=
-   ([_window_name_] [<window_partition>] [<window_order>] [<window_frame>])
+   ( [_window_name_] [<window partition>] [<window order>] [<window frame>] )
 
-<window_partition> ::= PARTITION BY <expr> [, <expr> ...]
+<window partition> ::= PARTITION BY <expr> [, <expr> ...]
 
-<window_order> ::=
-  ORDER BY <expr> [<direction>] [<nulls_placement>]
-        [, <expr> [<direction>] [<nulls_placement>] ...]
+<window order> ::=
+  ORDER BY <expr> [<direction>] [<nulls placement>]
+        [, <expr> [<direction>] [<nulls placement>] ...]
 
 <direction> ::= ASC | DESC
 
-<nulls_placement> ::= NULLS {FIRST | LAST}
+<nulls placement> ::= NULLS {FIRST | LAST}
 
-<window_frame> ::=
-  {ROWS | RANGE} <window_frame_extent>
+<window frame> ::=
+  {ROWS | RANGE} <window frame extent> [<window frame exclusion>]
 
-<window_frame_extent> ::=
-  <window_frame_start> | <window_frame_between>
+<window frame extent> ::=
+  <window frame start> | <window frame between>
 
-<window_frame_start> ::=
+<window frame start> ::=
   UNBOUNDED PRECEDING | <expr> PRECEDING | CURRENT ROW
 
-<window_frame_between> ::=
-  BETWEEN <window_frame_bound_1> AND <window_frame_bound_2>
+<window frame between> ::=
+  BETWEEN {UNBOUNDED PRECEDING | <expr> PRECEDING | <expr> FOLLOWING | CURRENT ROW} AND
+          {UNBOUNDED FOLLOWING | <expr> PRECEDING | <expr> FOLLOWING | CURRENT ROW}
 
-<window_frame_bound_1> ::=
-    UNBOUNDED PRECEDING | <expr> PRECEDING | CURRENT ROW
-  | <expr> FOLLOWING
-
-<window_frame_bound_2> ::=
-    <expr> PRECEDING | CURRENT ROW | <expr> FOLLOWING
-  | UNBOUNDED FOLLOWING
+<window frame exclusion> ::=
+  EXCLUDE {NO OTHERS | CURRENT ROW | GROUP | TIES}
 
 <aggregate_function> ::= <<fblangref-aggfuncs,Агрегатные функции>>
 
@@ -109,22 +105,25 @@ DSQL
 |expr
 |Выражение. Может содержать столбец таблицы, литерал, переменную, выражение, скалярную или агрегатную функцию. Оконные функции в качестве выражения не допускаются.
 
-|window_partition
+|window partition
 |Выражение секционирования.
 
-|window_order
+|window order
 |Выражение сортировки.
 
-|window_frame
+|window frame
 |Выражение для задания рамки окна.
 
-|window_name
+|window frame exclusion
+|Выражение для исключения строк из рамки окна.
+
+|window name
 |Имя окна.
 
 |direction
 |Направление сортировки.
 
-|nulls_placement
+|nulls placement
 |Положение псевдозначения `NULL` в отсортированном наборе.
 
 |aggregate_function
@@ -451,6 +450,36 @@ ID SALARY      S1      S2      S3      S4      S5      S6      S7      S8
 1   10.00   49.00   37.00   27.00   32.00   49.00   20.00   29.00   19.00
 5   10.00   49.00   37.00   37.00   22.00   49.00   22.00   32.00   20.00
 2   12.00   49.00   49.00   49.00   12.00   49.00   12.00   22.00   22.00
+----
+====
+
+[[fblangref-windowfuncs-framing-exclude]]
+=== Исключение строк
+
+Необязательное предложение `EXCLUDE` является частью рамки окна и удаляет строки из рамки после оценки его границ. Оно может быть указано только вместе с явной рамкой `ROWS` или `RANGE`.
+
+* `EXCLUDE NO OTHERS` является значением по умолчанию и сохраняет рамку без изменений.
+* `EXCLUDE CURRENT ROW` удаляет из рамки только текущую строку.
+* `EXCLUDE GROUP` удаляет текущую строку и все её аналоги. Аналогами являются строки с теми же значениями `ORDER BY`, что и текущая строка. Если `ORDER BY` отсутствует, все строки в разделе являются аналогами.
+* `EXCLUDE TIES` удаляет аналоги текущей строки, но сохраняет саму текущую строку. Если `ORDER BY` отсутствует, все остальные строки в разделе удаляются из рамки.
+
+Например, при наличии дублирующихся зарплат следующий запрос суммирует весь упорядоченный раздел, за исключением группы аналогов текущей зарплаты:
+
+.Использование EXCLUDE GROUP в рамке окна
+[example]
+====
+[source,sql]
+----
+SELECT
+  EMP_NO,
+  SALARY,
+  SUM(SALARY) OVER (
+    ORDER BY SALARY
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    EXCLUDE GROUP
+  ) AS SUM_OTHER_SALARIES
+FROM EMPLOYEE
+ORDER BY SALARY;
 ----
 ====
 

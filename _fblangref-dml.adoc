@@ -2308,7 +2308,7 @@ GROUP BY class
   _window-name_ AS <window specification>
 
 <window specification> ::=
-   ([_window-name_] [<window partition>] [<window order>] [<window frame>])
+   ( [_window-name_] [<window partition>] [<window order>] [<window frame>] )
 
 
 <window partition> ::= PARTITION BY <expr> [, <expr> ...]
@@ -2322,7 +2322,7 @@ GROUP BY class
 <nulls placement> ::= NULLS {FIRST | LAST}
 
 <window frame> ::=
-  {ROWS | RANGE} <window frame extent>
+  {ROWS | RANGE} <window frame extent> [<window frame exclusion>]
 
 <window frame extent> ::=
   <window frame preceding> | <window frame between>
@@ -2333,6 +2333,9 @@ GROUP BY class
 <window frame between> ::=
   BETWEEN { UNBOUNDED PRECEDING | <expr> PRECEDING | <expr> FOLLOWING | CURRENT ROW }
       AND { UNBOUNDED FOLLOWING | <expr> PRECEDING | <expr> FOLLOWING | CURRENT ROW }
+
+<window frame exclusion> ::=
+  EXCLUDE {NO OTHERS | CURRENT ROW | GROUP | TIES}
 ----
 
 Имя окна может быть использовано в предложении `OVER` для ссылки на определение окна, кроме того оно может быть  использовано в качестве базового окна для другого именованного или встроенного (в предложении `OVER`) окна. Окна с рамкой (с предложениями `RANGE` и `ROWS`) не могут быть использованы в качестве базового окна, но могут быть использованы в предложении `OVER _window_name_`. Окно, которое использует ссылку на базовое окно, не может иметь предложение `PARTITION BY` и не может переопределять сортировку с помощью предложения `ORDER BY`.
