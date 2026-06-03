@@ -99,6 +99,7 @@
 |`GRANT`
 |`GREATEST`
 |`GROUP`
+|`GROUPS`
 |`HAVING`
 |`HOUR`
 |`IN`
@@ -246,7 +247,6 @@
 |`WITHIN`
 |`WITHOUT`
 |`YEAR`
-|{nbsp}
 |{nbsp}
 |===
 
@@ -455,6 +455,7 @@
 |`GRANTED`
 |`GREATEST`
 |`GROUP`
+|`GROUPS`
 |`HASH`
 |`HAVING`
 |`HEX_DECODE`
@@ -781,7 +782,6 @@
 |`YEAR`
 |`YEARDAY`
 |`ZONE`
-|{nbsp}
 |{nbsp}
 |===
 
