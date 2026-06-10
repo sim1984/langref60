@@ -1298,6 +1298,14 @@
 |RDB$SCHEMA_NAME
 |CHAR(63) CHARACTER SET UTF8
 |Имя схемы в которой расположена функция или её пакет.
+
+|RDB$AGGREGATE_FLAG
+|SMALLINT
+|Флаг агрегатной функции.
+
+1 - функция является агрегатной; +
+`NULL` или 0 - функция является скалярной.
+
 |===
 
 [[fblangref-systables-generators]]

@@ -24,6 +24,7 @@ END
 
 <package_item> ::=
     <function declaration>;
+  | <aggregate function declaration>;
   | <procedure declaration>;
   | <constant declaration>;
   | <temporary table declaration>;
@@ -32,6 +33,11 @@ END
   FUNCTION _func_name_ [(<in_params>)]
   RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
   [DETERMINISTIC]
+
+<aggregate function declaration> ::=
+  AGGREGATE FUNCTION _func_name_ [(<in_params>)]
+  RETURNS <type> [NOT NULL]
+    [COLLATE [ _coll-schema_ <period> ] _collation_]
 
 <procedure declaration> ::=
   PROCEDURE _proc_name_ [(<in_params>)]
@@ -50,12 +56,18 @@ END
 
 <package_body_item> ::=
     <function_impl>
+  | <agg_function_impl>
   | <procedure_impl>
 
 <function_impl> ::=
   FUNCTION _func_name_ [(<in_impl_params>)]
   RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
   <routine-body>
+
+<agg_function_impl> ::=
+  AGGREGATE FUNCTION _func_name_ [(<in_impl_params>)]
+  RETURNS <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
+  <agg-routine-body>
 
 <procedure_impl> ::=
   PROCEDURE _proc_name_ [(<in_impl_params>)]
@@ -118,7 +130,10 @@ END
 |Имя пакета. Может содержать до 63 символов.
 
 |function declaration
-|Объявление функции.
+|Объявление скалярной функции.
+
+|aggregate function declaration
+|Объявление агрегатной функции.
 
 |procedure declaration
 |Объявление процедуры.
@@ -130,7 +145,10 @@ END
 |Объявление временной таблицы.
 
 |function_impl
-|Реализация функции.
+|Реализация скалярной функции.
+
+|agg_function_impl
+|Реализация агрегатной функции.
 
 |procedure_impl
 |Реализация процедуры.
@@ -373,6 +391,8 @@ end!
 set term ;!
 ----
 ====
+
+// TODO: Добавить пример пакета с агрегатной функцией.
 
 .См. также:
 <<fblangref-ddl-package-body-drop,`DROP PACKAGE BODY`>>, <<fblangref-ddl-package-create,`CREATE PACKAGE`>>.

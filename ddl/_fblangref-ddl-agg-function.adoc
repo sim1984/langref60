@@ -1,0 +1,583 @@
+[[fblangref-ddl-agg-function]]
+= AGGREGATE FUNCTION
+
+Пользовательская агрегатная функция является программой, хранящейся в области метаданных базы данных и выполняющейся на стороне сервера. Они могут быть реализованы с помощью PSQL или механизма внешних движков (EXTERNAL ENGINE) в виде UDR.
+
+Пользовательские агрегатные функции обладают собственным локальным состоянием для каждой группы или кадра окна, логикой шага и вычислением конечного результата.
+
+Пользовательские агрегатные функции имеют то же пространство имён, что и хранимые функции. Они могут располагаться внутри схем или пакетов, а также объявлены внутри других подпрограмм с помощью `DECLARE AGGREGATE FUNCTION`.
+
+[[fblangref-ddl-function-agg-create]]
+== `CREATE AGGREGATE FUNCTION`
+
+.Назначение
+Создание новой агрегатной функции.
+(((CREATE AGGREGATE FUNCTION)))
+
+.Доступно в
+DSQL
+
+[[fblangref-ddl-func-agg-create-syntax]]
+.Синтаксис
+[listing,subs="+quotes,macros,attributes"]
+----
+CREATE AGGREGATE FUNCTION [ _func-schema_ <period> ] _funcname_ [( <in_params> )]
+RETURNS <type> [NOT NULL]
+  [COLLATE [ _coll-schema_ <period> ] _collation_]
+<agg-routine-body>
+
+<in_params> ::= <inparam> [, <inparam> ... ]
+
+<inparam> ::= <param_decl> [{= | DEFAULT} <value>]
+
+<value> ::=  {<literal> | NULL | <context_var>}
+
+<param_decl> ::= _paramname_ <type> [NOT NULL] [COLLATE [ _coll-schema_ <period> ] _collation_]
+
+<type> ::=
+    <datatype>
+  | [TYPE OF] [ _dom-schema_ <period> ] _domain_
+  | TYPE OF COLUMN [ _rel-schema_ <period> ] _rel_._col_
+
+<datatype> ::=
+    <scalar_datatype> | <blob_datatype>
+
+<scalar_datatype> ::=  См. <<fblangref-datatypes-syntax-scalar,Синтаксис скалярных типов данных>>
+
+<blob_datatype> ::= См. <<fblangref-datatypes-syntax-blob,Синтаксис типа данных BLOB>>
+
+<agg-routine-body> ::=
+    <psql-agg-routine-spec>
+  | <external-routine-spec>
+
+<psql-agg-routine-spec> ::=
+  [<rights-clause>] <psql-agg-routine-body>
+
+<rights-clause> ::=
+  SQL SECURITY {DEFINER | INVOKER}
+
+<psql-agg-routine-body> ::=
+  BEGIN
+    [ON START DO <statement>]
+
+    ON ACCUMULATE DO <statement>
+
+    ON GROUP DO <statement>
+
+    [ON FINISH DO <statement>]
+  END
+
+// TODO: здесь должна быть отсылка на тело агрегатной функции.
+Подробной синтаксис тела агрегатной функции на языке PSQL см. <<fblangref-psql-elements-body-syntax,Синтаксис тела агрегатной функции>>.
+
+<external-routine-spec> ::=
+  <external-routine-reference>
+  [AS <extbody>]
+
+<external-routine-reference> ::= EXTERNAL NAME <extname> ENGINE <engine>
+
+<extname> ::= '<module-name>!<routine-name>[!<misc-info>]'
+----
+
+[[fblangref-ddl-tbl-create-agg-func]]
+.Параметры оператора `CREATE AGGREGATE FUNCTION`
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|func-schema
+|Имя схемы функции. Если не указано, то функция создаётся в текущей схеме.
+
+|funcname
+|Имя хранимой функции. Может содержать до 63 символов.
+
+|inparam
+|Описание входного параметра.
+
+|literal
+|Литерал, совместимый по типу с параметром.
+
+|context_var
+|Любая контекстная переменная, тип которой совместим с типом параметра.
+
+|paramname
+|Имя входного параметра функции. Может содержать до 63 символов. Имя параметра должно быть уникальным среди входных параметров функции, а также её локальных переменных.
+
+|module-name
+|Имя внешнего модуля, в котором расположена функция.
+
+|routine-name
+|Внутреннее имя функции внутри внешнего модуля.
+
+|misc-info
+|Определяемая пользователем информация для передачи в функцию внешнего модуля.
+
+|extbody
+|Тело внешней функции. Строковый литерал который может использоваться UDR для различных целей.
+
+|engine
+|Имя движка для использования внешних функций. Обычно указывается имя UDR.
+
+|datatype
+|Тип данных SQL.
+
+|coll-schema
+|Имя схемы сортировки (сравнения). Если не указано, то сортировка будет найдена в пути поиска.
+
+|collation
+|Имя сортировки (сравнения).
+
+|dom-schema
+|Имя схемы домена. Если не указано, то домен будет найден в пути поиска.
+
+|domain_name
+|Имя домена.
+
+|rel-schema
+|Имя схемы таблицы или представления. Если не указано, то таблица или представление будут найдены в пути поиска.
+
+|rel
+|Имя таблицы или представления.
+
+|col
+|Имя столбца таблицы или представления.
+|===
+
+Оператор `CREATE AGGREGATE FUNCTION` создаёт новую агрегатную функцию.
+
+Если перед именем агрегатную функции указана схема, то функция будет создана в указанной схеме, в противном случае функция будет создана в текущей схеме (первая валидная схема в пути поиска).
+
+Имя агрегатную функции должно быть уникальным среди имён всех хранимых скалярных, агрегатных и внешних (Legacy UDF) функций внутри заданной (текущей) схемы.
+
+Для внутренних функций ("`подпрограмма`") достаточно уникальности имени только в рамках модулей, которые их "`охватывают`".
+
+[IMPORTANT]
+====
+Поскольку `CREATE AGGREGATE FUNCTION` является DDL оператором, то после того как создаваемая функция привязана к схеме во время подготовки оператора, путь поиска неявно и временно изменяется. Эта корректировка устанавливает путь поиска на схему функции. Кроме того, схема `SYSTEM` добавляется как последняя схема в путь поиска. Это обозначает, что имена объектов метаданных, используемые внутри оператора `CREATE AGGREGATE FUNCTION` будут разрешаться относительно этого нового пути поиска. Это относится как к телу функции, так и к входным параметрам и выходному результату, в которых могут использоваться домены или таблицы (`TYPE OF COLUMN`).
+====
+
+`CREATE AGGREGATE FUNCTION` является составным оператором, состоящий из заголовка и тела. Заголовок определяет имя агрегатной функции, объявляет входные параметры и тип возвращаемого значения.
+
+Тело функции состоит из необязательных объявлений локальных переменных, подпрограмм и именованных курсоров, и блока секций для обработки событий агрегирования. Блок секций для обработки событий агрегирования начинается с ключевого слова `BEGIN`, и завершается ключевым словом `END`. Объявления локальных переменных и именованных курсоров, а также внутренние операторы должны завершаться точкой с запятой (;).
+
+Входные параметры и выходной результат описывается по тем же правилам, что и для скалярных хранимых функций (см. <<fblangref-ddl-function-create>>).
+
+[[fblangref-ddl-function-agg-create-sql-security]]
+=== Привилегии выполнения
+
+(((CREATE FUNCTION, SQL SECURITY)))
+Необязательное предложение `SQL SECURITY` позволяет задать с какими привилегиями выполняется агрегатная функция. Если выбрана опция `INVOKER`, то функция выполняется с привилегиями вызывающего пользователя. Если выбрана опция `DEFINER`, то функция выполняется с привилегиями определяющего пользователя (владельца функции). Эти привилегии будут дополнены привилегиями выданные самой агрегатной функции с помощью оператора `GRANT`. По умолчанию агрегатная функция выполняется с привилегиями вызывающего пользователя.
+
+[TIP]
+====
+Привилегии выполнения по умолчанию для вновь создаваемых объектов метаданных можно изменить с помощью оператора
+
+[listing]
+----
+ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
+----
+====
+
+[[fblangref-ddl-function-agg-create-body]]
+=== Тело агрегатной функции
+
+После ключевого слова `AS` следует тело хранимой функции.
+
+[[fblangref-ddl-function-agg-create-declare]]
+==== Объявление локальных переменных, курсоров и подпрограмм
+
+В необязательной секции `<declarations>` описаны локальные переменные функции, именованные курсоры и подпрограммы (декларируемые процедуры и функции). Локальные переменные подчиняются тем же правилам, что и входные параметры функции в отношении спецификации типа данных. Подробности вы можете посмотреть в главе "`Процедурный язык PSQL`" в разделах <<fblangref-psql-statements-declare-var,DECLARE VARIABLE>> и
+<<fblangref-psql-statements-declare-cursor,DECLARE CURSOR>>,
+<<fblangref-psql-statements-declare-procedure,DECLARE PROCEDURE>>,
+<<fblangref-psql-statements-declare-function,DECLARE FUNCTION>>.
+
+// TODO: DECLARE AGGREGATE FUNCTION
+
+[[fblangref-ddl-function-agg-create-begin-end]]
+==== Составной оператор с секциями обработки событий агрегирования
+
+После необязательной секции деклараций обязательно следует составной оператор с секциями для обработки событий агрегирования. Каждая секция обработки события агрегирования начинается с ключевого слова `ON` после чего следует тип события агрегирования и ключевое слово `DO`. После ключевого слова `DO` следует простой или составной PSQL оператор обработки этого события. Простые или составные операторы вне одной из секций обработки события агрегирования не допускаются. Предусмотрены следующие блоки для обработки событий агрегации:
+
+* `ON START DO` - необязательный блок для инициализации локальных переменных. Выполняется один раз если присутствует.
+* `ON ACCUMULATE DO` - обязательный блок, который выполняется для каждой подходящей записи.
+* `ON GROUP DO` - обязательный блок для вычисления и возврата результата агрегирования.
+* `ON FINISH DO` - необязательный блок, который выполняется один раз по завершению работы функции. Моет использоваться для очистки выделенных ресурсов.
+
+Подробнее о написании тела агрегатной функции см. в // TODO: написать
+
+[[fblangref-ddl-function-agg-create_external]]
+=== Внешние функции
+
+Пользовательская агрегатная функция может быть расположена во внешнем модуле. В этом случае вместо тела функции указывается место расположения функции во внешнем модуле с помощью предложения `EXTERNAL NAME`. Аргументом этого предложения является строка, в которой через разделитель указано имя внешнего модуля, имя функции внутри модуля и определённая пользователем информация. В предложении `ENGINE` указывается имя движка для обработки подключения внешних модулей. В Firebird для работы с внешними модулями используется движок UDR. После ключевого слова `AS` может быть указан строковый литерал -- "тело" внешней функции, оно может быть использовано внешним модулем для различных целей.
+
+
+[[fblangref-ddl-function-agg-create-who]]
+=== Кто может создать агрегатную функцию?
+
+Выполнить оператор `CREATE AGGREGATE FUNCTION` могут:
+
+* <<fblangref-security-administrators,Администраторы>>
+* Владелец схемы в которой создаётся хранимая функция;
+* Пользователи с привилегией `CREATE FUNCTION` для схемы в которой создаётся хранимая функция.
+
+Пользователь, создавший агрегатную функцию, становится её владельцем.
+
+[[fblangref-ddl-function-agg-create-examples]]
+=== Примеры
+
+.Создание пользовательской агрегатной функции sum_i
+[example]
+====
+[source,sql]
+----
+set term ^;
+
+create aggregate function sum_i(v integer)
+    returns bigint
+as
+    declare total bigint;
+    declare seen boolean;
+begin
+    on start do
+    begin
+        total = 0;
+        seen = false;
+    end
+
+    on accumulate do
+    begin
+        if (v is not null) then
+        begin
+            total = total + v;
+            seen = true;
+        end
+    end
+
+    on group do
+    begin
+        if (not seen) then
+            return null;
+
+        return total;
+    end
+end^
+
+set term ;^
+----
+====
+
+.См. также:
+<<fblangref-ddl-function-agg-createoralter>>,
+<<fblangref-ddl-function-agg-alter>>,
+<<fblangref-ddl-function-agg-recreate>>,
+<<fblangref-ddl-function-agg-drop>>.
+
+[[fblangref-ddl-function-agg-alter]]
+== `ALTER AGGREGATE FUNCTION`
+
+.Назначение
+Изменение существующей агрегатной функции.
+(((ALTER AGGREGATE FUNCTION)))
+
+.Доступно в
+DSQL
+
+.Синтаксис
+[listing,subs="+quotes,macros,attributes"]
+----
+ALTER AGGREGATE FUNCTION [ _func-schema_ <period> ] _funcname_
+{   <alter-agg-function-body>
+  | <alter-agg-function-option> ... }
+
+<alter-agg-function-body> ::=
+  [ ( <in_params> ) ]
+  RETURNS <type>
+    [COLLATE [ _coll-schema_ <period> ] _collation_]
+  <agg-routine-body>
+
+<alter-agg-function-option> ::=
+    SQL SECURITY {INVOKER | DEFINER}
+  | DROP SQL SECURITY
+
+Подробнее см. <<fblangref-ddl-func-agg-create-syntax>>.
+----
+
+Оператор `ALTER AGGREGATE FUNCTION` позволяет изменять:
+
+* состав и характеристики входных параметров, типа выходного значения;
+* локальные переменные, именованные курсоры и подпрограммы;
+* тело агрегатной функции;
+* устанавливать или удалять привилегии выполнения (SQL SECURITY).
+
+Не возможно преобразовать агрегатную функцию в скалярную и наоборот.
+
+Для внешних агрегатных функций (UDR) вы можете изменить точку входа и имя движка.
+
+После выполнения оператора `ALTER AGGREGATE FUNCTION` существующие привилегии и зависимости сохраняются.
+
+Если указано только имя функции, то её поиск производится в путях поиска (`SEARCH_PATH`). Будет изменена первая найденная функция с заданным именем среди схем перечисленных в путях поиска.
+
+[NOTE]
+====
+Будьте осторожны при изменении количества и типов входных параметров агрегатных функций. Существующий код приложения может стать неработоспособным из-за того, что формат вызова функции несовместим с новым описанием параметров. Кроме того, PSQL модули, использующие изменённую агрегатную функцию, могут стать некорректными. Информация о том, как это обнаружить, находится в приложении <<fblangref-appx-supp-rdb-validblr,Поле RDB$VALID_BLR>>.
+====
+
+[[fblangref-ddl-function-agg-alter_sql_security]]
+=== Привилегии выполнения
+
+(((ALTER FUNCTION, SQL SECURITY)))
+Оператор `ALTER AGGREGATE FUNCTION` позволяет изменить привилегии выполнения функции без повторного указания входных параметров, выходного результата и тела функции. Для установки привилегий выполнения используется предложение `SQL SECURITY` с одной из опций: `INVOKER` или `DEFINER`. Если необходимо удалить привилегии выполнения функции укажите предложение `DROP SQL SECURITY`.
+
+[[fblangref-ddl-function-agg-alter-who]]
+=== Кто может изменить функцию?
+
+Выполнить оператор `ALTER AGGREGATE FUNCTION` могут:
+
+* <<fblangref-security-administrators,Администраторы>>
+* Владелец агрегатной функции;
+* Владелец схемы в которой расположена агрегатная функция;
+* Пользователи с привилегией `ALTER ANY FUNCTION` для схемы в которой расположена хранимая функция.
+
+[[fblangref-ddl-function-agg-alter-examples]]
+=== Примеры
+
+.Изменение пользовательской агрегатной функции sum_i
+[example]
+====
+[source,sql]
+----
+set term ^;
+
+alter aggregate function sum_i(v integer)
+    returns bigint
+as
+    declare total bigint;
+    declare seen boolean;
+begin
+    on start do
+    begin
+        total = 0;
+        seen = false;
+    end
+
+    on accumulate do
+    begin
+        if (v is not null) then
+        begin
+            total = total + v;
+            seen = true;
+        end
+    end
+
+    on group do
+    begin
+        if (not seen) then
+            return null;
+
+        return total;
+    end
+end^
+
+set term ;^
+----
+====
+
+.См. также:
+<<fblangref-ddl-function-agg-create>>,
+<<fblangref-ddl-function-agg-createoralter>>,
+<<fblangref-ddl-function-agg-drop>>.
+
+[[fblangref-ddl-function-agg-createoralter]]
+== `CREATE OR ALTER AGGREGATE FUNCTION`
+
+.Назначение
+Создание новой или изменение существующей агрегатной функции.
+(((CREATE OR ALTER AGGREGATE FUNCTION)))
+
+.Доступно в
+DSQL
+
+.Синтаксис
+[listing,subs="+quotes,macros,attributes"]
+----
+CREATE OR ALTER AGGREGATE FUNCTION [ _func-schema_ <period> ] _funcname_ [( <in_params> )]
+RETURNS <type>
+  [COLLATE [ _coll-schema_ <period> ] _collation_]
+<agg-routine-body>
+
+Подробнее см. <<fblangref-ddl-func-agg-create-syntax>>.
+----
+
+Оператор `CREATE OR ALTER AGGREGATE FUNCTION` создаёт новую или изменяет существующую агрегатную функцию. Если агрегатная функция не существует, то она будет создана с использованием предложения `CREATE AGGREGATE FUNCTION`. Если она уже существует, то она будет изменена и перекомпилирована, при этом существующие привилегии и зависимости сохраняются.
+
+Агрегатная функция создаётся или изменяется относительно указанной схемы. Если указано только имя агрегатной функции, то её создание или изменение происходит в текущей схеме (первая валидная схема в путях поиска).
+
+[[fblangref-ddl-function-agg-createoralter-examples]]
+=== Примеры
+
+.Создание или изменение пользовательской агрегатной функции sum_i
+[example]
+====
+[source,sql]
+----
+set term ^;
+
+create or alter aggregate function sum_i(v integer)
+    returns bigint
+as
+    declare total bigint;
+    declare seen boolean;
+begin
+    on start do
+    begin
+        total = 0;
+        seen = false;
+    end
+
+    on accumulate do
+    begin
+        if (v is not null) then
+        begin
+            total = total + v;
+            seen = true;
+        end
+    end
+
+    on group do
+    begin
+        if (not seen) then
+            return null;
+
+        return total;
+    end
+end^
+
+set term ;^
+----
+====
+
+.См. также:
+<<fblangref-ddl-function-agg-create>>, <<fblangref-ddl-function-agg-alter>>.
+
+[[fblangref-ddl-function-agg-drop]]
+== `DROP FUNCTION`
+
+.Назначение
+Удаление скалярной или агрегатной функции.
+
+.Доступно в
+DSQL
+
+.Синтаксис
+
+[listing,subs="+quotes"]
+----
+DROP FUNCTION [IF EXISTS] [ _func-schema_ <period> ] _funcname_
+----
+
+.Параметры оператора `DROP FUNCTION`
+[cols="<1,<3", options="header",stripes="none"]
+|===
+^| Параметр
+^| Описание
+
+|func-schema
+|Имя схемы функции. Если не указано, то функция будет найдена в пути поиска.
+
+|funcname
+|Имя хранимой функции.
+
+|===
+
+Оператор `DROP FUNCTION` удаляет существующую скалярную или агрегатную функцию.
+
+Если указано только имя функции, то её поиск производится в путях поиска (`SEARCH_PATH`). Будет удалена первая найденная функция с заданным именем среди схем перечисленных в путях поиска.
+
+Если от функции существуют зависимости, то при попытке удаления такой функции будет выдана соответствующая ошибка.
+
+Если используется предложение `IF EXISTS`, то оператор `DROP FUNCTION` попытается удалить функцию без выдачи ошибки, если её не существует. DDL триггеры не будут запускаться, если функция не существует.
+
+[[fblangref-ddl-agg-function-drop-who]]
+=== Кто может удалить функцию?
+
+Выполнить оператор `DROP FUNCTION` могут:
+
+* <<fblangref-security-administrators,Администраторы>>
+* Владелец скалярной или агрегатной функции;
+* Владелец схемы в которой расположена хранимая функция;
+* Пользователи с привилегией `DROP ANY FUNCTION` для схемы в которой расположена хранимая функция.
+
+[[fblangref-ddl-function-agg-drop-examples]]
+=== Примеры
+
+.Удаление агрегатной функции
+[example]
+====
+[source,sql]
+----
+-- удаляется первая найденная в путях поиска функция sum_i
+DROP FUNCTION sum_i;
+
+-- удаляется функция sum_i из схемы APP
+DROP PROCEDURE APP.sum_i;
+----
+====
+
+.Удаление агрегатной функции, если она существует
+[example]
+====
+[source,sql]
+----
+DROP FUNCTION IF EXISTS sum_i;
+----
+====
+
+.См. также:
+<<fblangref-ddl-function-agg-create>>.
+
+[[fblangref-ddl-function-agg-recreate]]
+== `RECREATE AGGREGATE FUNCTION`
+
+.Назначение
+Создание новой или пересоздание существующей хранимой функции.
+(((RECREATE AGGREGATE FUNCTION)))
+
+.Доступно в
+DSQL
+
+.Синтаксис
+[listing,subs="+quotes,macros,attributes"]
+----
+RECREATE AGGREGATE FUNCTION [ _func-schema_ <period> ] _funcname_ [( <in_params> )]
+RETURNS <type>
+  [COLLATE [ _coll-schema_ <period> ] _collation_]
+<agg-routine-body>
+
+Подробнее см. <<fblangref-ddl-func-agg-create-syntax>>
+----
+
+Оператор `RECREATE AGGREGATE FUNCTION` создаёт новую или пересоздаёт существующую агрегатную функцию. Если функция (агрегатная или скалярная) с таким именем уже существует в указанной (текущей) схеме, то оператор попытается удалить её и создать новую функцию. Операция закончится неудачей при подтверждении транзакции, если функция имеет зависимости.
+
+Агрегатная функция создаётся или пересоздаётся относительно указанной схемы. Если указано только имя хранимой функции, то её создание или пересоздание происходит в текущей схеме (первая валидная схема в путях поиска).
+
+[NOTE]
+====
+Имейте в виду, что ошибки зависимостей не обнаруживаются до фазы подтверждения транзакции.
+====
+
+После пересоздания функции привилегии на выполнение агрегатной функции и привилегии самой хранимой функции не сохраняются.
+
+[WARNING]
+====
+Скалярные и пользовательские агрегатные функции имеют одно и то же пространство имён. Это обозначает, что `RECREATE AGGREGATE FUNCTION` может удалить скалярную функцию и создать агрегатную функцию с тем же именем.
+====
+
+[[fblangref-ddl-function-agg-recreate_examples]]
+=== Примеры
+
+// TODO: Написать
+
+.См. также:
+<<fblangref-ddl-function-agg-create>>, <<fblangref-ddl-function-agg-drop>>.
+

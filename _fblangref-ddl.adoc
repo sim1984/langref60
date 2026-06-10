@@ -29,6 +29,8 @@ include::ddl/_fblangref-ddl-procedure.adoc[leveloffset=+1]
 
 include::ddl/_fblangref-ddl-function.adoc[leveloffset=+1]
 
+include::ddl/_fblangref-ddl-agg-function.adoc[leveloffset=+1]
+
 include::ddl/_fblangref-ddl-package.adoc[leveloffset=+1]
 
 include::ddl/_fblangref-ddl-package-body.adoc[leveloffset=+1]

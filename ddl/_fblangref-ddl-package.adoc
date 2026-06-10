@@ -35,6 +35,7 @@ END
 
 <package_item> ::=
     <function declaration>;
+  | <aggregate function declaration>;
   | <procedure declaration>;
   | <constant declaration>;
   | <temporary table declaration>;
@@ -44,6 +45,11 @@ END
   RETURNS <type> [NOT NULL]
     [COLLATE [ _coll-schema_ <period> ] _collation_]
   [ [NOT] DETERMINISTIC ]
+
+<aggregate function declaration> ::=
+  AGGREGATE FUNCTION _func_name_ [(<in_params>)]
+  RETURNS <type> [NOT NULL]
+    [COLLATE [ _coll-schema_ <period> ] _collation_]
 
 <procedure declaration> ::=
   PROCEDURE _proc_name_ [(<in_params>)]
@@ -99,7 +105,10 @@ END
 |Имя пакета. Может содержать до 63 символов.
 
 |function declaration
-|Объявление функции.
+|Объявление скалярной функции.
+
+|aggregate function declaration
+|Объявление агрегатной функции.
 
 |procedure declaration
 |Объявление процедуры.
@@ -247,6 +256,11 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 
 При использовании `TYPE OF COLUMN` наследуется только тип данных, а в случае строковых типов ещё и набор символов, и порядок сортировки. Ограничения и значения по умолчанию столбца никогда не используются.
 
+[[fblangref-ddl-package-create-func-agg]]
+=== Агрегатные функции
+
+Функция может быть объявлена как агрегатная `AGGREGATE FUNCTION` или скалярная `FUNCTION`. Если функция объявлена как агрегатная, то она должна быть реализована как агрегатная, а не скалярная.
+
 [[fblangref-ddl-package-create-func-determ]]
 === Детерминированные функции
 
@@ -258,6 +272,8 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 
 Указание инструкции `DETERMINISTIC` на самом деле нечто вроде "`обещания`", что код функции будет возвращать одно и то же. В данный момент детерминистическая функция считается инвариантом и работает по тем же принципам, что и другие инварианты. То есть вычисляется и кэшируется на уровне текущего выполнения данного запроса.
 ====
+
+Ключевое слово `DETERMINISTIC` допустимо указывать только для скалярных функций.
 
 [[fblangref-ddl-package-create-const]]
 === Константы
@@ -473,6 +489,8 @@ end!
 set term ;!
 ----
 ====
+
+// TODO: Пример с агрегатной функций.
 
 .См. также:
 <<fblangref-ddl-package-body-create,CREATE PACKAGE BODY>>,

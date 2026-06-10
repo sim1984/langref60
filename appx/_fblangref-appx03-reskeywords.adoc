@@ -261,6 +261,7 @@
 |`ABS`
 |`ABSOLUTE`
 |`ACCENT`
+|`ACCUMULATE`
 |`ACOS`
 |`ACOSH`
 |`ACTION`
@@ -430,6 +431,7 @@
 |`FETCH`
 |`FILE`
 |`FILTER`
+|`FINISH`
 |`FIRST`
 |`FIRSTNAME`
 |`FIRST_DAY`
@@ -782,6 +784,7 @@
 |`YEAR`
 |`YEARDAY`
 |`ZONE`
+|{nbsp}
 |{nbsp}
 |===
 
