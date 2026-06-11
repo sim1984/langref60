@@ -229,10 +229,11 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 ==== Объявление локальных переменных, курсоров и подпрограмм
 
 В необязательной секции `<declarations>` описаны локальные переменные процедуры, подпрограммы и именованные курсоры. В отношении спецификации типа данных локальные переменные подчиняются тем же правилам, что и входные и выходные параметры процедуры. Подробности вы можете посмотреть в главе "`Процедурный язык PSQL`" в разделах
-<<fblangref-psql-statements-declare-var,DECLARE VARIABLE>> и
-<<fblangref-psql-statements-declare-cursor,DECLARE CURSOR>>,
-<<fblangref-psql-statements-declare-procedure,DECLARE PROCEDURE>>,
-<<fblangref-psql-statements-declare-function,DECLARE FUNCTION>>.
+<<fblangref-psql-statements-declare-var>> и
+<<fblangref-psql-statements-declare-cursor>>,
+<<fblangref-psql-statements-declare-procedure>>,
+<<fblangref-psql-statements-declare-function>>,
+<<fblangref-psql-statements-declare-agg-function>>.
 
 После необязательной секции деклараций обязательно следует составной оператор. Составной оператор состоит из одного или нескольких PSQL операторов, заключенных между ключевыми словами `BEGIN` и `END`. Составной оператор может содержать один или несколько других составных операторов. Вложенность ограничена 512 уровнями. Любой из `BEGIN ... END` блоков может быть пустым, в том числе и главный блок.
 

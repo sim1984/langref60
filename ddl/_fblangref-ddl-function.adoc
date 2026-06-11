@@ -250,10 +250,11 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 [[fblangref-ddl-function-create-declare]]
 ==== Объявление локальных переменных, курсоров и подпрограмм
 
-В необязательной секции `<declarations>` описаны локальные переменные функции, именованные курсоры и подпрограммы (подпроцедуры и подфункции). Локальные переменные подчиняются тем же правилам, что и входные параметры функции в отношении спецификации типа данных. Подробности вы можете посмотреть в главе "`Процедурный язык PSQL`" в разделах <<fblangref-psql-statements-declare-var,DECLARE VARIABLE>> и
-<<fblangref-psql-statements-declare-cursor,DECLARE CURSOR>>,
-<<fblangref-psql-statements-declare-procedure,DECLARE PROCEDURE>>,
-<<fblangref-psql-statements-declare-function,DECLARE FUNCTION>>.
+В необязательной секции `<declarations>` описаны локальные переменные функции, именованные курсоры и подпрограммы (подпроцедуры и подфункции). Локальные переменные подчиняются тем же правилам, что и входные параметры функции в отношении спецификации типа данных. Подробности вы можете посмотреть в главе "`Процедурный язык PSQL`" в разделах <<fblangref-psql-statements-declare-var>> и
+<<fblangref-psql-statements-declare-cursor>>,
+<<fblangref-psql-statements-declare-procedure>>,
+<<fblangref-psql-statements-declare-function>>,
+<<fblangref-psql-statements-declare-agg-function>>.
 
 После необязательной секции деклараций обязательно следует составной оператор. Составной оператор состоит из одного или нескольких PSQL операторов, заключенных между ключевыми словами `BEGIN` и `END`. Составной оператор может содержать один или несколько других составных операторов. Вложенность ограничена 512 уровнями. Любой из `BEGIN ... END` блоков может быть пустым, в том числе и главный блок.
 
