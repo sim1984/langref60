@@ -6232,6 +6232,8 @@ DO <sql_command>
   | <subproc-implementation>
   | <subfunc-declaration>
   | <subfunc-implementation>
+  | <agg-subfunc-declaration>
+  | <agg-subfunc-implementation>
 
 <sql_command> :==
     <select-stmt>
@@ -6333,25 +6335,25 @@ DO <sql_command>
 
 [source,sql]
 ----
-using (p1 integer = ?, p2 integer = ?)
-    -- Declare a local function
-    declare function subfunc (i1 integer) returns integer
-    as
-    begin
-        return i1;
-    end
+USING (p1 INTEGER = ?, p2 INTEGER = ?)
+  -- Declare a local function
+  DECLARE FUNCTION SubFunc (i1 INTEGER) RETURNS INTEGER
+  AS
+  BEGIN
+    RETURN i1;
+  END
 
-    -- Declare a local procedure
-    declare procedure subproc (i1 integer) returns (o1 integer)
-    as
-    begin
-        o1 = i1;
-        suspend;
-    end
-do
-    -- The main query
-    select subfunc(:p1) + o1
-    from subproc(:p2 + ?);
+  -- Declare a local procedure
+  DECLARE PROCEDURE SubProc (i1 INTEGER) RETURNS (o1 INTEGER)
+  AS
+  BEGIN
+    o1 = i1;
+    SUSPEND;
+  END
+DO
+  -- The main query
+  SELECT SubFunc(:p1) + o1
+  FROM SubProc(:p2 + ?);
 ----
 
 В этом сценарии:
@@ -6428,14 +6430,14 @@ end
 ====
 [source,sql]
 ----
-using
-  declare start_value integer = 1;
-  declare stop_value integer = 10;
-do
-select
-  s.n
-from
-  generate_series(:start_value, :stop_value) as s(n)
+USING
+  DECLARE START_VALUE INTEGER = 1;
+  DECLARE STOP_VALUE INTEGER = 10;
+DO
+SELECT
+  S.N
+FROM
+  GENERATE_SERIES(:START_VALUE, :STOP_VALUE) AS S(N)
 ----
 ====
 
@@ -6444,10 +6446,36 @@ from
 ====
 [source,sql]
 ----
-using in autonomous transaction
-do
-   insert into audit_log (log_time, message)
-   values (current_timestamp, 'Entry written in autonomous transaction');
+USING IN AUTONOMOUS TRANSACTION
+DO
+   INSERT INTO AUDIT_LOG (LOG_TIME, MESSAGE)
+   VALUES (CURRENT_TIMESTAMP, 'Entry written in autonomous transaction');
+----
+====
+
+.Использование USING для выполнения запроса с локальной пользовательской агрегатной функцией
+[example]
+====
+[source,sql]
+----
+USING
+  DECLARE AGGREGATE FUNCTION PRODUCT(I BIGINT)
+  RETURNS BIGINT
+  AS
+    DECLARE R BIGINT;
+  BEGIN
+    ON START DO
+      R = 1;
+
+    ON ACCUMULATE DO
+      R = R * I;
+
+    ON GROUP DO
+      RETURN R;
+  END
+DO
+  SELECT PRODUCT(S.N)
+  FROM GENERATE_SERIES(1, 10) AS S(N)
 ----
 ====
 

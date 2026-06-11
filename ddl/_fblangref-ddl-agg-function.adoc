@@ -67,9 +67,6 @@ RETURNS <type> [NOT NULL]
     [ON FINISH DO <statement>]
   END
 
-// TODO: здесь должна быть отсылка на тело агрегатной функции.
-Подробной синтаксис тела агрегатной функции на языке PSQL см. <<fblangref-psql-elements-body-syntax,Синтаксис тела агрегатной функции>>.
-
 <external-routine-spec> ::=
   <external-routine-reference>
   [AS <extbody>]
@@ -187,12 +184,12 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 [[fblangref-ddl-function-agg-create-declare]]
 ==== Объявление локальных переменных, курсоров и подпрограмм
 
-В необязательной секции `<declarations>` описаны локальные переменные функции, именованные курсоры и подпрограммы (декларируемые процедуры и функции). Локальные переменные подчиняются тем же правилам, что и входные параметры функции в отношении спецификации типа данных. Подробности вы можете посмотреть в главе "`Процедурный язык PSQL`" в разделах <<fblangref-psql-statements-declare-var,DECLARE VARIABLE>> и
-<<fblangref-psql-statements-declare-cursor,DECLARE CURSOR>>,
-<<fblangref-psql-statements-declare-procedure,DECLARE PROCEDURE>>,
-<<fblangref-psql-statements-declare-function,DECLARE FUNCTION>>.
+В необязательной секции `<declarations>` описаны локальные переменные функции, именованные курсоры и подпрограммы (декларируемые процедуры и функции). Локальные переменные подчиняются тем же правилам, что и входные параметры функции в отношении спецификации типа данных. Подробности вы можете посмотреть в главе "`Процедурный язык PSQL`" в разделах <<fblangref-psql-statements-declare-var>> и
+<<fblangref-psql-statements-declare-cursor>>,
+<<fblangref-psql-statements-declare-procedure>>,
+<<fblangref-psql-statements-declare-function>>,
+<<fblangref-psql-statements-declare-agg-function>>.
 
-// TODO: DECLARE AGGREGATE FUNCTION
 
 [[fblangref-ddl-function-agg-create-begin-end]]
 ==== Составной оператор с секциями обработки событий агрегирования
@@ -204,13 +201,12 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 * `ON GROUP DO` - обязательный блок для вычисления и возврата результата агрегирования.
 * `ON FINISH DO` - необязательный блок, который выполняется один раз по завершению работы функции. Моет использоваться для очистки выделенных ресурсов.
 
-Подробнее о написании тела агрегатной функции см. в // TODO: написать
+Подробнее о написании тела агрегатной функции и модели её исполнения см. в <<fblangref-psql-function-agg-syntax>>.
 
 [[fblangref-ddl-function-agg-create_external]]
 === Внешние функции
 
 Пользовательская агрегатная функция может быть расположена во внешнем модуле. В этом случае вместо тела функции указывается место расположения функции во внешнем модуле с помощью предложения `EXTERNAL NAME`. Аргументом этого предложения является строка, в которой через разделитель указано имя внешнего модуля, имя функции внутри модуля и определённая пользователем информация. В предложении `ENGINE` указывается имя движка для обработки подключения внешних модулей. В Firebird для работы с внешними модулями используется движок UDR. После ключевого слова `AS` может быть указан строковый литерал -- "тело" внешней функции, оно может быть использовано внешним модулем для различных целей.
-
 
 [[fblangref-ddl-function-agg-create-who]]
 === Кто может создать агрегатную функцию?
@@ -347,39 +343,39 @@ ALTER AGGREGATE FUNCTION [ _func-schema_ <period> ] _funcname_
 ====
 [source,sql]
 ----
-set term ^;
+SET TERM ^;
 
-alter aggregate function sum_i(v integer)
-    returns bigint
-as
-    declare total bigint;
-    declare seen boolean;
-begin
-    on start do
-    begin
-        total = 0;
-        seen = false;
-    end
+ALTER AGGREGATE FUNCTION SUM_I (V INTEGER)
+RETURNS BIGINT
+AS
+  DECLARE TOTAL BIGINT;
+  DECLARE SEEN BOOLEAN;
+BEGIN
+  ON START DO
+  BEGIN
+    TOTAL = 0;
+    SEEN = FALSE;
+  END
 
-    on accumulate do
-    begin
-        if (v is not null) then
-        begin
-            total = total + v;
-            seen = true;
-        end
-    end
+  ON ACCUMULATE DO
+  BEGIN
+    IF (V IS NOT NULL) THEN
+    BEGIN
+      TOTAL = TOTAL + V;
+      SEEN = TRUE;
+    END
+  END
 
-    on group do
-    begin
-        if (not seen) then
-            return null;
+  ON GROUP DO
+  BEGIN
+    IF (NOT SEEN) THEN
+      RETURN NULL;
 
-        return total;
-    end
-end^
+    RETURN TOTAL;
+  END
+END^
 
-set term ;^
+SET TERM ;^
 ----
 ====
 
@@ -421,39 +417,39 @@ RETURNS <type>
 ====
 [source,sql]
 ----
-set term ^;
+SET TERM ^;
 
-create or alter aggregate function sum_i(v integer)
-    returns bigint
-as
-    declare total bigint;
-    declare seen boolean;
-begin
-    on start do
-    begin
-        total = 0;
-        seen = false;
-    end
+CREATE OR ALTER AGGREGATE FUNCTION SUM_I (V INTEGER)
+RETURNS BIGINT
+AS
+  DECLARE TOTAL BIGINT;
+  DECLARE SEEN BOOLEAN;
+BEGIN
+  ON START DO
+  BEGIN
+    TOTAL = 0;
+    SEEN = FALSE;
+  END
 
-    on accumulate do
-    begin
-        if (v is not null) then
-        begin
-            total = total + v;
-            seen = true;
-        end
-    end
+  ON ACCUMULATE DO
+  BEGIN
+    IF (V IS NOT NULL) THEN
+    BEGIN
+      TOTAL = TOTAL + V;
+      SEEN = TRUE;
+    END
+  END
 
-    on group do
-    begin
-        if (not seen) then
-            return null;
+  ON GROUP DO
+  BEGIN
+    IF (NOT SEEN) THEN
+      RETURN NULL;
 
-        return total;
-    end
-end^
+    RETURN TOTAL;
+  END
+END^
 
-set term ;^
+SET TERM ;^
 ----
 ====
 
@@ -576,7 +572,46 @@ RETURNS <type>
 [[fblangref-ddl-function-agg-recreate_examples]]
 === Примеры
 
-// TODO: Написать
+.Пересоздание пользовательской агрегатной функции sum_i
+[example]
+====
+[source,sql]
+----
+SET TERM ^;
+
+RECREATE AGGREGATE FUNCTION SUM_I (V INTEGER)
+RETURNS BIGINT
+AS
+  DECLARE TOTAL BIGINT;
+  DECLARE SEEN BOOLEAN;
+BEGIN
+  ON START DO
+  BEGIN
+    TOTAL = 0;
+    SEEN = FALSE;
+  END
+
+  ON ACCUMULATE DO
+  BEGIN
+    IF (V IS NOT NULL) THEN
+    BEGIN
+      TOTAL = TOTAL + V;
+      SEEN = TRUE;
+    END
+  END
+
+  ON GROUP DO
+  BEGIN
+    IF (NOT SEEN) THEN
+      RETURN NULL;
+
+    RETURN TOTAL;
+  END
+END^
+
+SET TERM ;^
+----
+====
 
 .См. также:
 <<fblangref-ddl-function-agg-create>>, <<fblangref-ddl-function-agg-drop>>.

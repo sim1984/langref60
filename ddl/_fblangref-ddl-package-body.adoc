@@ -359,40 +359,158 @@ END
 ====
 [source,sql]
 ----
-set term !;
+SET TERM !;
 
-create package body pkg
-as
-begin
-    -- объявление приватной временной таблицы пакета
-    temporary table t_priv(
-        id integer
-    ) on commit preserve rows
-      unique index uq_t_priv_id (id);
+CREATE PACKAGE BODY PKG
+AS
+BEGIN
+  -- объявление приватной временной таблицы пакета
+  TEMPORARY TABLE T_PRIV(
+    ID INTEGER
+  )
+  ON COMMIT PRESERVE ROWS
+  UNIQUE INDEX UQ_T_PRIV_ID (ID);
 
-    procedure p1(n integer)
-    as
-    begin
-      -- вставка записи в публичную временную таблицу пакета
-      insert into t_pub(id) values (:n);
-      -- вставка записи в закрытую временную таблицу пакета
-      insert into t_priv(id) values (:n);
-    end
+  PROCEDURE P1(N INTEGER)
+  AS
+  BEGIN
+    -- вставка записи в публичную временную таблицу пакета
+    INSERT INTO T_PUB(ID) VALUES (:N);
+    -- вставка записи в закрытую временную таблицу пакета
+    INSERT INTO T_PRIV(ID) VALUES (:N);
+  END
 
-    procedure p2 returns (n integer)
-    as
-    begin
-      for
-        select id from t_pub into :n do
-          suspend;
-    end
-end!
+  PROCEDURE P2 RETURNS (N INTEGER)
+  AS
+  BEGIN
+    FOR
+      SELECT ID FROM T_PUB INTO :N DO
+        SUSPEND;
+  END
+END!
 
-set term ;!
+SET TERM ;!
 ----
 ====
 
-// TODO: Добавить пример пакета с агрегатной функцией.
+.Создание тела пакета с агрегатными функциями
+====
+[source,sql]
+----
+-- заголовок создан ранее
+
+SET TERM !;
+
+CREATE PACKAGE BODY PUBLIC.OPTIMIZER_UTILS
+AS
+BEGIN
+  -- временная таблица, которая
+  -- используется для сортировки предикатов по селективности.
+  TEMPORARY TABLE T_SEL (
+    GROUP_ID BINARY(16),
+    SELECTIVITY DOUBLE PRECISION
+  )
+  ON COMMIT DELETE ROWS
+  INDEX T_SEL_IDX_GROUP_ID (GROUP_ID);
+
+
+  /**
+   * Расчёт селективности конъюнктов предикатов (предикаты объединённые AND).
+   * Предикаты считаются некоррелированными.
+   * Общая селективность оценивается как произведения селективностей предикатов.
+   *
+   * Подход использовался в Firebird 5.0 и более ранних.
+   */
+  AGGREGATE FUNCTION CONJ_SELECTIVITY_FB50 (A_SELECTIVITY DOUBLE PRECISION)
+  RETURNS DOUBLE PRECISION
+  AS
+    DECLARE S DOUBLE PRECISION;
+  BEGIN
+    ON START DO
+     S = 1;
+
+    ON ACCUMULATE DO
+     S = S * A_SELECTIVITY;
+
+    ON GROUP DO
+      RETURN S;
+  END
+
+  /**
+   * Расчёт селективности конъюнктов предикатов (предикаты объединённые AND).
+   * Предикаты считаются частично коррелированными.
+   * Используется алгоритм Exponential backoff. Суть алгоритма в следующем:
+   * Предикаты сортируются по селективности от лучшей к худшей (меньшей к большей),
+   * а затем общая селективность рассчитывается по формуле:
+   *
+   * S = S1 * S2^1/2 * S3^1/4 ... SN^1/2N
+   *
+   * Подход используется начиная с Firebird 6.0.
+   */
+  AGGREGATE FUNCTION CONJ_SELECTIVITY_FB60 (A_SELECTIVITY DOUBLE PRECISION)
+  RETURNS DOUBLE PRECISION
+  AS
+    DECLARE GROUP_ID BINARY(16);
+    DECLARE S DOUBLE PRECISION;
+    DECLARE P DOUBLE PRECISION;
+  BEGIN
+    ON START DO
+    BEGIN
+      S = 1;
+      P = 1;
+      GROUP_ID = GEN_UUID(7);
+    END
+
+    ON ACCUMULATE DO
+     INSERT INTO T_SEL(GROUP_ID, SELECTIVITY)
+     VALUES (:GROUP_ID, :A_SELECTIVITY);
+
+    ON GROUP DO
+    BEGIN
+      FOR
+        SELECT
+          SELECTIVITY
+        FROM T_SEL
+        WHERE GROUP_ID = :GROUP_ID
+        ORDER BY SELECTIVITY
+        AS CURSOR C
+      DO
+      BEGIN
+        S = S * POWER(C.SELECTIVITY, P);
+        P = P * 0.5;
+      END
+
+      RETURN S;
+    END
+
+    ON FINISH DO
+      DELETE FROM T_SEL WHERE GROUP_ID = :GROUP_ID;
+  END
+END!
+
+SET TERM ;!
+
+WITH
+  T (S) AS (
+    SELECT 0.25 FROM RDB$DATABASE
+    UNION ALL
+    SELECT 0.25 FROM RDB$DATABASE
+    UNION ALL
+    SELECT 0.1 FROM RDB$DATABASE
+  )
+SELECT
+  OPTIMIZER_UTILS.CONJ_SELECTIVITY_FB50(T.S) AS SEL_FB50,
+  OPTIMIZER_UTILS.CONJ_SELECTIVITY_FB60(T.S) AS SEL_FB60
+FROM T;
+----
+
+[listing]
+----
+               SEL_FB50                SEL_FB60
+======================= =======================
+   0.006250000000000000     0.03535533905932738
+----
+====
 
 .См. также:
 <<fblangref-ddl-package-body-drop,`DROP PACKAGE BODY`>>, <<fblangref-ddl-package-create,`CREATE PACKAGE`>>.

@@ -341,6 +341,7 @@ SET TERM ;^
 <aggregate-name>(<args>) OVER (<window-specification>)
 ----
 
+[[fblangref-psql-function-agg-syntax]]
 ==== Синтаксис пользовательских агрегатных функций
 
 Синтаксис создания пользовательской агрегатной функции на языке PSQL выглядит следующим образом:
@@ -350,10 +351,20 @@ SET TERM ;^
 { RECREATE | { CREATE [OR ALTER] } | ALTER } AGGREGATE FUNCTION <function-name>
     [ ( <input-parameter> [, <input-parameter> ...] ) ]
     RETURNS <return-type>
-    [SQL SECURITY {INVOKER | DEFINER}]
-AS
-    [<local declarations>]
-BEGIN
+    <agg-routine-body>
+
+<agg-routine-body> ::=
+    <psql-agg-routine-spec>
+  | <external-routine-spec>
+
+<psql-agg-routine-spec> ::=
+  [<rights-clause>] <psql-agg-routine-body>
+
+<rights-clause> ::=
+  SQL SECURITY {DEFINER | INVOKER}
+
+<psql-agg-routine-body> ::=
+  BEGIN
     [ON START DO <statement>]
 
     ON ACCUMULATE DO <statement>
@@ -361,7 +372,15 @@ BEGIN
     ON GROUP DO <statement>
 
     [ON FINISH DO <statement>]
-END
+  END
+
+<external-routine-spec> ::=
+  <external-routine-reference>
+  [AS <extbody>]
+
+<external-routine-reference> ::= EXTERNAL NAME <extname> ENGINE <engine>
+
+<extname> ::= '<module-name>!<routine-name>[!<misc-info>]'
 ----
 
 Пользовательские агрегатные функции также могут быть реализованы во внешних модулях написанных на других языках. В этом случае их синтаксис выглядит следующим образом:
@@ -391,17 +410,55 @@ END
 <<fblangref-ddl-function-agg-createoralter>>,
 <<fblangref-ddl-function-agg-recreate>> в главе "`Операторы определения данных DDL`".
 
+[[fblangref-psql-function-agg-pkg]]
 ==== Упакованные агрегатные функции
 
 Пользовательские агрегатные функции могут быть описаны и реализованы в рамках PSQL пакетов. Подробнее см. <<fblangref-ddl-package-create>> и <<fblangref-ddl-package-body-create>>.
 
+[[fblangref-psql-function-agg-decl]]
 ==== Декларируемые пользовательские агрегатные функции
 
-Пользовательские агрегатные функции могут не только хранится в схеме БД или пакете, но и быть объявленными как подпрограмма в хранимых процедурах и функций, триггерах, анонимных блоках и в операторе `USING`. Подробнее об объявленных агрегатных функциях см. <<fblangref-psql-statements-declare-agg-function>>
+Пользовательские агрегатные функции могут не только хранится в схеме БД или пакете, но и быть объявленными как подпрограмма в хранимых процедурах и функций, триггерах, анонимных блоках и в операторе `USING`. Подробнее об объявленных агрегатных функциях см. <<fblangref-psql-statements-declare-agg-function>>.
 
+[[fblangref-psql-function-agg-exec]]
 ==== Модель выполнения
 
-// TODO: Написать
+Агрегатная функция вызывается один раз для каждого экземпляра агрегата:
+
+* один раз для каждой группы в групповой агрегации
+* один раз для каждого оконного кадра в оконной агрегации
+
+Для каждого экземпляра:
+
+. Выделяется частный контекст выполнения
+. Локальные переменные, объявленные в теле подпрограммы, изначально имеют значение `NULL`
+. `ON START DO` выполняется один раз, если присутствует
+. `ON ACCUMULATE DO` выполняется для каждой подходящей строки
+. `ON GROUP DO` выполняется для вычисления текущего результата агрегата
+. `ON FINISH DO` выполняется один раз при завершении работы экземпляра агрегата и может выполнять деструктивную очистку
+
+Локальные переменные, объявленные в теле подпрограммы, видны `ON START DO`, `ON ACCUMULATE DO` и `ON GROUP DO`, а также, если присутствует, `ON FINISH DO`, и сохраняются в течение всего времени жизни одного и того же экземпляра агрегата.
+
+Формальные входные параметры агрегатной функции видны только `ON ACCUMULATE DO`. Они не видны командам `ON START DO`, `ON GROUP DO` или `ON FINISH DO`.
+
+`ON GROUP DO` является повторяемым и нетерминальным. При оконном выполнении движок может вызвать `ON GROUP DO`, затем продолжить выполнение того же агрегированного экземпляра с помощью дополнительных вызовов `ON ACCUMULATE DO`, а затем снова вызвать `ON GROUP DO`. Используйте `ON FINISH DO` для терминальной деструктивной очистки.
+
+[[fblangref-psql-function-agg-restriction]]
+==== Ограничения
+
+* `DETERMINISTIC` не допускается для агрегатных функций;
+* только `ON ACCUMULATE DO` может ссылаться на входные параметры агрегатной функции;
+* `ON START DO`, `ON ACCUMULATE DO` и `ON FINISH DO` не могут использовать `RETURN`; вместо этого используйте `EXIT` для досрочного выхода;
+* `ON GROUP DO` должен использовать `RETURN <value>` для получения результата агрегатной функции;
+* `ON GROUP DO` не может использовать `EXIT`.
+
+[[fblangref-psql-function-agg-ret-exit]]
+==== Семантика RETURN и EXIT
+
+* В командах `ON START DO`, `ON ACCUMULATE DO` и `ON FINISH DO` команда `EXIT;` завершает работу только в текущем разделе досрочно.
+* В этих трех разделах любая форма `RETURN` недопустима.
+* В команде `ON GROUP DO` команда `RETURN <value>;` выдает агрегированный результат.
+* В команде `ON GROUP DO` команда `EXIT;` недопустима.
 
 [[fblangref-psql-function-drop]]
 === Удаление хранимой функции
@@ -1482,9 +1539,8 @@ PSQL
 
 <output-parameters> ::= <outparam> [, <outparam> ...]
 
-// TODO: Добавить правильную ссылку
 <psql-agg-routine-body> ::=
-  См. <<fblangref-psql-elements-body-syntax,Синтаксис тела модуля>>
+  См. в <<fblangref-psql-function-agg-syntax>>.
 ----
 
 [[fblangref30-psql-tbl-declare-func-agg]]
@@ -1560,6 +1616,8 @@ BEGIN
 END
 ----
 ====
+
+Подробнее о написании тела агрегатной функции и модели её исполнения см. в <<fblangref-psql-function-agg-syntax>>.
 
 [[fblangref-psql-statements-beginend]]
 === `BEGIN ... END`

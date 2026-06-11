@@ -471,26 +471,64 @@ END
 ====
 [source,sql]
 ----
-set term !;
+SET TERM !;
 
-recreate package pkg
-as
-begin
-    -- объявление публичной временной таблицы пакета
-    temporary table t_pub(
-        id integer
-    ) on commit preserve rows
-      index idx_t_pub_id (id);
+RECREATE PACKAGE PKG
+AS
+BEGIN
+  -- объявление публичной временной таблицы пакета
+  TEMPORARY TABLE T_PUB(
+    ID INTEGER
+  )
+  ON COMMIT PRESERVE ROWS
+  INDEX IDX_T_PUB_ID (ID);
 
-    procedure p1(n integer);
-    procedure p2 returns (n integer);
-end!
+  PROCEDURE P1(N INTEGER);
+  PROCEDURE P2 RETURNS (N INTEGER);
+END!
 
-set term ;!
+SET TERM ;!
 ----
 ====
 
-// TODO: Пример с агрегатной функций.
+.Создание заголовка пакета с агрегатными функциями
+[example]
+====
+[source,sql]
+----
+SET TERM !;
+
+CREATE PACKAGE PUBLIC.OPTIMIZER_UTILS
+AS
+BEGIN
+  /**
+   * Расчёт селективности конъюнктов предикатов (предикаты объединённые AND).
+   * Предикаты считаются некоррелированными.
+   * Общая селективность оценивается как произведения селективностей предикатов.
+   *
+   * Подход использовался в Firebird 5.0 и более ранних.
+   */
+  AGGREGATE FUNCTION CONJ_SELECTIVITY_FB50 (A_SELECTIVITY DOUBLE PRECISION)
+  RETURNS DOUBLE PRECISION;
+
+  /**
+   * Расчёт селективности конъюнктов предикатов (предикаты объединённые AND).
+   * Предикаты считаются частично коррелированными.
+   * Используется алгоритм Exponential backoff. Суть алгоритма в следующем:
+   * Предикаты сортируются по селективности от лучшей к худшей (меньшей к большей),
+   * а затем общая селективность рассчитывается по формуле:
+   *
+   * S = S1 * S2^1/2 * S3^1/4 ... SN^1/2N
+   *
+   * Подход используется начиная с Firebird 6.0.
+   */
+  AGGREGATE FUNCTION CONJ_SELECTIVITY_FB60 (A_SELECTIVITY DOUBLE PRECISION)
+  RETURNS DOUBLE PRECISION;
+END!
+
+SET TERM ;!
+----
+====
 
 .См. также:
 <<fblangref-ddl-package-body-create,CREATE PACKAGE BODY>>,
