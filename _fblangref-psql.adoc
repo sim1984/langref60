@@ -2602,21 +2602,21 @@ END
 Состояние пула внешних подключений можно запросить с использованием контекстных переменных в пространстве имен `SYSTEM`:
 
 .Переменные пространства имён SYSTEM для контроля пула внешних соединений
-[cols="<1,<3", options="header",stripes="none"]
+[cols="<2,<5", options="header",stripes="none"]
 |===
 ^| Переменная
 ^| Описание
 
-|EXT_CONN_POOL_SIZE
+|`EXT_CONN_POOL_SIZE`
 |Размер пула.
 
-|EXT_CONN_POOL_LIFETIME
+|`EXT_CONN_POOL_LIFETIME`
 |Время жизни неактивных соединений.
 
-|EXT_CONN_POOL_IDLE_COUNT
+|`EXT_CONN_POOL_IDLE_COUNT`
 |Текущее количество неактивных соединений в пуле.
 
-|EXT_CONN_POOL_ACTIVE_COUNT
+|`EXT_CONN_POOL_ACTIVE_COUNT`
 |Текущее количество активных соединений в пуле.
 |===
 
