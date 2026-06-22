@@ -309,7 +309,7 @@ DROP ROLE SELLERS;
 ====
 [source,sql]
 ----
-DROP ROLE [IF EXISTS] SELLERS;
+DROP ROLE IF EXISTS SELLERS;
 ----
 ====
 
