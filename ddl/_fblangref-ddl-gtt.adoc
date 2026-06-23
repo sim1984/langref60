@@ -50,13 +50,25 @@ WHERE t.rdb$field_name = 'RDB$RELATION_TYPE'
 (((CREATE GLOBAL TEMPORARY TABLE)))
 Глобальные временные таблицы создаются с помощью оператора `CREATE GLOBAL TEMPORARY TABLE`. Синтаксис этого оператор представлен ниже:
 
-.Синтаксис
+[[fblangref-ddl-gtt-create-syntax]]
+.Синтаксис создания глобальной временной таблицы
 [listing,subs=+quotes]
 ----
 CREATE GLOBAL TEMPORARY TABLE [IF NOT EXISTS] [ _tbl-schema_ <period> ] _tablename_
   (<column_def> [, {<column_def> | <table_constraint>} ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]
   [SQL SECURITY {DEFINER | INVOKER}]
+----
+
+[[fblangref-ddl-gtt-create-as-query-syntax]]
+.Синтаксис создания глобальной временной таблицы по результатам запроса
+[listing,subs=+quotes]
+----
+CREATE GLOBAL TEMPORARY TABLE [IF NOT EXISTS] [ _tbl-schema_ <period> ] _tablename_
+  [ (<column name> [, <column name> ...]) ]
+  AS <query expression>
+  [WITH [NO] DATA]
+  [ON COMMIT {DELETE | PRESERVE} ROWS]
 ----
 
 Полный синтаксис см. <<fblangref-ddl-table-create>>.
@@ -73,6 +85,50 @@ CREATE GLOBAL TEMPORARY TABLE [IF NOT EXISTS] [ _tbl-schema_ <period> ] _tablena
 В Firebird 2.x была ошибка: `COMMIT RETAINING` и `ROLLBACK RETAINING` делали записи не видимыми для текущей транзакции.
 Для возврата поведения 2.x установить параметр `ClearGTTAtRetaining` равным 1 в `firebird.conf`.
 ====
+
+=== Создание глобальных временных таблиц на основе результатов запроса
+
+Оператор `CREATE GLOBAL TEMPORARY TABLE` имеет специальную форму (см. <<fblangref-ddl-gtt-create-as-query-syntax>>) для создания таблицы по результатам запроса.
+
+Данная форма оператора `CREATE GLOBAL TEMPORARY TABLE` имеет необязательную опцию `WITH [NO] DATA`:
+
+* `WITH DATA` используется по умолчанию и вставляет результат запроса в новую таблицу, созданную в той же транзакции;
+* `WITH NO DATA` создает только определение таблицы.
+
+Для глобальных временных таблиц действуют обычные правила определения времени жизни данных во временных таблицах.
+
+См. также <<fblangref-ddl-table-create-as-query>>.
+
+==== Поведение в ISQL
+
+В режиме AUTODDL (по умолчанию) ISQL использует отдельные транзакции для операторов DDL и DML. При выполнении команды `CREATE TABLE ... AS <query>` с параметром `WITH DATA` создание таблицы и заполнение данными происходят в транзакции DDL.
+
+Для обычных таблиц вставленные строки не видны транзакции DML до тех пор, пока транзакция DDL не будет зафиксирована. Для временных таблиц `ON COMMIT DELETE ROWS` такое поведение еще более удивительно, поскольку строки относятся к транзакции DDL и, следовательно, вообще не видны транзакции DML. Для таблиц `ON COMMIT PRESERVE ROWS` поведение похоже на поведение `isql` с обычными таблицами.
+
+----
+SQL> CREATE GLOBAL TEMPORARY TABLE T1 AS SELECT 1 A FROM RDB$DATABASE;
+SQL> SELECT * FROM T1;
+
+SQL> COMMIT;
+SQL> SELECT * FROM T1;
+----
+
+Таблица существует, но строки не возвращаются, поскольку данные были вставлены в транзакции DDL и не видны транзакции DML.
+
+Чтобы избежать такого поведения, отключите AUTODDL перед выполнением оператора:
+
+----
+SQL> SET AUTODDL OFF;
+
+SQL> CREATE GLOBAL TEMPORARY TABLE T1 AS SELECT 1 A FROM RDB$DATABASE;
+SQL> SELECT * FROM T1;
+
+           A
+============
+           1
+----
+
+Когда функция AUTODDL отключена, создание таблицы и заполнение данных происходят в текущей транзакции, благодаря чему вставленные строки становятся сразу видимыми.
 
 [[fblangref-ddl-table-create-gtt-examples]]
 === Примеры
@@ -114,6 +170,18 @@ CREATE GLOBAL TEMPORARY TABLE APP.MYTXGTT (
     TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
 ----
 
+Создание временной таблицы на основе запроса.
+
+[source,sql]
+----
+CREATE GLOBAL TEMPORARY TABLE session_report
+AS
+SELECT emp_no, salary
+FROM employee
+WITH DATA
+ON COMMIT PRESERVE ROWS;
+----
+
 [[fblangref-ddl-gtt-alter]]
 == `ALTER TABLE` (GTT)
 
@@ -134,13 +202,23 @@ CREATE GLOBAL TEMPORARY TABLE APP.MYTXGTT (
 .Доступно в
 DSQL.
 
-.Синтаксис
+.Синтаксис пересоздания глобальной временной таблицы
 [listing,subs="+quotes"]
 ----
 RECREATE GLOBAL TEMPORARY TABLE [ _tbl-schema_ <period> ] _tablename_
   (<col_def> [, <col_def> | <tconstraint> ...])
   [ON COMMIT {DELETE | PRESERVE} ROWS]
   [SQL SECURITY {DEFINER | INVOKER}]
+----
+
+.Синтаксис пересоздания глобальной временной таблицы на основании результатов запроса
+[listing,subs="+quotes"]
+----
+RECREATE GLOBAL TEMPORARY TABLE [ _tbl-schema_ <period> ] _tablename_
+  [ (<column name> [, <column name> ...]) ]
+  AS <query expression>
+  [WITH [NO] DATA]
+  [ON COMMIT {DELETE | PRESERVE} ROWS]
 ----
 
 Полное описание определений столбцов и ограничений таблицы смотрите в разделе <<fblangref-ddl-table-create,CREATE TABLE>>.
@@ -152,6 +230,9 @@ RECREATE GLOBAL TEMPORARY TABLE [ _tbl-schema_ <period> ] _tablename_
 [[fblangref-ddl-gtt-recreate-examples]]
 === Примеры
 
+.Пересоздание глобальной временной таблицы
+[example]
+====
 [source,sql]
 ----
 RECREATE GLOBAL TEMPORARY TABLE MYTXGTT (
@@ -161,3 +242,18 @@ RECREATE GLOBAL TEMPORARY TABLE MYTXGTT (
     TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ----
+====
+
+.Пересоздание глобальной временной таблицы на основе результатов запроса
+[example]
+====
+[source,sql]
+----
+RECREATE GLOBAL TEMPORARY TABLE session_report
+AS
+SELECT emp_no, salary
+FROM employee
+WITH DATA
+ON COMMIT PRESERVE ROWS;
+----
+====

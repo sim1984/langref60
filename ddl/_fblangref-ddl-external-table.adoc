@@ -39,6 +39,7 @@
 
 [[fblangref-ddl-table-ext-create]]
 == CREATE TABLE (EXTERNAL)
+(((CREATE TABLE, EXTERNAL FILE)))
 
 Синтаксис создания внешней таблицы, с учётом всех ограничений для внешних таблиц выглядит следующим образом:
 
