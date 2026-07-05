@@ -2967,18 +2967,27 @@ union all
 (((SELECT, ORDER BY)))
 Результат выборки данных при выполнении оператора `SELECT` по умолчанию никак не упорядочивается (хотя довольно часто происходит упорядочение в хронологическом порядке помещения строк в таблицу операторами `INSERT`). Предложение `ORDER BY` позволяет задать необходимый порядок при выборке данных.
 
+[[fblangref-dml-select-orderby-syntax]]
 .Синтаксис
 [listing,subs=+quotes]
 ----
 SELECT ... FROM ...
 ...
-ORDER BY <ordering-item> [, <ordering-item> ...]
+ORDER BY <sort-specification-list>
 
-<ordering-item> ::=
-  {_col-name_ | _col-alias_ | _col-position_ | _expression_}
-  [COLLATE _collation-name_]
-  [ASC[ENDING] | DESC[ENDING]]
-  [NULLS {FIRST | LAST}]
+<sort-specification-list> ::=
+  <sort-specification [, <sort-specification> ...]
+
+<sort-specification> ::=
+  <value-expression> [<ordering-specification>] [<null-ordering>]
+
+<ordering-specification> ::=
+    ASC  | ASCENDING
+  | DESC | DESCENDING
+
+<null-ordering> ::=
+    NULLS FIRST
+  | NULLS LAST
 ----
 
 [[fblangref-dml-tbl-orderby]]
@@ -2988,20 +2997,9 @@ ORDER BY <ordering-item> [, <ordering-item> ...]
 ^| Параметр
 ^| Описание
 
-|col-name
-|Полное имя столбца.
+|value-expression
+|Выражение любого типа. Целочисленные литералы рассматривается как позиция столбца.
 
-|col-alias
-|Алиас (псевдоним) столбца.
-
-|col-position
-|Позиция столбца.
-
-|expression
-|Произвольное выражение.
-
-|collation-name
-|Имя сопоставления (порядка сортировки).
 |===
 
 В предложении через запятую перечисляются столбцы, по которым нужно упорядочить результирующий набор данных. Можно задавать имя столбца, псевдоним, присвоенный столбцу в списке выбора при помощи ключевого слова `AS`, или порядковый номер столбца в списке выбора. В одном предложении можно для разных столбцов смешивать форму записи. Например, один столбец в списке сортировки может быть задан своим именем, а другой порядковым номером.
