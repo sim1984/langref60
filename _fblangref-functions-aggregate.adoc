@@ -671,8 +671,9 @@ GROUP BY name
 
 К функциям упорядоченного набора относятся следующие:
 
-* `LISTAGG` или `LIST`
-* Функции обратного распределения `PERCENTILE_CONT` и `PERCENTILE_DISC`.
+* `LISTAGG` или `LIST`;
+* Функции обратного распределения `PERCENTILE_CONT` и `PERCENTILE_DISC`;
+* Функции гипотетического набора: `RANK`, `DENSE_RANK`, `PERCENT_RANK` и `CUME_DIST`.
 
 [[fblangref-aggfuncs-list]]
 === `LISTAGG() / LIST()`
@@ -1239,6 +1240,48 @@ DEPT_NO             MEDIAN_CONT           MEDIAN_DISC
 ====
 
 Пример использования `PERCENTILE_CONT` в качестве оконной функции см. <<fblangref-windowfuncs-ex-percentile-cont>>.
+
+[[fblangref-aggfuncs-hypotset]]
+== Функции гипотетического набора
+
+Функции гипотетических множеств включают функции ранжирования и распределения рангов, с которые существуют также в виде оконных функций (см. <<fblangref-windowfuncs-rankfuncs>>), но они применяются к группам для ввода значений в гипотетической форме.
+
+Существуют две функции ранжирования отсортированных множеств: `RANK` и `DENSE_RANK`. Также существуют две функции распределения рангов отсортированных множеств: `PERCENT_RANK` и `CUME_DIST`. Оконные функции и функции упорядоченных множеств различаются способом упорядочивания. Первые упорядочивают внутри окна, а вторые -- внутри группы.
+
+.Синтаксис агрегатных функций гипотетического множества
+[listing,subs=+quotes]
+----
+<hypothetical-set-agg-function> ::=
+      RANK(<args>) WITHIN GROUP (ORDER BY <sorted_args>)
+    | DENSE_RANK(<args>) WITHIN GROUP (ORDER BY <sorted_args>)
+    | PERCENT_RANK(<args>) WITHIN GROUP (ORDER BY <sorted_args>)
+    | CUME_DIST(<args>) WITHIN GROUP (ORDER BY <sorted_args>)
+----
+
+
+Каждый из агрегатов "`гипотетического множества`" связан с оконной функцией с тем же именем. В каждом случае результатом агрегата является значение, которое соответствующая оконная функция вернула бы для "`гипотетической`" строки, построенной на основе `args`, если бы такая строка была добавлена ​​к отсортированной группе строк, представленной `sorted_args`. Для каждой из этих функций список прямых аргументов, заданных в `args`, должен соответствовать количеству и типам агрегируемых аргументов, заданных в `sorted_args`. В отличие от большинства встроенных агрегатов, эти агрегаты не являются строгими, то есть они не удаляют входные строки, содержащие значения `NULL`. Значения `NULL` сортируются в соответствии с правилом, указанным в предложении `ORDER BY`.
+
+Значения входных аргументов `args` должны быть постоянными внутри каждой группы.
+
+[[fblangref-aggfuncs-hypotset-rank]]
+=== `RANK()`
+
+// TODO: написать
+
+[[fblangref-aggfuncs-hypotset-dense-rank]]
+=== `DENSE_RANK()`
+
+// TODO: написать
+
+[[fblangref-aggfuncs-hypotset-percent-rank]]
+=== `PERCENT_RANK()`
+
+// TODO: написать
+
+[[fblangref-aggfuncs-hypotset-cume-dist]]
+=== `CUME_DIST()`
+
+// TODO: написать
 
 [[fblangref-aggfuncs-stats]]
 == Статистические функции
