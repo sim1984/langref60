@@ -216,7 +216,7 @@ RECREATE GLOBAL TEMPORARY TABLE [ _tbl-schema_ <period> ] _tablename_
 ----
 RECREATE GLOBAL TEMPORARY TABLE [ _tbl-schema_ <period> ] _tablename_
   [ (<column name> [, <column name> ...]) ]
-  AS <query expression>
+  AS { <query expression> | ( <query expression> ) }
   [WITH [NO] DATA]
   [ON COMMIT {DELETE | PRESERVE} ROWS]
 ----

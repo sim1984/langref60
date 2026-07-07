@@ -174,7 +174,7 @@ CREATE LOCAL TEMPORARY TABLE [IF NOT EXISTS] [ _tbl-schema_ <period> ] _tablenam
 ----
 CREATE LOCAL TEMPORARY TABLE [IF NOT EXISTS] [ _tbl-schema_ <period> ] _tablename_
   [ (<column name> [, <column name> ...]) ]
-  AS <query expression>
+  AS { <query expression> | ( <query expression> ) }
   [WITH [NO] DATA]
   [ON COMMIT {DELETE | PRESERVE} ROWS]
 ----
