@@ -1619,6 +1619,294 @@ END
 
 Подробнее о написании тела агрегатной функции и модели её исполнения см. в <<fblangref-psql-function-agg-syntax>>.
 
+[[fblangref-psql-statements-declare-temp-table]]
+=== `DECLARE LOCAL TEMPORARY TABLE`
+
+.Назначение
+Объявление локальной временной таблицы.
+(((DECLARE LOCAL TEMPORARY TABLE))) (((DECLARE TEMPORARY TABLE)))
+
+.Доступно в
+PSQL
+
+.Синтаксис
+[listing,subs="+quotes,macros,attributes"]
+----
+DECLARE [LOCAL] TEMPORARY TABLE <table_name>
+(
+    <column_definition> [, ...]
+);
+----
+
+Firebird поддерживает объявление локальных временных таблиц (`DECLARE LOCAL TEMPORARY TABLE` или DLTT) внутри блоков PSQL, процедур, функций и триггеров.
+
+Объявленные локальные временные таблицы являются локальными для скомпилированного объекта PSQL или блока `EXECUTE BLOCK`. Они не хранятся в метаданных базы данных и не требуют предложения `ON COMMIT`. Их данные ограничены текущим кадром выполнения.
+
+Объявленные локальные временные таблицы полезны для временных промежуточных данных, которые не должны быть доступны через метаданные базы данных и должны автоматически изолироваться для каждого кадра выполнения PSQL.
+
+Объявленные локальные временные таблицы могут использоваться обычными операторами DML, скомпилированными в той же области видимости PSQL (`SELECT`, `INSERT`, `UPDATE`, `DELETE` и др.). Они могут использоваться в подзапросах, объединениях и циклах курсора, как и другие источники записей.
+
+==== Особенности объявленных локальных временных таблиц
+
+* Объявленные локальные временные таблицы имеют область видимости данных в пределах кадра выполнения.
+* Структура таблицы является частью скомпилированного оператора PSQL, процедуры, функции или триггера.
+* Данные таблицы являются частными для текущего кадра выполнения.
+* Данные удаляются после завершения этого кадра выполнения.
+* Фиксация или откат транзакции не определяют время жизни таблицы; отсутствует поведение `ON COMMIT`.
+* Автономный блок транзакций внутри того же кадра выполнения видит те же данные.
+* Локальные подпрограммы могут обращаться к объявленным локальным временным таблицам из области видимости содержащего их PSQL. Они видят и изменяют данные текущего содержащего их кадра выполнения.
+* Локальные подпрограммы также могут объявлять свои собственные локальные временные таблицы. Данные этих таблиц имеют область видимости кадра выполнения подпрограммы.
+* Рекурсивные вызовы повторно используют ту же скомпилированную структуру таблицы, но каждый рекурсивный кадр выполнения имеет отдельные данные.
+
+==== Область видимости и разрешение имён
+
+Объявленные локальные временные таблицы видны только операторам SQL, внутри области видимости PSQL объекта, в котором объявлена таблица, и его локальным подпрограммам.
+
+* Неквалифицированные ссылки на объявленное имя разрешаются в объявленную локальную таблицу.
+* Операторы SQL в локальных подпрограммах также могут ссылаться на объявленные локальные временные таблицы из содержащей их области видимости PSQL.
+* Объявленное имя не может быть квалифицировано по схеме или пакету.
+* Таблица отсутствует в `RDB$RELATIONS`, `RDB$RELATION_FIELDS`, метаданных мониторинга или других постоянных метаданных.
+* Динамический SQL, включая `EXECUTE STATEMENT`, анализируется отдельно и не видит объявленные локальные временные таблицы.
+
+Имя локальной таблицы использует то же пространство имен, что и другие локальные имена. Оно не может дублировать входной параметр, выходной параметр, локальную переменную, курсор или другую объявленную локальную таблицу в той же области видимости.
+
+==== Ограничения
+
+Объявленные локальные временные таблицы намеренно поддерживают небольшую часть возможностей определения таблиц.
+
+Ограничения на определения столбцов:
+
+* Значения по умолчанию (`DEFAULT`) не поддерживаются.
+* Столбцы `COMPUTED BY` не поддерживаются.
+* Столбцы `IDENTITY` не поддерживаются.
+* Столбцы-массивы не поддерживаются.
+* Ограничение `NOT NULL` на уровне поля поддерживается, но только в качестве безымянного ограничения.
+
+Ограничения уровня таблицы и столбцов не поддерживаются:
+
+* Первичные ключи (`PRIMARY KEY`) не поддерживаются;
+* Внешние ключи (`FOREIGN KEY`) не поддерживаются;
+* Ограничение уникальности (`UNIQUE`) не поддерживаются;
+* Ограничения проверки (`CHECK`) не поддерживаются;
+* Именованные ограничения (`CONSTRAINT`) не поддерживаются.
+
+Другие ограничения:
+
+* Один оператор PSQL, процедура, функция или триггер могут объявить не более 1024 локальных временных таблиц;
+* Индексы не поддерживаются;
+* Триггеры на объявленных локальных временных таблицах не поддерживаются;
+* Явные привилегии не поддерживаются;
+* Функции `ALTER TABLE`, `DROP TABLE`, `CREATE INDEX`, `ALTER INDEX` и `DROP INDEX` недопустимы для объявленных локальных временных таблиц;
+* Объявленные локальные временные таблицы не могут быть использованы в качестве ссылок постоянными метаданными объектами вне объекта PSQL, в котором они объявлены.
+
+==== Примеры использования
+
+.Использование объявленной временной талицы в `EXECUTE BLOCK`
+[example]
+====
+[source,sql]
+----
+SET TERM !;
+
+EXECUTE BLOCK RETURNS (N INTEGER)
+AS
+    DECLARE LOCAL TEMPORARY TABLE T (
+        ID INTEGER NOT NULL,
+        VAL VARCHAR(20)
+    );
+BEGIN
+    INSERT INTO T(ID, VAL) VALUES (1, 'a');
+    INSERT INTO T(ID, VAL) VALUES (2, 'b');
+
+    UPDATE T SET ID = ID + 10 WHERE ID = 1;
+    DELETE FROM T WHERE ID = 2;
+
+    SELECT COUNT(*) FROM T INTO N;
+    SUSPEND;
+END!
+
+SET TERM ;!
+----
+====
+
+.Использование объявленной временной талицы в процедуре
+[example]
+====
+[source,sql]
+----
+SET TERM !;
+
+CREATE PROCEDURE P_COUNT_VALUES RETURNS (N INTEGER)
+AS
+    DECLARE LOCAL TEMPORARY TABLE T (
+        ID INTEGER NOT NULL
+    );
+BEGIN
+    INSERT INTO T(ID) VALUES (1);
+    INSERT INTO T(ID) VALUES (2);
+
+    SELECT COUNT(*) FROM T INTO N;
+    SUSPEND;
+END!
+
+SET TERM ;!
+----
+====
+
+.Использование объявленной временной талицы в рекурсивной процедуре
+[example]
+====
+[source,sql]
+----
+SET TERM !;
+
+CREATE PROCEDURE P_LTT_REC(D INTEGER)
+    RETURNS (DEPTH INTEGER, CNT_BEFORE INTEGER, CNT_AFTER INTEGER)
+AS
+    DECLARE LOCAL TEMPORARY TABLE T (
+        ID INTEGER
+    );
+BEGIN
+    INSERT INTO T VALUES (:D);
+    SELECT COUNT(*) FROM T INTO CNT_BEFORE;
+
+    IF (D > 0) THEN
+    BEGIN
+        FOR
+            SELECT DEPTH, CNT_BEFORE, CNT_AFTER
+            FROM P_LTT_REC(:D - 1)
+            INTO DEPTH, CNT_BEFORE, CNT_AFTER
+        DO
+            SUSPEND;
+    END
+
+    SELECT COUNT(*) FROM T INTO CNT_AFTER;
+    DEPTH = D;
+    SUSPEND;
+END!
+
+SET TERM ;!
+----
+
+Каждая строка, возвращаемая процедурой `P_LTT_REC(2)`, сообщает `CNT_BEFORE = 1` и `CNT_AFTER = 1`, потому что каждый рекурсивный кадр имеет свои собственные табличные данные.
+====
+
+.Использование объявленной временной талицы с автономной транзакцией
+[example]
+====
+[source,sql]
+----
+SET TERM !;
+
+EXECUTE BLOCK RETURNS (N INTEGER)
+AS
+    DECLARE LOCAL TEMPORARY TABLE T (
+        ID INTEGER
+    );
+BEGIN
+    INSERT INTO T VALUES (10);
+
+    IN AUTONOMOUS TRANSACTION DO
+    BEGIN
+        SELECT COUNT(*) FROM T INTO N;
+    END
+
+    SUSPEND;
+END!
+
+SET TERM ;!
+----
+
+Блок автономной транзакции видит строку, вставленную родительским кадром выполнения.
+====
+
+.Использование объявленной временной талицы с локальными подпрограммами
+[example]
+====
+[source,sql]
+----
+SET TERM !;
+
+EXECUTE BLOCK RETURNS (N INTEGER, S INTEGER)
+AS
+    DECLARE LOCAL TEMPORARY TABLE T (
+        ID INTEGER
+    );
+
+    DECLARE PROCEDURE P_ADD(V INTEGER)
+    AS
+    BEGIN
+        INSERT INTO T VALUES (:V);
+    END
+
+    DECLARE FUNCTION F_COUNT RETURNS INTEGER
+    AS
+        DECLARE VARIABLE RET INTEGER;
+    BEGIN
+        SELECT COUNT(*) FROM T INTO RET;
+        RETURN RET;
+    END
+BEGIN
+    INSERT INTO T VALUES (1);
+    EXECUTE PROCEDURE P_ADD(2);
+
+    N = F_COUNT();
+    SELECT SUM(ID) FROM T INTO S;
+    SUSPEND;
+END!
+
+SET TERM ;!
+----
+
+Локальные процедуры и функции, объявленные внешним блоком `EXECUTE BLOCK`, используют тот же набор строк, что и текущий внешний фрейм выполнения.
+====
+
+.Использование объявленной временной талицы с пользовательской агрегатной функцией
+[example]
+====
+[source,sql]
+----
+SET TERM !;
+
+CREATE AGGREGATE FUNCTION AGG_LAST_VALUE_BY_DATE (
+  A_VALUE BIGINT,
+  A_DATE TIMESTAMP
+)
+RETURNS BIGINT
+AS
+  DECLARE LOCAL TEMPORARY TABLE X_T (
+    VALUE_FIELD BIGINT,
+    DATE_FIELD TIMESTAMP
+  );
+
+  DECLARE RET_VALUE BIGINT;
+BEGIN
+  ON ACCUMULATE DO
+    INSERT INTO X_T (VALUE_FIELD, DATE_FIELD)
+    VALUES (:A_VALUE, :A_DATE);
+
+  ON GROUP DO
+  BEGIN
+    SELECT
+      X_T.VALUE_FIELD
+    FROM X_T
+    ORDER BY X_T.DATE_FIELD DESC
+    FETCH FIRST ROW ONLY
+    INTO RET_VALUE;
+
+    RETURN RET_VALUE;
+  END
+END!
+
+SET TERM ;!
+
+SELECT
+  CODE_HORSE,
+  AGG_LAST_VALUE_BY_DATE(CODE_FARM, BYDATE) AS LAST_CODE_FARM
+FROM REGISTER_VIEW
+GROUP BY CODE_HORSE;
+----
+
 [[fblangref-psql-statements-beginend]]
 === `BEGIN ... END`
 

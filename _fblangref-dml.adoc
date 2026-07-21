@@ -6226,6 +6226,8 @@ DO <sql_command>
 
 <local_declaration> ::=
     <declare variable>
+  | <declare cursor>
+  | <declare local temporary table>
   | <subproc-declaration>
   | <subproc-implementation>
   | <subfunc-declaration>

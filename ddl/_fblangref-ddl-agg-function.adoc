@@ -184,11 +184,12 @@ ALTER DATABASE SET DEFAULT SQL SECURITY {DEFINER | INVOKER}
 [[fblangref-ddl-function-agg-create-declare]]
 ==== Объявление локальных переменных, курсоров и подпрограмм
 
-В необязательной секции `<declarations>` описаны локальные переменные функции, именованные курсоры и подпрограммы (декларируемые процедуры и функции). Локальные переменные подчиняются тем же правилам, что и входные параметры функции в отношении спецификации типа данных. Подробности вы можете посмотреть в главе "`Процедурный язык PSQL`" в разделах <<fblangref-psql-statements-declare-var>> и
+В необязательной секции `<declarations>` описаны локальные переменные функции, именованные курсоры, подпрограммы (декларируемые процедуры и функции) и локальные временные таблицы. Локальные переменные подчиняются тем же правилам, что и входные параметры функции в отношении спецификации типа данных. Подробности вы можете посмотреть в главе "`Процедурный язык PSQL`" в разделах <<fblangref-psql-statements-declare-var>>,
 <<fblangref-psql-statements-declare-cursor>>,
 <<fblangref-psql-statements-declare-procedure>>,
 <<fblangref-psql-statements-declare-function>>,
-<<fblangref-psql-statements-declare-agg-function>>.
+<<fblangref-psql-statements-declare-agg-function>>,
+<<fblangref-psql-statements-declare-temp-table>>.
 
 
 [[fblangref-ddl-function-agg-create-begin-end]]
