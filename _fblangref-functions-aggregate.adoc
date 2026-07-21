@@ -471,6 +471,7 @@ SELECT LISTAGG (ALL COL4, ':')
 FROM TEST_T;
 ----
 
+[listing,subs="+quotes"]
 ----
 =======
 J:I:L:K
@@ -482,6 +483,7 @@ SELECT LISTAGG (DISTINCT COL4, ':')
 FROM TEST_T;
 ----
 
+[listing]
 ----
 ========
 I:J:K:L
@@ -495,8 +497,9 @@ SELECT LISTAGG (DISTINCT COL3, ':')
 FROM TEST_T;
 ----
 
+[listing]
 ----
-====
+=====
 A:B
 ----
 
@@ -507,8 +510,9 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
-====
+=====
 A:B
 ----
 
@@ -519,8 +523,9 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
-====
+=====
 B:A
 ----
 
@@ -533,8 +538,9 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
-====
+=====
 B:A
 ----
 
@@ -547,8 +553,9 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
-====
+=====
 A:B
 ----
 
@@ -561,8 +568,9 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
-====
+=====
 A:B
 ----
 
@@ -573,8 +581,9 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
-====
+=====
 A:B
 ----
 
@@ -587,6 +596,7 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
 =======
 B:D:A:C
@@ -599,6 +609,7 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
 =======
 D:B:C:A
@@ -611,6 +622,7 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
 =======
 C:A:D:B
@@ -625,6 +637,7 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
 =======
 J:L:I:K
@@ -637,6 +650,7 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
 ======
 I:K:J:L
@@ -649,8 +663,9 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
-===
+=====
 A:B
 ----
 
@@ -665,6 +680,7 @@ SELECT LISTAGG (ALL COL2, ':') WITHIN GROUP (ORDER BY COL3)
 FROM TEST_T;
 ----
 
+[listing]
 ----
 ===========
 E:A:C:B:D:F
@@ -677,6 +693,7 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
 ===========
 A:C:B:D:F:E
@@ -689,6 +706,7 @@ SELECT
 FROM TEST_T;
 ----
 
+[listing]
 ----
 ===========
 E:B:C:D:F:A

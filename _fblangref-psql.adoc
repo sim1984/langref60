@@ -1906,6 +1906,7 @@ SELECT
 FROM REGISTER_VIEW
 GROUP BY CODE_HORSE;
 ----
+====
 
 [[fblangref-psql-statements-beginend]]
 === `BEGIN ... END`
@@ -2038,7 +2039,6 @@ IF (<condition>)
 ****
 PSQL не обеспечивает более сложных переходов с несколькими ветвями, таких как `CASE` или `SWITCH`. Однако можно объединить операторы `IF ... THEN ... ELSE` в цепочку, см. раздел примеров ниже. В качестве альтернативы, оператор `CASE` из DSQL доступен в PSQL и может удовлетворить по крайней мере некоторые варианты использования в виде switch:
 
-
 [listing]
 ----
 CASE <test_expr>
@@ -2055,8 +2055,6 @@ END
 ----
 
 .Использования `CASE` в PSQL.
-[example]
-====
 [source,sql]
 ----
 ...
@@ -2067,7 +2065,6 @@ C = CASE
     END;
 ...
 ----
-====
 ****
 
 [[fblangref-psql-ifthen-exmpl]]
