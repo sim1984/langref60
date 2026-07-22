@@ -22,7 +22,7 @@ font:
       bold: NotoSans-Bold.ttf
       italic: NotoSans-Italic.ttf
       bold_italic: NotoSans-BoldItalic.ttf
-base-font-size: 12
+base-font-size: 11
 base:
   align: justify
 firebird:
@@ -34,7 +34,7 @@ firebird:
 link:
   font_color: $firebird_color_darkblue
 codespan:
-  font_color: '#000000'
+  font_color: null
 heading:
   font_family: Noto Sans
   font_color: $firebird_color_blue
@@ -52,11 +52,13 @@ title_page:
 code:
   background_color: $firebird_color_light_yellow
   border_color: $firebird_color_light_yellow
-  font-size: 10
+  font-size: 8
 source:
   background_color: $firebird_color_light_yellow
   border_color: $firebird_color_light_yellow
-  font-size: 10
+  font-size: 8
+outline_list:
+  item_spacing: 1
 header:
   border_color: dddddd
   border_width: 0.25

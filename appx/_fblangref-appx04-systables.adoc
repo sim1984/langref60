@@ -717,15 +717,15 @@
 
 На столбцы `RDB$FIELDS.RDB$SCHEMA_NAME` и `RDB$FIELDS.RDB$FIELD_NAME` ссылаются:
 
-* столбцы `RDB$SCHEMA_NAME` и `RDB$FIELD_NAME` в таблице <<fblangref-systables-field_dimensions,`RDB$FIELD_DIMENSIONS`>>
-* столбцы `RDB$FIELD_SOURCE_SCHEMA_NAME` и `RDB$FIELD_SOURCE` в таблице <<fblangref-systables-function_arguments,`RDB$FUNCTION_ARGUMENTS`>>
-* столбцы `RDB$FIELD_SOURCE_SCHEMA_NAME` и `RDB$FIELD_SOURCE` в таблице <<fblangref-systables-procedure_parameters,`RDB$PROCEDURE_PARAMETERS`>>
-* столбцы `RDB$FIELD_SOURCE_SCHEMA_NAME` и `RDB$FIELD_SOURCE` в таблице <<fblangref-systables-relation_fields,`RDB$RELATION_FIELDS`>>
+* столбцы `RDB$SCHEMA_NAME` и `RDB$FIELD_NAME` в <<fblangref-systables-field_dimensions,`RDB$FIELD_DIMENSIONS`>>
+* столбцы `RDB$FIELD_SOURCE_SCHEMA_NAME` и `RDB$FIELD_SOURCE` в <<fblangref-systables-function_arguments,`RDB$FUNCTION_ARGUMENTS`>>
+* столбцы `RDB$FIELD_SOURCE_SCHEMA_NAME` и `RDB$FIELD_SOURCE` в <<fblangref-systables-procedure_parameters,`RDB$PROCEDURE_PARAMETERS`>>
+* столбцы `RDB$FIELD_SOURCE_SCHEMA_NAME` и `RDB$FIELD_SOURCE` в <<fblangref-systables-relation_fields,`RDB$RELATION_FIELDS`>>
 
 .Описание столбцов таблицы `RDB$FIELDS`
-[cols="<4m,<3m,<5a", frame="all", options="header",stripes="none"]
+[cols="<3m,<3m,<6a", frame="all", options="header",stripes="none"]
 |===
-^| Наименование столбца
+^| Наименование
 ^| Тип данных
 ^| Описание
 
@@ -782,24 +782,24 @@
 |SMALLINT
 |Код типа данных для столбца:
 
-[horizontal.compact]
-`7`:: `SMALLINT`
-`8`:: `INTEGER`
-`10`:: `FLOAT`
-`12`:: `DATE`
-`13`:: `TIME WITHOUT TIME ZONE`
-`14`:: `CHAR` или `BINARY`
-`16`:: `BIGINT`
-`23`:: `BOOLEAN`
-`24`:: `DECFLOAT(16)`
-`25`:: `DECFLOAT(34)`
-`26`:: `INT128`
-`27`:: `DOUBLE PRECISION`
-`28`:: `TIME WITH TIME ZONE`
-`29`:: `TIMESTAMP WITH TIME ZONE`
-`35`:: `TIMESTAMP WITHOUT TIME ZONE`
-`37`:: `VARCHAR` или `VARBINARY`
-`261`:: `BLOB`
+[options="compact"]
+* `7` - `SMALLINT`
+* `8` - `INTEGER`
+* `10` - `FLOAT`
+* `12` - `DATE`
+* `13` - `TIME WITHOUT TIME ZONE`
+* `14` - `CHAR` или `BINARY`
+* `16` - `BIGINT`
+* `23` - `BOOLEAN`
+* `24` - `DECFLOAT(16)`
+* `25` - `DECFLOAT(34)`
+* `26` - `INT128`
+* `27` - `DOUBLE PRECISION`
+* `28` - `TIME WITH TIME ZONE`
+* `29` - `TIMESTAMP WITH TIME ZONE`
+* `35` - `TIMESTAMP WITHOUT TIME ZONE`
+* `37` - `VARCHAR` или `VARBINARY`
+* `261` - `BLOB`
 
 См. также описание столбца `RDB$FIELD_SUB_TYPE`
 
@@ -809,41 +809,40 @@
 
 Подтипы для `BLOB`:
 
-[horizontal.compact]
-`0`:: `BINARY` (бинарный)
-`1`:: `TEXT` (текстовый)
-`2`:: `BLR`
-`3`:: `ACL`
-`4`:: `RANGES`
-`5`:: `SUMMARY`
-`6`:: `FORMAT` -- закодированное описание метаданных таблицы
-`7`:: `TRANSACTION_DESCRIPTION`
-`8`:: `EXTERNAL_FILE_DESCRIPTION`
-`9`:: `DEBUG_INFORMATION`
-`>9`:: зарезервировано для внутреннего или будущего использования Firebird
-`<0`:: пользовательские подтипы BLOB
+[options="compact"]
+* `0` - `BINARY` (бинарный)
+* `1` - `TEXT` (текстовый)
+* `2` - `BLR`
+* `3` - `ACL`
+* `4` - `RANGES`
+* `5` - `SUMMARY`
+* `6` - `FORMAT` -- описание метаданных таблицы
+* `7` - `TRANSACTION_DESCRIPTION`
+* `8` - `EXTERNAL_FILE_DESCRIPTION`
+* `9` - `DEBUG_INFORMATION`
+* `>9` - зарезервировано для будущего использования Firebird
+* `<0` - пользовательские подтипы BLOB
 
 Для целочисленных типов данных (`SMALLINT`, `INTEGER`, `BIGINT`, `INT128`), и `DOUBLE PRECISION` (в первом диалекте):
 
-[horizontal.compact]
-`0`:: (или `NULL`) без подтипа -- тип данных определяется `RDB$FIELD_TYPE`. +
+[options="compact"]
+* `0` - (или `NULL`) без подтипа -- тип данных определяется `RDB$FIELD_TYPE`. +
 Если `RDB$FIELD_SCALE` не равен нулю, то обрабатывается как `NUMERIC`.
-`1`:: `NUMERIC`
-`2`:: `DECIMAL`
+* `1` - `NUMERIC`
+* `2` - `DECIMAL`
 
 Для `CHAR` и `VARCHAR`:
 
-[horizontal.compact]
-`0`:: (или `NULL`) без подтипа -- тип данных определяется `RDB$FIELD_TYPE`
-`1`:: `BINARY`/`VARBINARY`
-`>1`:: не типизированный -- тип данных определяется `RDB$FIELD_TYPE`.
-+
+[options="compact"]
+* `0` - (или `NULL`) без подтипа -- тип данных определяется `RDB$FIELD_TYPE`
+* `1` - `BINARY`/`VARBINARY`
+* `>1` - не типизированный -- тип данных определяется `RDB$FIELD_TYPE`. +
 Внутреннее использование для системных доменов, связанных с кодировкой символов.
 
 Для других типов данных:
 
-[horizontal.compact]
-`0`:: (или `NULL`) без подтипа -- тип данных определяется `RDB$FIELD_TYPE`
+[options="compact"]
+* `0` - (или `NULL`) без подтипа -- тип данных определяется `RDB$FIELD_TYPE`
 
 |RDB$MISSING_VALUE
 |BLOB SUB_TYPE BLR
@@ -861,9 +860,9 @@
 |SMALLINT
 |Флаг
 
-[horizontal.compact]
-`0`:: (или `NULL`) домен определён пользователем
-`1`:: системный домен
+[options="compact"]
+* `0` - (или `NULL`) домен определён пользователем
+* `1` - системный домен
 
 |RDB$QUERY_HEADER
 |BLOB SUB_TYPE TEXT CHARACTER SET UTF8
@@ -903,9 +902,9 @@
 |SMALLINT
 |Указывает, может ли домен принимать значение `NULL`
 
-[horizontal.compact]
-`0`:: (или `NULL`) `NULL` значения допускаются
-`1`:: `NULL` не допускается
+[options="compact"]
+* `0` - (или `NULL`) `NULL` значения допускаются
+* `1` - `NULL` не допускается
 
 |RDB$CHARACTER_LENGTH
 |SMALLINT

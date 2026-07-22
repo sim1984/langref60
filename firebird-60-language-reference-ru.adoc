@@ -11,6 +11,7 @@
 :icons: font
 :experimental:
 :lang: ru
+:compact-mode: true
 ifdef::backend-pdf[]
 :source-highlighter: coderay
 endif::[]
