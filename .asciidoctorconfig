@@ -1,3 +1,4 @@
+:doctype: book
 :encoding: utf-8
 :numbered:
 :stylesdir: {asciidoctorconfigdir}/theme/firebird-html
@@ -5,6 +6,8 @@
 :pdf-fontsdir: {asciidoctorconfigdir}/theme/fonts
 :pdf-themesdir: {asciidoctorconfigdir}/theme/firebird-pdf
 :pdf-theme: firebird
+:experimental:
+:icons: font
 :appendix-caption: Приложение
 :appendix-refsig: {appendix-caption}
 :caution-caption: Внимание

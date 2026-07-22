@@ -707,22 +707,23 @@
 
 |RDB$SCHEMA_NAME
 |CHAR(63) CHARACTER SET UTF8
-|Имя схемы в которой располагается домен.
+|Имя схемы, в которой располагается домен.
 |===
 
 [[fblangref-systables-fields]]
 == `RDB$FIELDS`
 
-Характеристики столбцов и доменов, как системных, так и созданных пользователем. В этой таблице хранятся подробности атрибутов всех столбцов.
+В таблице `RDB$FIELDS` хранятся определения именованных и сгенерированных системой доменов. В этой таблице хранится информация о типах доменов, столбцов и параметров. Столбцы и параметры могут иметь переопределяющую или более специфичную информацию о типах в своих собственных системных таблицах.
 
-[NOTE]
-====
-Обратите внимание! Столбец `RDB$FIELDS.RDB$FIELD_NAME` ссылается на `RDB$RELATION_FIELDS.RDB$FIELD_SOURCE`, но не на `RDB$RELATION_FIELDS.RDB$FIELD_NAME`.
-====
+На столбцы `RDB$FIELDS.RDB$SCHEMA_NAME` и `RDB$FIELDS.RDB$FIELD_NAME` ссылаются:
 
+* столбцы `RDB$SCHEMA_NAME` и `RDB$FIELD_NAME` в таблице <<fblangref-systables-field_dimensions,`RDB$FIELD_DIMENSIONS`>>
+* столбцы `RDB$FIELD_SOURCE_SCHEMA_NAME` и `RDB$FIELD_SOURCE` в таблице <<fblangref-systables-function_arguments,`RDB$FUNCTION_ARGUMENTS`>>
+* столбцы `RDB$FIELD_SOURCE_SCHEMA_NAME` и `RDB$FIELD_SOURCE` в таблице <<fblangref-systables-procedure_parameters,`RDB$PROCEDURE_PARAMETERS`>>
+* столбцы `RDB$FIELD_SOURCE_SCHEMA_NAME` и `RDB$FIELD_SOURCE` в таблице <<fblangref-systables-relation_fields,`RDB$RELATION_FIELDS`>>
 
 .Описание столбцов таблицы `RDB$FIELDS`
-[cols="<4m,<3m,<5", frame="all", options="header",stripes="none"]
+[cols="<4m,<3m,<5a", frame="all", options="header",stripes="none"]
 |===
 ^| Наименование столбца
 ^| Тип данных
@@ -730,7 +731,7 @@
 
 |RDB$FIELD_NAME
 |CHAR(63) CHARACTER SET UTF8
-|Имя домена, созданного пользователем, или домена, автоматически построенного ядром Firebird для столбца таблицы. Во втором случае имя будет начинаться с символов `RDB$`.
+|Имя домена, созданного пользователем, или домена, автоматически построенного  Firebird для столбца таблицы. Имя доменов сгенерированных системой начинаться с символов `RDB$`.
 
 |RDB$QUERY_NAME
 |CHAR(63) CHARACTER SET UTF8
@@ -764,64 +765,85 @@
 |SMALLINT
 |Размер столбца в байтах.
 
-`FLOAT`, `DATE`, `TIME`, `INTEGER` занимают 4 байта.
-
-`DOUBLE PRECISION`, `BIGINT`, `TIMESTAMP` и идентификатор `BLOB` -- 8 байтов.
-
-Для типов данных `CHAR` и `VARCHAR` столбец задаёт максимальное количество байтов, указанное при объявлении строкового домена (столбца).
+`BOOLEAN` занимает 1 байт. +
+`FLOAT`, `DATE`, `TIME`, `INTEGER` занимают 4 байта. +
+`DOUBLE PRECISION`, `BIGINT`, `TIMESTAMP`, `TIME WITH TIME ZONE`, `DECFLOAT(16)` и `BLOB` занимают 8 байтов. +
+`TIMESTAMP WITH TIME ZONE` занимает 12 байт. +
+`INT128` и `DECFLOAT(34)` занимают 16 байт. +
+Для `CHAR` и `VARCHAR` указывает максимальное количество байтов, которое может вместится в этот тип (зависит от объявленного размера и кодировки символов).
 
 |RDB$FIELD_SCALE
 |SMALLINT
-|Отрицательное число задаёт масштаб для столбцов `DECIMAL` и `NUMERIC` -- количество дробных знаков после десятичной точки.
+|Задаёт масштаб для доменов типа  `DECIMAL` и `NUMERIC`.
+
+Например, для `NUMERIC(p,s)` значение равно `-1 * s`, где `s` -- количество цифр после запятой.
 
 |RDB$FIELD_TYPE
 |SMALLINT
 |Код типа данных для столбца:
 
-7 -- `SMALLINT`; +
-8 -- `INTEGER`; +
-10 -- `FLOAT`; +
-12 -- `DATE`; +
-13 -- `TIME WITHOUT TIME ZONE`; +
-14 -- `CHAR` или `BINARY`; +
-16 -- `BIGINT`; +
-23 -- `BOOLEAN`; +
-24 -- `DECFLOAT(16)`; +
-25 -- `DECFLOAT(34)`; +
-26 -- `INT128`; +
-27 -- `DOUBLE PRECISION`; +
-28 -- `TIME WITH TIME ZONE`; +
-29 -- `TIMESTAMP WITH TIME ZONE`; +
-35 -- `TIMESTAMP WITHOUT TIME ZONE`; +
-37 -- `VARCHAR` или `VARBINARY`; +
-261 -- `BLOB`.
+[horizontal.compact]
+`7`:: `SMALLINT`
+`8`:: `INTEGER`
+`10`:: `FLOAT`
+`12`:: `DATE`
+`13`:: `TIME WITHOUT TIME ZONE`
+`14`:: `CHAR` или `BINARY`
+`16`:: `BIGINT`
+`23`:: `BOOLEAN`
+`24`:: `DECFLOAT(16)`
+`25`:: `DECFLOAT(34)`
+`26`:: `INT128`
+`27`:: `DOUBLE PRECISION`
+`28`:: `TIME WITH TIME ZONE`
+`29`:: `TIMESTAMP WITH TIME ZONE`
+`35`:: `TIMESTAMP WITHOUT TIME ZONE`
+`37`:: `VARCHAR` или `VARBINARY`
+`261`:: `BLOB`
 
-Коды для `DECIMAL` и `NUMERIC` имеют тот же размер, что и целые типы, используемые для их хранения.
-
-Для типов `BINARY`, `VARBINARY` поле `RDB$FIELD_SUB_TYPE = 0`, для `CHAR` и `VARCHAR` поле `RDB$FIELD_SUB_TYPE = 1`.
+См. также описание столбца `RDB$FIELD_SUB_TYPE`
 
 |RDB$FIELD_SUB_TYPE
 |SMALLINT
-|Для типа данных `BLOB` задаёт подтип:
+|Подтип для типа данных:
 
-0 -- не определён; +
-1 -- текст; +
-2 -- BLR; +
-3 -- список управления доступом (ACL); +
-4 -- резервируется для дальнейшего использования; +
-5 -- кодированное описание метаданных таблицы; +
-6 -- описание транзакции к нескольким базам данных, которая не завершилась нормально.
+Подтипы для `BLOB`:
 
-Для типа данных `CHAR` задаёт:
+[horizontal.compact]
+`0`:: `BINARY` (бинарный)
+`1`:: `TEXT` (текстовый)
+`2`:: `BLR`
+`3`:: `ACL`
+`4`:: `RANGES`
+`5`:: `SUMMARY`
+`6`:: `FORMAT` -- закодированное описание метаданных таблицы
+`7`:: `TRANSACTION_DESCRIPTION`
+`8`:: `EXTERNAL_FILE_DESCRIPTION`
+`9`:: `DEBUG_INFORMATION`
+`>9`:: зарезервировано для внутреннего или будущего использования Firebird
+`<0`:: пользовательские подтипы BLOB
 
-0 -- неопределённые данные; +
-1 -- фиксированные двоичные данные. +
+Для целочисленных типов данных (`SMALLINT`, `INTEGER`, `BIGINT`, `INT128`), и `DOUBLE PRECISION` (в первом диалекте):
 
-Для целочисленных типов данных (`SMALLINT`, `INTEGER`, `BIGINT`, `INT128`) и чисел с фиксированной точкой (`NUMERIC`, `DECIMAL`) задаёт конкретный тип данных:
+[horizontal.compact]
+`0`:: (или `NULL`) без подтипа -- тип данных определяется `RDB$FIELD_TYPE`. +
+Если `RDB$FIELD_SCALE` не равен нулю, то обрабатывается как `NUMERIC`.
+`1`:: `NUMERIC`
+`2`:: `DECIMAL`
 
-0 или `NULL` -- тип данных соответствует значению в поле `RDB$FIELD_TYPE`; +
-1 -- `NUMERIC`; +
-2 -- `DECIMAL`.
+Для `CHAR` и `VARCHAR`:
+
+[horizontal.compact]
+`0`:: (или `NULL`) без подтипа -- тип данных определяется `RDB$FIELD_TYPE`
+`1`:: `BINARY`/`VARBINARY`
+`>1`:: не типизированный -- тип данных определяется `RDB$FIELD_TYPE`.
++
+Внутреннее использование для системных доменов, связанных с кодировкой символов.
+
+Для других типов данных:
+
+[horizontal.compact]
+`0`:: (или `NULL`) без подтипа -- тип данных определяется `RDB$FIELD_TYPE`
 
 |RDB$MISSING_VALUE
 |BLOB SUB_TYPE BLR
@@ -833,11 +855,15 @@
 
 |RDB$DESCRIPTION
 |BLOB SUB_TYPE TEXT CHARACTER SET UTF8
-|Произвольный текст комментария для домена (столбца таблицы).
+|Описание домена заданное пользователем (текст `COMMENT ON`).
 
 |RDB$SYSTEM_FLAG
 |SMALLINT
-|Признак: значение 1 -- домен, автоматически созданный системой, значение 0 -- домен определён пользователем.
+|Флаг
+
+[horizontal.compact]
+`0`:: (или `NULL`) домен определён пользователем
+`1`:: системный домен
 
 |RDB$QUERY_HEADER
 |BLOB SUB_TYPE TEXT CHARACTER SET UTF8
@@ -845,7 +871,9 @@
 
 |RDB$SEGMENT_LENGTH
 |SMALLINT
-|Для столбцов `BLOB` задаёт длину буфера `BLOB` в байтах. Для остальных типов данных содержит `NULL`.
+|Рекомендуемая длина сегмента (в байтах) для `BLOB`. `NULL` для всех остальных типов данных.
+
+Устарело и предназначено в основном для ESQL.
 
 |RDB$EDIT_STRING
 |VARCHAR(127) CHARACTER SET NONE
@@ -853,34 +881,19 @@
 
 |RDB$EXTERNAL_LENGTH
 |SMALLINT
-|Длина столбца в байтах, если он входит в состав внешней таблицы. Всегда `NULL` для обычных таблиц.
+|Длина столбца в байтах, если он входит в состав внешней таблицы. `NULL` для обычных таблиц.
 
 |RDB$EXTERNAL_SCALE
 |SMALLINT
-|Показатель степени для столбца целого типа данных во внешней таблице; задаётся степенью 10, на которую умножается целое.
+|Масштаб для целочисленных полей внешней таблицы.
+
+См. также описание столбца `RDB$FIELD_SCALE`.
 
 |RDB$EXTERNAL_TYPE
 |SMALLINT
 |Тип данных поля, как он представляется во внешней таблице.
 
-7 -- `SMALLINT`; +
-8 -- `INTEGER`; +
-10 -- `FLOAT`; +
-12 -- `DATE`; +
-13 -- `TIME WITHOUT TIME ZONE`; +
-14 -- `CHAR`; +
-16 -- `BIGINT`; +
-23 -- `BOOLEAN`; +
-24 -- `DECFLOAT(16)`; +
-25 -- `DECFLOAT(34)`; +
-26 -- `INT128`; +
-27 -- `DOUBLE PRECISION`; +
-28 -- `TIME WITH TIME ZONE`; +
-29 -- `TIMESTAMP WITH TIME ZONE`; +
-35 -- `TIMESTAMP WITHOUT TIME ZONE`; +
-37 -- `VARCHAR`.
-
-Коды для `DECIMAL` и `NUMERIC` имеют тот же размер, что и целые типы, используемые для их хранения.
+См. также описание столбца `RDB$FIELD_TYPE`.
 
 |RDB$DIMENSIONS
 |SMALLINT
@@ -888,11 +901,16 @@
 
 |RDB$NULL_FLAG
 |SMALLINT
-|Указывает, может ли столбец принимать пустое значение (в поле будет значение `NULL`) или не может (в поле будет содержаться значение 1).
+|Указывает, может ли домен принимать значение `NULL`
+
+[horizontal.compact]
+`0`:: (или `NULL`) `NULL` значения допускаются
+`1`:: `NULL` не допускается
 
 |RDB$CHARACTER_LENGTH
 |SMALLINT
-|Длина столбцов `CHAR` или `VARCHAR` в символах (не в байтах).
+|Максимальное длина в символах для `CHAR` или `VARCHAR`. +
+Для `BINARY` или `VARBINARY` -- максимальное количество байт.
 
 |RDB$COLLATION_ID
 |SMALLINT
@@ -900,11 +918,11 @@
 
 |RDB$CHARACTER_SET_ID
 |SMALLINT
-|Идентификатора набора символов для символьного столбца, столбца `BLOB` или домена.
+|Идентификатора набора символов для символьного типа или `BLOB SUB_TYPE TEXT`.
 
 |RDB$FIELD_PRECISION
 |SMALLINT
-|Указывает общее количество цифр для числового типа данных с фиксированной точкой (`DECIMAL` и `NUMERIC`). Для целочисленных типов данных значением является 0, для всех остальных типов данных -- `NULL`.
+|Указывает общее количество цифр для числового типа данных с фиксированной точкой (_p_ в `DECIMAL(p[,s])`, `NUMERIC(p[,s])` и `DECFLOAT(p)`. Для целочисленных типов данных значением является 0. Для всех остальных типов данных -- `NULL`.
 
 |RDB$SECURITY_CLASS
 |CHAR(63) CHARACTER SET UTF8
@@ -916,7 +934,7 @@
 
 |RDB$SCHEMA_NAME
 |CHAR(63) CHARACTER SET UTF8
-|Имя схемы в которой расположен домен.
+|Имя схемы, в которой расположен домен.
 |===
 
 [[fblangref-systables-files]]
