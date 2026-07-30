@@ -23,10 +23,10 @@ ifdef::manname-title[:manname-title: Название]
 :part-label: Часть
 :part-refsig: {part-label}
 ifdef::preface-title[:preface-title: Предисловие]
+:toc-title: Содержание
 :section-refsig: Раздел
 :table-caption: Таблица
 :tip-caption: Подсказка
-:toc-title: Содержание
 :untitled-label: Без названия
 :version-label: Версия
 :warning-caption: Предупреждение
