@@ -343,6 +343,7 @@
 |`COMMON`
 |`COMPARE_DECFLOAT`
 |`COMPUTED`
+|`CONCURRENTLY`
 |`CONDITIONAL`
 |`CONNECT`
 |`CONNECTIONS`
@@ -760,6 +761,7 @@
 |`USER`
 |`USING`
 |`UUID_TO_CHAR`
+|`VALIDATE`
 |`VALUE`
 |`VALUES`
 |`VARBINARY`
@@ -784,8 +786,7 @@
 |`YEAR`
 |`YEARDAY`
 |`ZONE`
-|{nbsp}
-|{nbsp}
+// |{nbsp}
 |===
 
 :sectnums:
