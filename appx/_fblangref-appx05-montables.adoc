@@ -29,7 +29,7 @@
 <<fblangref-montables-attachments>>::
 Сведения о текущих соединениях с базой данных.
 
-<<fblangref-montables-call_stack`>>::
+<<fblangref-montables-call_stack>>::
 Обращения к стеку активными запросами хранимых процедур и триггеров.
 
 <<fblangref-montables-compiled-statements>>::

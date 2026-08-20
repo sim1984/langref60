@@ -173,7 +173,7 @@ ORDER BY name ASC
 ----
 
 .См. также:
-<<fblangref-dml-select-fetch-offset,"`FETCH`, `OFFSET`">>, <<fblangref-dml-select-rows,`ROWS`>>.
+<<fblangref-dml-select-fetch-offset>>, <<fblangref-dml-select-rows>>.
 
 [[fblangref-dml-select-fieldlist]]
 === Список полей `SELECT`
