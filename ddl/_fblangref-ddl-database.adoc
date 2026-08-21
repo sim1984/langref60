@@ -39,10 +39,11 @@ CREATE DATABASE <filespec>
 
 <server_spec> ::=
     _host_[/ {_port_ | _service_}]:
-  | <protocol>://[_host_[:{_port_ | _service_}]/]
+  | <tcp_protocol>://_host_[:{_port_ | _service_}]/
+  | xnet://
+  | unix://<socket_path>:
 
-<protocol> ::= inet | inet4 | inet6 | xnet
-
+<tcp_protocol> ::= inet | inet4 | inet6
 ----
 
 [NOTE]
@@ -78,8 +79,11 @@ CREATE DATABASE <filespec>
 |service
 |Имя сервиса. Должно совпадать со значением параметра `RemoteServiceName` файла `firebird.conf`.
 
-|protocol
-|Наименование протокола.
+|tcp_protocol
+|Наименование TCP протокола.
+
+|socket_path
+|Путь к сокету UNIX (параметр `RemoteServiceUnixSocket` файла `firebird.conf`).
 
 |username
 |Имя пользователя, права которого используются при создании базы данных. Может быть заключено в одинарные или двойные кавычки. Если имя пользователя заключено в двойные кавычки, то оно чувствительно к регистру.
@@ -149,11 +153,15 @@ _host_[/{_port_ | _service_}]:{_filepath_ | _db_alias_}
 INET:: TCP/IP (сначала пробует подключиться по протоколу TCP/IP v6, если не получилось, то TCP/IP v4);
 INET4:: TCP/IP v4;
 INET6:: TCP/IP v6;
-XNET:: локальный протокол.
+XNET:: локальный протокол;
+UNIX:: Unix Socket Domain (UDP) ().
 
 [listing,subs=+quotes]
 ----
-<protocol>://[_host_[:{_port_ | _service_}]/]{_filepath_ | _db_alias_}
+connection_string ::=
+    <tcp_protocol>://_host_[:{_port_ | _service_}]/{_filepath_ | _db_alias_}
+  | xnet://{_filepath_ | _db_alias_}
+  | unix://<unix_socket_path>:{_filepath_ | _db_alias_}
 ----
 
 [[fblangref-ddl-database-create-optionals]]
@@ -345,6 +353,33 @@ DEFAULT CHARACTER SET UTF8;
 [source,sql]
 ----
 CREATE DATABASE '[::1]:test'
+USER wizard PASSWORD 'player' ROLE RDB$ADMIN
+DEFAULT CHARACTER SET UTF8;
+----
+
+Создание базы данных с использованием локального протокола XNET.
+
+[source,sql]
+----
+CREATE DATABASE 'xnet://D:\db\test.fdb'
+USER wizard PASSWORD 'player' ROLE RDB$ADMIN
+DEFAULT CHARACTER SET UTF8;
+----
+
+Создание базы данных с использование Unix-socket на Linux.
+
+[source,sql]
+----
+CREATE DATABASE 'unix:///run/firebird/firebird.sock:/db/mydb.fdb'
+USER wizard PASSWORD 'player' ROLE RDB$ADMIN
+DEFAULT CHARACTER SET UTF8;
+----
+
+Создание базы данных с использование Unix-socket на Windows.
+
+[source,sql]
+----
+CREATE DATABASE 'unix://C:\firebird\firebird.sock:C:\db\mydb.fdb'
 USER wizard PASSWORD 'player' ROLE RDB$ADMIN
 DEFAULT CHARACTER SET UTF8;
 ----
