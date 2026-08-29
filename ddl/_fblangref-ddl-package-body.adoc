@@ -52,7 +52,7 @@ END
     <column_definition> [, ...]
   )
   [ON COMMIT {DELETE | PRESERVE} ROWS]
-  [{[UNIQUE] [ASC | DESC] INDEX _index_name_ (_column_name_)}...]
+  [{[UNIQUE] [ASC | DESC] INDEX _index_name_ (_column_name_ [, ...])} ...]
 
 <package_body_item> ::=
     <function_impl>
@@ -404,16 +404,6 @@ SET TERM !;
 CREATE PACKAGE BODY PUBLIC.OPTIMIZER_UTILS
 AS
 BEGIN
-  -- временная таблица, которая
-  -- используется для сортировки предикатов по селективности.
-  TEMPORARY TABLE T_SEL (
-    GROUP_ID BINARY(16),
-    SELECTIVITY DOUBLE PRECISION
-  )
-  ON COMMIT DELETE ROWS
-  INDEX T_SEL_IDX_GROUP_ID (GROUP_ID);
-
-
   /**
    * Расчёт селективности конъюнктов предикатов (предикаты объединённые AND).
    * Предикаты считаются некоррелированными.
@@ -450,20 +440,22 @@ BEGIN
   AGGREGATE FUNCTION CONJ_SELECTIVITY_FB60 (A_SELECTIVITY DOUBLE PRECISION)
   RETURNS DOUBLE PRECISION
   AS
-    DECLARE GROUP_ID BINARY(16);
     DECLARE S DOUBLE PRECISION;
     DECLARE P DOUBLE PRECISION;
+
+    DECLARE TABLE T_SEL (
+      SELECTIVITY DOUBLE PRECISION
+    );
   BEGIN
     ON START DO
     BEGIN
       S = 1;
       P = 1;
-      GROUP_ID = GEN_UUID(7);
     END
 
     ON ACCUMULATE DO
-     INSERT INTO T_SEL(GROUP_ID, SELECTIVITY)
-     VALUES (:GROUP_ID, :A_SELECTIVITY);
+     INSERT INTO T_SEL(SELECTIVITY)
+     VALUES (:A_SELECTIVITY);
 
     ON GROUP DO
     BEGIN
@@ -471,7 +463,6 @@ BEGIN
         SELECT
           SELECTIVITY
         FROM T_SEL
-        WHERE GROUP_ID = :GROUP_ID
         ORDER BY SELECTIVITY
         AS CURSOR C
       DO
@@ -482,9 +473,6 @@ BEGIN
 
       RETURN S;
     END
-
-    ON FINISH DO
-      DELETE FROM T_SEL WHERE GROUP_ID = :GROUP_ID;
   END
 END!
 

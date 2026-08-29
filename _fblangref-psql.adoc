@@ -1635,7 +1635,8 @@ PSQL
 DECLARE [LOCAL] TEMPORARY TABLE <table_name>
 (
     <column_definition> [, ...]
-);
+)
+[[UNIQUE] [ASC | DESC] INDEX _index_name_ (_column_name_ [, ...])] ...];
 ----
 
 Firebird поддерживает объявление локальных временных таблиц (`DECLARE LOCAL TEMPORARY TABLE` или DLTT) внутри блоков PSQL, процедур, функций и триггеров.
@@ -1645,6 +1646,18 @@ Firebird поддерживает объявление локальных вре
 Объявленные локальные временные таблицы полезны для временных промежуточных данных, которые не должны быть доступны через метаданные базы данных и должны автоматически изолироваться для каждого кадра выполнения PSQL.
 
 Объявленные локальные временные таблицы могут использоваться обычными операторами DML, скомпилированными в той же области видимости PSQL (`SELECT`, `INSERT`, `UPDATE`, `DELETE` и др.). Они могут использоваться в подзапросах, объединениях и циклах курсора, как и другие источники записей.
+
+Индексы можно объявлять непосредственно в объявлении таблицы:
+
+[source,sql]
+----
+declare local temporary table t (
+    id integer not null,
+    val varchar(20)
+)
+    index idx_t_id (id)
+    descending index idx_t_val_desc (val);
+----
 
 ==== Особенности объявленных локальных временных таблиц
 
@@ -1693,7 +1706,7 @@ Firebird поддерживает объявление локальных вре
 Другие ограничения:
 
 * Один оператор PSQL, процедура, функция или триггер могут объявить не более 1024 локальных временных таблиц;
-* Индексы не поддерживаются;
+* Индексы по выражению и частичные индексы не поддерживаются;
 * Триггеры на объявленных локальных временных таблицах не поддерживаются;
 * Явные привилегии не поддерживаются;
 * Функции `ALTER TABLE`, `DROP TABLE`, `CREATE INDEX`, `ALTER INDEX` и `DROP INDEX` недопустимы для объявленных локальных временных таблиц;
@@ -1713,7 +1726,8 @@ AS
     DECLARE LOCAL TEMPORARY TABLE T (
         ID INTEGER NOT NULL,
         VAL VARCHAR(20)
-    );
+    )
+    UNIQUE INDEX UQ_T_ID (ID);
 BEGIN
     INSERT INTO T(ID, VAL) VALUES (1, 'a');
     INSERT INTO T(ID, VAL) VALUES (2, 'b');
@@ -1868,28 +1882,36 @@ SET TERM ;!
 ----
 SET TERM !;
 
-CREATE AGGREGATE FUNCTION AGG_LAST_VALUE_BY_DATE (
+CREATE OR ALTER AGGREGATE FUNCTION AGG_LAST_VALUE_BY_DATE (
   A_VALUE BIGINT,
-  A_DATE TIMESTAMP
+  A_DATE TIMESTAMP,
+  A_SEARCH_DATE TIMESTAMP
 )
 RETURNS BIGINT
 AS
   DECLARE LOCAL TEMPORARY TABLE X_T (
     VALUE_FIELD BIGINT,
     DATE_FIELD TIMESTAMP
-  );
+  )
+  DESCENDING INDEX IDX_X_T_DATE (DATE_FIELD);
 
+  DECLARE X_SEARCH_DATE TIMESTAMP;
   DECLARE RET_VALUE BIGINT;
 BEGIN
   ON ACCUMULATE DO
+  BEGIN
+    X_SEARCH_DATE = A_SEARCH_DATE;
+
     INSERT INTO X_T (VALUE_FIELD, DATE_FIELD)
     VALUES (:A_VALUE, :A_DATE);
+  END
 
   ON GROUP DO
   BEGIN
     SELECT
       X_T.VALUE_FIELD
     FROM X_T
+    WHERE X_T.DATE_FIELD <= :X_SEARCH_DATE
     ORDER BY X_T.DATE_FIELD DESC
     FETCH FIRST ROW ONLY
     INTO RET_VALUE;
@@ -1902,7 +1924,7 @@ SET TERM ;!
 
 SELECT
   CODE_HORSE,
-  AGG_LAST_VALUE_BY_DATE(CODE_FARM, BYDATE) AS LAST_CODE_FARM
+  AGG_LAST_VALUE_BY_DATE(CODE_FARM, BYDATE, TIMESTAMP '2024-01-01') AS LAST_CODE_FARM
 FROM REGISTER_VIEW
 GROUP BY CODE_HORSE;
 ----
