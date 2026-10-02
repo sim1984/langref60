@@ -470,7 +470,7 @@ GRANT <ddl_privileges>
   | PROCEDURE | ROLE | SEQUENCE | TABLE | VIEW
 
 <schemaless_object_type> ::=
-    FILTER | ROLE | SCHEMA
+    FILTER | ROLE | SCHEMA | TABLESPACE
 
 <db_ddl_privileges> ::=
   {ALL [PRIVILEGES] | <db_ddl_privilege_list>} DATABASE

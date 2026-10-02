@@ -38,6 +38,7 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
 
 <schema-less-type> ::=
     SCHEMA
+  | TABLESPACE
   | FILTER
   | ROLE
   | [GLOBAL] MAPPING
@@ -142,6 +143,15 @@ COMMENT ON <object> IS {'_sometext_' | NULL}
 [source,sql]
 ----
 COMMENT ON DATABASE IS 'Это тестовая (''my.fdb'') БД';
+----
+====
+
+.Добавление комментария для табличного пространства BIG_TS
+[example]
+====
+[source,sql]
+----
+COMMENT ON TABLESPACE BIG_TS IS 'Табличное пространство для архивных данных на большом HDD';
 ----
 ====
 

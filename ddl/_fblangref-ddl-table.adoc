@@ -33,6 +33,7 @@ CREATE [{GLOBAL | LOCAL} TEMPORARY] TABLE [IF NOT EXISTS] [ _tbl-schema_ <period
   [ON COMMIT {DELETE | PRESERVE} ROWS]
   [SQL SECURITY {DEFINER | INVOKER}]
   [{ENABLE | DISABLE} PUBLICATION]
+  [[IN] TABLESPACE {_ts_name_ | PRIMARY}]
 
 <col_def> ::=
     <regular_col_def>
@@ -74,29 +75,31 @@ CREATE [{GLOBAL | LOCAL} TEMPORARY] TABLE [IF NOT EXISTS] [ _tbl-schema_ <period
 <array_datatype> ::= См. <<fblangref-datatypes-syntax-array,Синтаксис массивов>>
 
 <col_constraint> ::= [CONSTRAINT _constr_name_]
-{   UNIQUE [<using_index>]
-  | PRIMARY KEY [<using_index>]
+{   UNIQUE [<using_index>] [<ts_constr_index>]
+  | PRIMARY KEY [<using_index>] [<ts_constr_index>]
   | REFERENCES [ _other-schema_ <period> ] _other_table_ [(_other_col_)]
       [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
       [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
-      [<using_index>]
+      [<using_index>] [<ts_constr_index>]
   | CHECK (<check_condition>)
 }
 
 <tconstraint> ::= [CONSTRAINT _constr_name_]
-{   UNIQUE (<col_list>) [<using_index>]
-  | PRIMARY KEY (<col_list>) [<using_index>]
+{   UNIQUE (<col_list>) [<using_index>] [<ts_constr_index>]
+  | PRIMARY KEY (<col_list>) [<using_index>] [<ts_constr_index>]
   | FOREIGN KEY (<col_list>)
-    REFERENCES [ _other-schema_ <period> ] _other_table_ [(<col_list>)]
-      [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
-      [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
-      [<using_index>]
+      REFERENCES [ _other-schema_ <period> ] _other_table_ [(<col_list>)]
+        [ON DELETE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
+        [ON UPDATE { NO ACTION | CASCADE | SET DEFAULT | SET NULL}]
+        [<using_index>] [<ts_constr_index>]
   | CHECK (<check_condition>)
 }
 
 <col_list> ::= _colname_ [, _colname_ ...]
 
 <using_index> ::= USING [ASC[ENDING] | DESC[ENDING]] INDEX [ _tbl-schema_ <period> ] _indexname_
+
+<ts_constr_index> ::= [[IN] TABLESPACE {_ts_index_name_ | PRIMARY}]
 ----
 
 [[fblangref-ddl-tbl-create-as-query-syntax]]
@@ -125,6 +128,9 @@ CREATE [{GLOBAL | LOCAL} TEMPORARY] TABLE [IF NOT EXISTS] [ _tbl-schema_ <period
 
 |filespec
 |Спецификация файла (только для внешних таблиц).
+
+|ts_name
+|Имя табличного пространства для размещения данных таблицы.
 
 |colname
 |Имя столбца таблицы, может содержать до 63 символов.
@@ -164,6 +170,9 @@ CREATE [{GLOBAL | LOCAL} TEMPORARY] TABLE [IF NOT EXISTS] [ _tbl-schema_ <period
 
 |using_index
 |Позволяет задать имя автоматически создаваемого индекса для ограничения, и опционально определить, какой это будет индекс -- по возрастанию (по умолчанию) или по убыванию.
+
+|ts_index_name
+|Имя табличного пространства, используемого для размещения автоматически создаваемого индекса ограничения.
 
 |literal
 |Литерал.
@@ -923,6 +932,7 @@ ALTER TABLE [ _tbl-schema_ <period> ] _tablename_
   | ALTER [COLUMN] colname <col_mod>
   | ALTER SQL SECURITY {DEFINER | INVOKER}
   | {ENABLE | DISABLE} PUBLICATION
+  | SET TABLESPACE [TO] {_ts_name_ | PRIMARY}
 
 <col_def> ::=
     <regular_col_def>

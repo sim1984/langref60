@@ -22,6 +22,7 @@ INDEX [IF NOT EXISTS] [ _idx-schema_ <period> ] _indexname_ [{ACTIVE | INACTIVE}
 ON [ _tbl-schema_ <period> ] _tablename_
 {(<column_list>) | COMPUTED [BY] (<value_expression>)}
 [WHERE <search_condition>]
+[[IN] TABLESPACE {_ts_name_ | PRIMARY}]
 [CONCURRENTLY]
 
 <column_list> ::= _col_ [, _col_ ...]
@@ -55,6 +56,9 @@ ON [ _tbl-schema_ <period> ] _tablename_
 
 |search_condition
 |Условие поиска, содержащее столбцы таблицы. Используется для определения подмножества записей таблицы, которые будут проиндексированы.
+
+|ts_name
+|Имя табличного пространства для размещения индекса.
 |===
 
 Оператор `CREATE INDEX` создаёт индекс для таблицы, который может быть использован для ускорения поиска, сортировки и/или группирования. Кроме того, индекс может быть использован при определении ограничений, таких как первичный ключ, внешний ключ или ограничения уникальности. Индекс может быть построен на столбцах любого типа кроме `BLOB` и массивов.
@@ -448,7 +452,7 @@ Validation of unique index "IDX_TAB_ID" failed.
 == `ALTER INDEX`
 
 .Назначение
-Перевод индекса в активное/неактивное состояние, перестройка индекса.
+Перевод индекса в активное/неактивное состояние, перестройка индекса, проверка уникальности или изменение табличного пространства.
 (((ALTER INDEX)))
 
 .Доступно в
@@ -460,6 +464,7 @@ DSQL, ESQL.
 ALTER INDEX [ _idx-schema_ <period> ] _indexname_
     {ACTIVE [CONCURRENTLY] | INACTIVE}
   | VALIDATE UNIQUE
+  | SET TABLESPACE [TO] {_ts_name_ | PRIMARY}
 ----
 
 [[fblangref-ddl-idx-alteridx]]
@@ -474,6 +479,9 @@ ALTER INDEX [ _idx-schema_ <period> ] _indexname_
 
 |indexname
 |Имя индекса.
+
+|ts_name
+|Имя табличного пространства в которое будет перемещён индекс.
 
 |===
 

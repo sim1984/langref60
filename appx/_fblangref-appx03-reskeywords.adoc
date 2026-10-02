@@ -87,6 +87,7 @@
 |`EXTRACT`
 |`FALSE`
 |`FETCH`
+|`FILE`
 |`FILTER`
 |`FLOAT`
 |`FOR`
@@ -210,6 +211,7 @@
 |`STDDEV_SAMP`
 |`SUM`
 |`TABLE`
+|`TABLESPACE`
 |`THEN`
 |`TIME`
 |`TIMESTAMP`
@@ -247,6 +249,7 @@
 |`WITHIN`
 |`WITHOUT`
 |`YEAR`
+|{nbsp}
 |{nbsp}
 |===
 
