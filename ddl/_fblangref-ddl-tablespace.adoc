@@ -18,7 +18,7 @@
 .Доступно в
 DSQL, ESQL
 
-[[fblangref-ddl-db-create-syntax]]
+[[fblangref-ddl-tablespace-create-syntax]]
 .Синтаксис
 [listing,subs="+quotes,attributes"]
 ----
@@ -101,7 +101,7 @@ CREATE TABLESPACE IF NOT EXISTS BIG_TS FILE 'D:\fbdata\secondary.ts';
 .Доступно в
 DSQL, ESQL
 
-[[fblangref-ddl-db-alter-syntax]]
+[[fblangref-ddl-tablespace-alter-syntax]]
 .Синтаксис
 [listing,subs="+quotes,attributes"]
 ----
