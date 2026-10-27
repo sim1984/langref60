@@ -20,12 +20,14 @@ DSQL, ESQL.
 CREATE [UNIQUE] [ASC[ENDING] | DESC[ENDING]]
 INDEX [IF NOT EXISTS] [ _idx-schema_ <period> ] _indexname_ [{ACTIVE | INACTIVE}]
 ON [ _tbl-schema_ <period> ] _tablename_
-{(<column_list>) | COMPUTED [BY] (<value_expression>)}
+{(<segment_list>) | COMPUTED [BY] (<value_expression>)}
 [WHERE <search_condition>]
 [[IN] TABLESPACE {_ts_name_ | PRIMARY}]
 [CONCURRENTLY]
 
-<column_list> ::= _col_ [, _col_ ...]
+<segment_list> ::= <single_segment> [, <single_segment> ...]
+
+<single_segment> ::= _column_ | _column_ (_length_)
 ----
 
 [[fblangref-ddl-idx-createidx]]
@@ -47,9 +49,12 @@ ON [ _tbl-schema_ <period> ] _tablename_
 |tablename
 |Имя таблицы, для которой строится индекс.
 
-|col
+|column
 |Столбец таблицы.
-В качестве столбцов не могут быть использованы поля типа BLOB, ARRAY и вычисляемые поля.
+В качестве столбцов не могут быть использованы поля типа `BLOB`, `ARRAY` и вычисляемые поля.
+
+|length
+|Максимальная длина префикса. Допустима только для столбцов типа `CHAR`, `VARCHAR`, `BINARY` и `VARBINARY`.
 
 |value_expression
 |Выражение, содержащее столбцы таблицы. Значение этого выражения будет ключом индекса.
@@ -101,6 +106,22 @@ ADD CONSTRAINT PK_COUNTRY PRIMARY KEY (ID);
 ====
 Убывающий (`DESC[ENDING]`) индекс может быть полезен при поиске наивысших значений (максимум, последнее и т.д.)
 ====
+
+[[fblangref-ddl-index-prefix]]
+=== Префиксный индекс
+
+Префиксный индекс — это индекс, который строится не на полных значениях столбца, а только на их начальном фрагменте (префиксе). Для указания длины префикса в спецификации индекса используется синтаксис `_column_ (_length_)`, где `_length_` — количество символов (для небинарных строковых типов: `CHAR`, `VARCHAR`) или байт (для двоичных типов: `BINARY`, `VARBINARY`).
+
+Префиксный индекс полезен в следующих случаях:
+
+* Позволяет проиндексировать длинные строковые столбцы (см. <<fblangref-ddl-index-keylimits-char>>). В ряде случаев даже короткий префикс обеспечивает достаточную селективность (уникальность), позволяя эффективно фильтровать строки в запросах (например, с `LIKE 'prefix%'` или точным совпадением).
+* Индексирование только части длинных строк (например, URL, длинных текстов) заметно уменьшает размер индекса.
+
+Поиск с использованием префиксного индекса работает следующим образом:
+
+* Если искомое значение больше длинны префикса указанного при определении индекса, то оно обрезается до длинны префикса;
+* По этому обрезанному значению производится поиск ключей в префиксном индексе;
+* Записи извлечённые с использованием индекса дополнительно фильтруются по полной строке.
 
 [[fblangref-ddl-index-computed]]
 === Вычисляемые индексы или индексы по выражению
@@ -321,6 +342,30 @@ CREATE INDEX IDX_SALESTAT ON SALES (ORDER_STATUS, PAID);
 [source,sql]
 ----
 CREATE UNIQUE INDEX UNQ_COUNTRY_NAME ON COUNTRY (NAME);
+----
+====
+
+.Создание префиксного индекса
+[example]
+====
+[source,sql]
+----
+CREATE INDEX IDX_FARM_ADDRESS ON FARM (ADDRESS(30));
+----
+
+Само поле `ADDRESS` имеет дину 255 символов, но индекс построен только для первых 30 из них.
+
+Использование:
+
+[source,sql]
+----
+SELECT *
+FROM FARM
+WHERE ADDRESS STARTS 'Rus';
+
+SELECT *
+FROM FARM
+WHERE ADDRESS = 'Russia'
 ----
 ====
 
