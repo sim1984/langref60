@@ -1414,6 +1414,11 @@
 |CHAR(63) CHARACTER SET UTF8
 |Имя пакета для индексов упакованных временных таблиц.
 
+|RDB$CHARACTER_LENGTH
+|SMALLINT
+|Максимальная длина префикса для сегмента индекса.
+Допустима только для столбцов типа `CHAR`, `VARCHAR`, `BINARY` и `VARBINARY`.
+
 |===
 
 [[fblangref-systables-indices]]
