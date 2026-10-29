@@ -111,6 +111,9 @@ CREATE [{GLOBAL | LOCAL} TEMPORARY] TABLE [IF NOT EXISTS] [ _tbl-schema_ <period
   AS { <query expression> | ( <query expression> ) }
   [WITH [NO] DATA]
   [ON COMMIT {DELETE | PRESERVE} ROWS]
+  [SQL SECURITY {DEFINER | INVOKER}]
+  [{ENABLE | DISABLE} PUBLICATION]
+  [[IN] TABLESPACE {_ts_name_ | PRIMARY}]
 ----
 
 [[fblangref-ddl-tbl-createtbl]]
